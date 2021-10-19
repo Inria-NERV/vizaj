@@ -6,7 +6,7 @@ import "regenerator-runtime/runtime.js";
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, sensorMeshList } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, disposeLinks } from "../js/draw_links";
+import { loadAndDrawLinks, clearLinks } from "../js/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 
@@ -157,7 +157,7 @@ function handleFileSelect(evt) {
   if (evt.target.files.length === 0) { return; }
   const file = evt.target.files[0];
   const fileUrl = window.URL.createObjectURL(file);
-  disposeLinks();
+  clearLinks();
   loadAndDrawLinks(fileUrl);
 }
 

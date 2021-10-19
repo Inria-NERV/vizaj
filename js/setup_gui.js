@@ -1,5 +1,5 @@
 import { gui, controls } from '../public/main';
-import { updateVisibleLinks, redrawLinks } from './draw_links';
+import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks } from './draw_links';
 import { updateBrainMeshVisibility } from './draw_cortex';
 
 const guiParams = {
@@ -15,7 +15,6 @@ const guiParams = {
     linkTopPointHandleDistances: .25,
     linkSensorAngles: 3 / 8,
     linkSensorHandleDistances: 1,
-    // linkTopPointAngle is unstable to change
     linkTopPointAngle: 0,
 
     defaultLinkGeometry: () => {
@@ -25,7 +24,6 @@ const guiParams = {
         guiParams.linkSensorHandleDistances = 0.;
         redrawLinks();
     },
-
     bellLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0.5;
@@ -33,7 +31,6 @@ const guiParams = {
         guiParams.linkSensorHandleDistances = .5;
         redrawLinks();
     },
-
     triangleLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0;
@@ -41,7 +38,6 @@ const guiParams = {
         guiParams.linkSensorHandleDistances = 0.;
         redrawLinks();
     },
-
     roundedSquareLinkGeometry: () => {
         guiParams.linkHeight = 0.5;
         guiParams.linkTopPointHandleDistances = 1.;
@@ -49,7 +45,6 @@ const guiParams = {
         guiParams.linkSensorHandleDistances = 1.;
         redrawLinks();
     },
-
     peakLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0;
@@ -57,7 +52,18 @@ const guiParams = {
         guiParams.linkSensorHandleDistances = 1.;
         redrawLinks();
     },
+
+    generateLinkMesh: generateLinkLineMesh,
+    makeLinkLineMesh: () => changeLinkMesh(generateLinkLineMesh),
+    makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
+    linkThickness: 1.
+    
   };
+
+function changeLinkMesh(generateLinkMethod){
+    guiParams.generateLinkMesh = generateLinkMethod;
+    redrawLinks();
+}
 
 function setupGui() {
     const cameraFolder = gui.addFolder('Camera');
@@ -74,6 +80,7 @@ function setupGui() {
     linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(redrawLinks).listen();
     linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(redrawLinks).listen();
     linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(redrawLinks).listen();
+    //This one below is messy
     //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
     const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
@@ -83,8 +90,12 @@ function setupGui() {
     premadeLinkGeometries.add(guiParams, 'roundedSquareLinkGeometry').name('Rounded square');
     premadeLinkGeometries.add(guiParams, 'peakLinkGeometry').name('Peak');
 
-    gui.add(guiParams, 'loadFile').name('Load CSV file');
+    const linkVolume = gui.addFolder('linkVolume');
+    linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
+    linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
+    linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
+    gui.add(guiParams, 'loadFile').name('Load CSV file');
 }
 
 export {
