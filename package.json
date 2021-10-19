@@ -1,0 +1,26 @@
+{
+  "name": "test3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./js/main.js",
+  "scripts": {
+    "test": "mocha --reporter list",
+    "start": "parcel public/index.html"
+  },
+  "author": "tibo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node": "^16.6.1",
+    "path": "^0.12.7",
+    "regenerator-runtime": "^0.13.9",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.56.3",
+    "serve": "^12.0.0",
+    "three": "^0.131.3",
+    "webpack": "^5.51.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.8.0"
+  }
+}
