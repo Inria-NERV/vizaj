@@ -41374,7 +41374,7 @@ function generateLinkLineMesh(curvePath, link) {
   var geometry = new THREE.BufferGeometry().setFromPoints(splinePoints);
   var linkMat = new THREE.LineBasicMaterial({
     color: new THREE.Color(link.strength, 0, 1 - link.strength),
-    opacity: 0.8,
+    opacity: link.strength,
     transparent: true
   });
   var curveObject = new THREE.Line(geometry, linkMat);
@@ -41387,7 +41387,7 @@ function generateLinkVolumeMesh(curvePath, link) {
     opacity: link.strength,
     transparent: true
   });
-  var linkProfileShape = new THREE.Shape().absarc(0., 0., 1. * link.strength * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
+  var linkProfileShape = new THREE.Shape().absarc(0., 0., 1. - link.normDist * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
   var extrudeSettings = {
     steps: 24,
     bevelEnabled: false,
@@ -42022,7 +42022,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55642" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63942" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

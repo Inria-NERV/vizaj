@@ -133,7 +133,7 @@ function generateLinkLineMesh(curvePath, link){
     const geometry = new THREE.BufferGeometry().setFromPoints( splinePoints );
     const linkMat = new THREE.LineBasicMaterial( { 
         color : new THREE.Color(link.strength, 0, 1-link.strength), 
-        opacity: 0.8,
+        opacity: link.strength,
     transparent: true } );
     const curveObject = new THREE.Line( geometry, linkMat );
     return curveObject;
@@ -145,7 +145,7 @@ function generateLinkVolumeMesh(curvePath, link){
         opacity: link.strength,
         transparent: true
     });
-    const linkProfileShape = new THREE.Shape().absarc(0., 0., 1. * link.strength * guiParams.linkThickness, 0, Math.PI * 2, false);
+    const linkProfileShape = new THREE.Shape().absarc(0., 0., 1. - link.normDist * guiParams.linkThickness, 0, Math.PI * 2, false);
     const extrudeSettings = {
         steps: 24,
         bevelEnabled: false,
