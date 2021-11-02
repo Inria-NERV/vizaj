@@ -5,7 +5,6 @@ import { loadData } from './load_data';
 import { guiParams } from './setup_gui';
 import { maxSensorDistance } from './draw_sensors';
 import { Matrix3, Vector3 } from "three";
-import { link } from "fs";
 
 
 function loadAndDrawLinks(linksDataFileUrl){
