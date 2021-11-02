@@ -47,11 +47,6 @@ function getLinkToGlobalMatrix(A, B){
     return m;
 }
 
-function flattenDistanceProportion(normalisedDistance){
-    if (normalisedDistance == 1 || normalisedDistance == 0) {return normalisedDistance;}
-    const k = 2.3;
-    return 1 / ( 1 + (normalisedDistance / ( 1 - normalisedDistance) ) ** ( -k ) );
-}
 
 function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance){
     const controlPointC = new THREE.Vector3(
@@ -74,6 +69,12 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flatten
             .applyMatrix3(linkToGlobalMatrix),
         controlPointLinkBasis: controlPointC
     };
+}
+
+function flattenDistanceProportion(normalisedDistance){
+    if (normalisedDistance == 1 || normalisedDistance == 0) {return normalisedDistance;}
+    const k = 2.3;
+    return 1 / ( 1 + (normalisedDistance / ( 1 - normalisedDistance) ) ** ( -k ) );
 }
 
 export { getSplinePoints }

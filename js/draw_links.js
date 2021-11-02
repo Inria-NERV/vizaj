@@ -71,7 +71,7 @@ function generateLinkVolumeMesh(curvePath, link){
         opacity: link.strength,
         transparent: true
     });
-    const linkProfileShape = new THREE.Shape().absarc(0., 0., 1. - link.normDist * guiParams.linkThickness, 0, Math.PI * 2, false);
+    const linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * guiParams.linkThickness, 0, Math.PI * 2, false);
     const extrudeSettings = {
         steps: 24,
         bevelEnabled: false,
@@ -92,7 +92,7 @@ function redrawLinks(){
     drawLinksAndUpdateVisibility(linkListTemp);
 }
 
-function clearLinks() {
+function clearAllLinks() {
     while (linkMeshList.length){
         const link = linkMeshList.pop();
         clearLink(link.mesh);
@@ -100,9 +100,19 @@ function clearLinks() {
 }
 
 function clearLink(mesh){
+    disposeMesh(mesh);
+    scene.remove(mesh);
+}
+
+function disposeMesh(mesh){
     mesh.geometry.dispose();
     mesh.material.dispose();
-    scene.remove(mesh);
+}
+
+export function clearAll(){
+    while(scene.children.length > 0){ 
+        scene.remove(scene.children[0]); 
+    }
 }
 
 function updateVisibleLinks(minStrength, maxStrength) {
@@ -123,7 +133,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
 }
 
  export {
-    clearLinks,
+    clearAllLinks as clearLinks,
     loadAndDrawLinks,
     generateLinkLineMesh,
     generateLinkVolumeMesh,

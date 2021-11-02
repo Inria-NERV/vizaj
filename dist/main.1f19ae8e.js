@@ -41213,15 +41213,6 @@ function getLinkToGlobalMatrix(A, B) {
   return m;
 }
 
-function flattenDistanceProportion(normalisedDistance) {
-  if (normalisedDistance == 1 || normalisedDistance == 0) {
-    return normalisedDistance;
-  }
-
-  var k = 2.3;
-  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
-}
-
 function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
   var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
   0);
@@ -41236,13 +41227,23 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flatten
     controlPointLinkBasis: controlPointC
   };
 }
+
+function flattenDistanceProportion(normalisedDistance) {
+  if (normalisedDistance == 1 || normalisedDistance == 0) {
+    return normalisedDistance;
+  }
+
+  var k = 2.3;
+  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
+}
 },{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/draw_links.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clearLinks = clearLinks;
+exports.clearAll = clearAll;
+exports.clearLinks = clearAllLinks;
 exports.loadAndDrawLinks = loadAndDrawLinks;
 exports.generateLinkLineMesh = generateLinkLineMesh;
 exports.generateLinkVolumeMesh = generateLinkVolumeMesh;
@@ -41402,7 +41403,7 @@ function generateLinkVolumeMesh(curvePath, link) {
     opacity: link.strength,
     transparent: true
   });
-  var linkProfileShape = new THREE.Shape().absarc(0., 0., 1. - link.normDist * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
+  var linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
   var extrudeSettings = {
     steps: 24,
     bevelEnabled: false,
@@ -41426,7 +41427,7 @@ function redrawLinks() {
   drawLinksAndUpdateVisibility(linkListTemp);
 }
 
-function clearLinks() {
+function clearAllLinks() {
   while (_main.linkMeshList.length) {
     var link = _main.linkMeshList.pop();
 
@@ -41435,10 +41436,20 @@ function clearLinks() {
 }
 
 function clearLink(mesh) {
-  mesh.geometry.dispose();
-  mesh.material.dispose();
+  disposeMesh(mesh);
 
   _main.scene.remove(mesh);
+}
+
+function disposeMesh(mesh) {
+  mesh.geometry.dispose();
+  mesh.material.dispose();
+}
+
+function clearAll() {
+  while (_main.scene.children.length > 0) {
+    _main.scene.remove(_main.scene.children[0]);
+  }
 }
 
 function updateVisibleLinks(minStrength, maxStrength) {
@@ -41558,7 +41569,8 @@ var guiParams = {
   makeLinkVolumeMesh: function makeLinkVolumeMesh() {
     return changeLinkMesh(_draw_links.generateLinkVolumeMesh);
   },
-  linkThickness: 1.
+  linkThickness: 1.,
+  test: _draw_links.clearAll
 };
 exports.guiParams = guiParams;
 
@@ -41611,6 +41623,8 @@ function setupGui() {
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
+
+  _main.gui.add(guiParams, 'test').name('test');
 }
 },{"../public/main":"main.js","./draw_links":"../js/draw_links.js","./draw_cortex":"../js/draw_cortex.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";

@@ -1,5 +1,5 @@
 import { gui, controls } from '../public/main';
-import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks } from './draw_links';
+import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks, clearAll } from './draw_links';
 import { updateBrainMeshVisibility } from './draw_cortex';
 
 const guiParams = {
@@ -56,7 +56,9 @@ const guiParams = {
     generateLinkMesh: generateLinkLineMesh,
     makeLinkLineMesh: () => changeLinkMesh(generateLinkLineMesh),
     makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
-    linkThickness: 1.
+    linkThickness: 1.,
+
+    test: clearAll
     
   };
 
@@ -96,6 +98,8 @@ function setupGui() {
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     gui.add(guiParams, 'loadFile').name('Load CSV file');
+
+    gui.add(guiParams, 'test').name('test');
 }
 
 export {
