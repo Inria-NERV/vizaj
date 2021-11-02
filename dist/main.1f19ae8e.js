@@ -41154,9 +41154,89 @@ function getMaxSensorDistance(positions) {
     }
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js"}],"../js/compute_link_shape.js":[function(require,module,exports) {
+"use strict";
 
-},{}],"../js/draw_links.js":[function(require,module,exports) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSplinePoints = getSplinePoints;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _draw_sensors = require("./draw_sensors");
+
+var _setup_gui = require("./setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function getSplinePoints(link, L) {
+  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
+  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+  var pointA = {
+    controlPoint: link.node1.position
+  };
+  var pointB = {
+    controlPoint: link.node2.position
+  };
+  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+
+  var normalisedDistance = linkBasisA.distanceTo(linkBasisB) / _draw_sensors.maxSensorDistance;
+
+  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).distanceTo(new THREE.Vector3(0, 0, 0));
+  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
+  var quaternionA = new THREE.Quaternion();
+  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  var quaternionB = new THREE.Quaternion();
+  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
+  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
+  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
+  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
+  var curvePath = new THREE.CurvePath();
+  curvePath.add(splineLeft);
+  curvePath.add(splineRight);
+  return curvePath;
+} //This function is to get the rotation to be in the link plan
+//It makes it easier to write 3d operations in such a plan
+
+
+function getLinkToGlobalMatrix(A, B) {
+  var i = A.clone().addScaledVector(B, -1).normalize();
+  var j = B.clone().add(A).normalize();
+  var k = i.clone().cross(j);
+  var m = new THREE.Matrix3();
+  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
+  return m;
+}
+
+function flattenDistanceProportion(normalisedDistance) {
+  if (normalisedDistance == 1 || normalisedDistance == 0) {
+    return normalisedDistance;
+  }
+
+  var k = 2.3;
+  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
+}
+
+function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
+  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
+  0);
+  var leftHandleRotation = new THREE.Quaternion();
+  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  var rightHandleRotation = new THREE.Quaternion();
+  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  return {
+    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
+    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    controlPointLinkBasis: controlPointC
+  };
+}
+},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/draw_links.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41179,7 +41259,7 @@ var _load_data = require("./load_data");
 
 var _setup_gui = require("./setup_gui");
 
-var _fs = require("fs");
+var _compute_link_shape = require("./compute_link_shape");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41264,7 +41344,7 @@ function drawLinks(_x2) {
 
 function _drawLinks() {
   _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linkList) {
-    var L, _iterator4, _step4, _link6, splinePoints, curveObject;
+    var L, _iterator4, _step4, link, splinePoints, curveObject;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
@@ -41275,16 +41355,16 @@ function _drawLinks() {
 
             try {
               for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                _link6 = _step4.value;
-                splinePoints = getSplinePoints(_link6, L); //Change here the generate link method to get volume, or just a line
+                link = _step4.value;
+                splinePoints = (0, _compute_link_shape.getSplinePoints)(link, L); //Change here the generate link method to get volume, or just a line
 
-                curveObject = _setup_gui.guiParams.generateLinkMesh(splinePoints, _link6);
+                curveObject = _setup_gui.guiParams.generateLinkMesh(splinePoints, link);
                 curveObject.layers.set(_main.LINK_LAYER);
 
                 _main.scene.add(curveObject);
 
                 _main.linkMeshList.push({
-                  link: _link6,
+                  link: link,
                   mesh: curveObject
                 });
               }
@@ -41302,71 +41382,6 @@ function _drawLinks() {
     }, _callee2);
   }));
   return _drawLinks.apply(this, arguments);
-}
-
-function getSplinePoints(link, L) {
-  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
-  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
-  var pointA = {
-    controlPoint: link.node1.position
-  };
-  var pointB = {
-    controlPoint: link.node2.position
-  };
-  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-
-  var normalisedDistance = linkBasisA.distanceTo(linkBasisB) / _draw_sensors.maxSensorDistance;
-
-  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).distanceTo(new THREE.Vector3(0, 0, 0));
-  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
-  var quaternionA = new THREE.Quaternion();
-  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  var quaternionB = new THREE.Quaternion();
-  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
-  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
-  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
-  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
-  var curvePath = new THREE.CurvePath();
-  curvePath.add(splineLeft);
-  curvePath.add(splineRight);
-  return curvePath;
-} //This function is to get the rotation to be in the link plan
-//It makes it easier to write 3d operations in such a plan
-
-
-function getLinkToGlobalMatrix(A, B) {
-  var i = A.clone().addScaledVector(B, -1).normalize();
-  var j = B.clone().add(A).normalize();
-  var k = i.clone().cross(j);
-  var m = new THREE.Matrix3();
-  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
-  return m;
-}
-
-function flattenDistanceProportion(normalisedDistance) {
-  if (normalisedDistance == 1 || normalisedDistance == 0) {
-    return normalisedDistance;
-  }
-
-  var k = 2.3;
-  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
-}
-
-function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
-  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
-  0);
-  var leftHandleRotation = new THREE.Quaternion();
-  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  var rightHandleRotation = new THREE.Quaternion();
-  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  return {
-    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
-    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    controlPointLinkBasis: controlPointC
-  };
 }
 
 function generateLinkLineMesh(curvePath, link) {
@@ -41402,10 +41417,10 @@ function redrawLinks() {
   var linkListTemp = [];
 
   while (_main.linkMeshList.length) {
-    var _link = _main.linkMeshList.pop();
+    var link = _main.linkMeshList.pop();
 
-    clearLink(_link.mesh);
-    linkListTemp.push(_link.link);
+    clearLink(link.mesh);
+    linkListTemp.push(link.link);
   }
 
   drawLinksAndUpdateVisibility(linkListTemp);
@@ -41413,9 +41428,9 @@ function redrawLinks() {
 
 function clearLinks() {
   while (_main.linkMeshList.length) {
-    var _link2 = _main.linkMeshList.pop();
+    var link = _main.linkMeshList.pop();
 
-    clearLink(_link2.mesh);
+    clearLink(link.mesh);
   }
 }
 
@@ -41435,8 +41450,8 @@ function updateVisibleLinks(minStrength, maxStrength) {
 
   try {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var _link3 = _step.value;
-      _link3.mesh.visible = false;
+      var link = _step.value;
+      link.mesh.visible = false;
     }
   } catch (err) {
     _iterator.e(err);
@@ -41449,8 +41464,8 @@ function updateVisibleLinks(minStrength, maxStrength) {
 
   try {
     for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var _link4 = _step2.value;
-      _link4.mesh.visible = true;
+      var _link = _step2.value;
+      _link.mesh.visible = true;
     }
   } catch (err) {
     _iterator2.e(err);
@@ -41463,8 +41478,8 @@ function updateVisibleLinks(minStrength, maxStrength) {
 
   try {
     for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-      var _link5 = _step3.value;
-      _link5.mesh.visible = false;
+      var _link2 = _step3.value;
+      _link2.mesh.visible = false;
     }
   } catch (err) {
     _iterator3.e(err);
@@ -41472,7 +41487,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
     _iterator3.f();
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","fs":"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/_empty.js"}],"../js/setup_gui.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./compute_link_shape":"../js/compute_link_shape.js"}],"../js/setup_gui.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42022,7 +42037,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63942" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59119" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
