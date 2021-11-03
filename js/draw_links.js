@@ -86,7 +86,7 @@ function redrawLinks(){
     const linkListTemp = [];
     while (linkMeshList.length){
         const link = linkMeshList.pop();
-        clearLink(link.mesh);
+        clearAllLinks(link.mesh);
         linkListTemp.push(link.link);
     }
     drawLinksAndUpdateVisibility(linkListTemp);
@@ -95,21 +95,22 @@ function redrawLinks(){
 function clearAllLinks() {
     while (linkMeshList.length){
         const link = linkMeshList.pop();
-        clearLink(link.mesh);
+        deleteMesh(link.mesh);
     }
 }
 
-function clearLink(mesh){
+function deleteMesh(mesh){
     disposeMesh(mesh);
     scene.remove(mesh);
 }
+
 
 function disposeMesh(mesh){
     mesh.geometry.dispose();
     mesh.material.dispose();
 }
 
-export function clearAll(){
+function clearAll(){
     while(scene.children.length > 0){ 
         scene.remove(scene.children[0]); 
     }
@@ -134,6 +135,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
 
  export {
     clearAllLinks as clearLinks,
+    clearAll,
     loadAndDrawLinks,
     generateLinkLineMesh,
     generateLinkVolumeMesh,

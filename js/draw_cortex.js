@@ -20,7 +20,7 @@ function loadCortexModel(){
 
 function parseRowCortexTri(row) {
     const splitted_row = row.split(",");
-    return [parseInt(splitted_row[0]-1), parseInt(splitted_row[1]-1), parseInt(splitted_row[2]-1)];
+    return [parseInt(splitted_row[0]), parseInt(splitted_row[1]), parseInt(splitted_row[2])];
 }
 function loadCortexVert(){
     return loadData(cortexVertUrl, 'cortex vertices', parseCsv3dCoordinatesRow);

@@ -41242,8 +41242,8 @@ function flattenDistanceProportion(normalisedDistance) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.clearAll = clearAll;
 exports.clearLinks = clearAllLinks;
+exports.clearAll = clearAll;
 exports.loadAndDrawLinks = loadAndDrawLinks;
 exports.generateLinkLineMesh = generateLinkLineMesh;
 exports.generateLinkVolumeMesh = generateLinkVolumeMesh;
@@ -41420,7 +41420,7 @@ function redrawLinks() {
   while (_main.linkMeshList.length) {
     var link = _main.linkMeshList.pop();
 
-    clearLink(link.mesh);
+    clearAllLinks(link.mesh);
     linkListTemp.push(link.link);
   }
 
@@ -41431,11 +41431,11 @@ function clearAllLinks() {
   while (_main.linkMeshList.length) {
     var link = _main.linkMeshList.pop();
 
-    clearLink(link.mesh);
+    deleteMesh(link.mesh);
   }
 }
 
-function clearLink(mesh) {
+function deleteMesh(mesh) {
   disposeMesh(mesh);
 
   _main.scene.remove(mesh);
@@ -41674,7 +41674,7 @@ function loadCortexModel() {
 
 function parseRowCortexTri(row) {
   var splitted_row = row.split(",");
-  return [parseInt(splitted_row[0] - 1), parseInt(splitted_row[1] - 1), parseInt(splitted_row[2] - 1)];
+  return [parseInt(splitted_row[0]), parseInt(splitted_row[1]), parseInt(splitted_row[2])];
 }
 
 function loadCortexVert() {
@@ -42051,7 +42051,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59119" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54267" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
