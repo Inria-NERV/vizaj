@@ -41252,6 +41252,8 @@ exports.updateVisibleLinks = updateVisibleLinks;
 
 var THREE = _interopRequireWildcard(require("three"));
 
+var _compute_link_shape = require("./compute_link_shape");
+
 var _draw_sensors = require("./draw_sensors");
 
 var _main = require("../public/main");
@@ -41259,8 +41261,6 @@ var _main = require("../public/main");
 var _load_data = require("./load_data");
 
 var _setup_gui = require("./setup_gui");
-
-var _compute_link_shape = require("./compute_link_shape");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41329,27 +41329,45 @@ function connectivityMatrixOnLoadCallBack(data) {
   return outList;
 }
 
-function drawLinksAndUpdateVisibility(linkList) {
-  drawLinks(linkList).then(function () {
-    _main.linkMeshList.sort(function (x1, x2) {
-      return x2.link.strength - x1.link.strength;
-    });
-  }).then(function () {
-    return updateVisibleLinks(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
-  });
+function drawLinksAndUpdateVisibility(_x2) {
+  return _drawLinksAndUpdateVisibility.apply(this, arguments);
 }
 
-function drawLinks(_x2) {
+function _drawLinksAndUpdateVisibility() {
+  _drawLinksAndUpdateVisibility = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linkList) {
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            drawLinks(linkList).then(function () {
+              _main.linkMeshList.sort(function (x1, x2) {
+                return x2.link.strength - x1.link.strength;
+              });
+            }).then(function () {
+              return updateVisibleLinks(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
+            });
+
+          case 1:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+  return _drawLinksAndUpdateVisibility.apply(this, arguments);
+}
+
+function drawLinks(_x3) {
   return _drawLinks.apply(this, arguments);
 }
 
 function _drawLinks() {
-  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linkList) {
+  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
     var L, _iterator4, _step4, link, splinePoints, curveObject;
 
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
             L = _draw_sensors.maxSensorDistance * .5;
             _iterator4 = _createForOfIteratorHelper(linkList);
@@ -41377,10 +41395,10 @@ function _drawLinks() {
 
           case 3:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
-    }, _callee2);
+    }, _callee3);
   }));
   return _drawLinks.apply(this, arguments);
 }
@@ -41420,7 +41438,7 @@ function redrawLinks() {
   while (_main.linkMeshList.length) {
     var link = _main.linkMeshList.pop();
 
-    clearAllLinks(link.mesh);
+    deleteMesh(link.mesh);
     linkListTemp.push(link.link);
   }
 
@@ -41498,7 +41516,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
     _iterator3.f();
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./compute_link_shape":"../js/compute_link_shape.js"}],"../js/setup_gui.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","./compute_link_shape":"../js/compute_link_shape.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js"}],"../js/setup_gui.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41570,6 +41588,9 @@ var guiParams = {
     return changeLinkMesh(_draw_links.generateLinkVolumeMesh);
   },
   linkThickness: 1.,
+  link2dTest: function link2dTest() {
+    (0, _draw_links.clearAll)();
+  },
   test: _draw_links.clearAll
 };
 exports.guiParams = guiParams;
@@ -41623,6 +41644,8 @@ function setupGui() {
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
+
+  _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
 
   _main.gui.add(guiParams, 'test').name('test');
 }

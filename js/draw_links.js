@@ -1,10 +1,11 @@
 import * as THREE from "three";
+import { getSplinePoints } from './compute_link_shape';
 import { sensorMeshList } from './draw_sensors';
 import { scene, linkMeshList, LINK_LAYER} from '../public/main';
 import { loadData } from './load_data';
 import { guiParams } from './setup_gui';
 import { maxSensorDistance } from './draw_sensors';
-import { getSplinePoints } from './compute_link_shape';
+
 
 
 function loadAndDrawLinks(linksDataFileUrl){
@@ -34,8 +35,7 @@ function connectivityMatrixOnLoadCallBack(data){
     return outList;
 }
 
-function drawLinksAndUpdateVisibility(linkList)
-{
+async function drawLinksAndUpdateVisibility(linkList){
     drawLinks(linkList)
     .then(() => {linkMeshList.sort((x1, x2) => x2.link.strength - x1.link.strength)})
     .then(() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay));
@@ -86,7 +86,7 @@ function redrawLinks(){
     const linkListTemp = [];
     while (linkMeshList.length){
         const link = linkMeshList.pop();
-        clearAllLinks(link.mesh);
+        deleteMesh(link.mesh);
         linkListTemp.push(link.link);
     }
     drawLinksAndUpdateVisibility(linkListTemp);

@@ -58,6 +58,11 @@ const guiParams = {
     makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
     linkThickness: 1.,
 
+    link2dTest: () => { 
+        clearAll();
+        
+
+    },
     test: clearAll
     
   };
@@ -99,6 +104,7 @@ function setupGui() {
 
     gui.add(guiParams, 'loadFile').name('Load CSV file');
 
+    gui.add(guiParams, 'link2dTest').name('link2dTest');
     gui.add(guiParams, 'test').name('test');
 }
 
