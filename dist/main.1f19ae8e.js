@@ -41045,6 +41045,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAndDrawSensors = loadAndDrawSensors;
+exports.clearAllSensors = clearAllSensors;
 exports.maxSensorDistance = exports.sensorMeshList = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
@@ -41052,6 +41053,10 @@ var THREE = _interopRequireWildcard(require("three"));
 var _main = require("../public/main.js");
 
 var _load_data = require("./load_data.js");
+
+var _setup_gui = require("./setup_gui");
+
+var _draw_links = require("./draw_links");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41066,28 +41071,28 @@ exports.sensorMeshList = sensorMeshList;
 var maxSensorDistance = 0.;
 exports.maxSensorDistance = maxSensorDistance;
 
-function loadAndDrawSensors() {
-  loadAllSensorData().then(function (response) {
+function loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl) {
+  loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl).then(function (response) {
     drawAllSensors(response[0], response[1]);
     getMaxSensorDistance(response[1]);
   });
 }
 
-function loadAllSensorData() {
-  return Promise.all([loadSensorLabels(), loadSensorCoordinates()]);
+function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
+  return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
 }
 
-function loadSensorCoordinates() {
+function loadSensorCoordinates(_x) {
   return _loadSensorCoordinates.apply(this, arguments);
 }
 
 function _loadSensorCoordinates() {
-  _loadSensorCoordinates = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+  _loadSensorCoordinates = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt("return", (0, _load_data.loadData)(_main.sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow));
+            return _context.abrupt("return", (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow));
 
           case 1:
           case "end":
@@ -41099,17 +41104,17 @@ function _loadSensorCoordinates() {
   return _loadSensorCoordinates.apply(this, arguments);
 }
 
-function loadSensorLabels() {
+function loadSensorLabels(_x2) {
   return _loadSensorLabels.apply(this, arguments);
 }
 
 function _loadSensorLabels() {
-  _loadSensorLabels = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+  _loadSensorLabels = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(sensorLabelsUrl) {
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            return _context2.abrupt("return", (0, _load_data.loadData)(_main.sensorLabelsUrl, 'sensor labels', function (x) {
+            return _context2.abrupt("return", (0, _load_data.loadData)(sensorLabelsUrl, 'sensor labels', function (x) {
               return x;
             }));
 
@@ -41144,6 +41149,8 @@ function drawSensor(label, coordinates) {
 }
 
 function getMaxSensorDistance(positions) {
+  exports.maxSensorDistance = maxSensorDistance = 0.;
+
   for (var i = 0; i < positions.length; i++) {
     for (var j = 0; j < i; j++) {
       var _dist = new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2]).distanceTo(new THREE.Vector3(positions[j][0], positions[j][1], positions[j][2]));
@@ -41154,89 +41161,14 @@ function getMaxSensorDistance(positions) {
     }
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js"}],"../js/compute_link_shape.js":[function(require,module,exports) {
-"use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getSplinePoints = getSplinePoints;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _draw_sensors = require("./draw_sensors");
-
-var _setup_gui = require("./setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function getSplinePoints(link, L) {
-  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
-  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
-  var pointA = {
-    controlPoint: link.node1.position
-  };
-  var pointB = {
-    controlPoint: link.node2.position
-  };
-  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-
-  var normalisedDistance = linkBasisA.distanceTo(linkBasisB) / _draw_sensors.maxSensorDistance;
-
-  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).distanceTo(new THREE.Vector3(0, 0, 0));
-  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
-  var quaternionA = new THREE.Quaternion();
-  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  var quaternionB = new THREE.Quaternion();
-  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
-  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
-  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
-  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
-  var curvePath = new THREE.CurvePath();
-  curvePath.add(splineLeft);
-  curvePath.add(splineRight);
-  return curvePath;
-} //This function is to get the rotation to be in the link plan
-//It makes it easier to write 3d operations in such a plan
-
-
-function getLinkToGlobalMatrix(A, B) {
-  var i = A.clone().addScaledVector(B, -1).normalize();
-  var j = B.clone().add(A).normalize();
-  var k = i.clone().cross(j);
-  var m = new THREE.Matrix3();
-  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
-  return m;
-}
-
-function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
-  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
-  0);
-  var leftHandleRotation = new THREE.Quaternion();
-  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  var rightHandleRotation = new THREE.Quaternion();
-  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  return {
-    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
-    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    controlPointLinkBasis: controlPointC
-  };
-}
-
-function flattenDistanceProportion(normalisedDistance) {
-  if (normalisedDistance == 1 || normalisedDistance == 0) {
-    return normalisedDistance;
+function clearAllSensors() {
+  while (sensorMeshList.length) {
+    var sensor = sensorMeshList.pop();
+    (0, _draw_links.deleteMesh)(sensor);
   }
-
-  var k = 2.3;
-  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
 }
-},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/draw_links.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./draw_links":"../js/draw_links.js"}],"../js/draw_links.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41244,6 +41176,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.clearLinks = clearAllLinks;
 exports.clearAll = clearAll;
+exports.deleteMesh = deleteMesh;
 exports.loadAndDrawLinks = loadAndDrawLinks;
 exports.generateLinkLineMesh = generateLinkLineMesh;
 exports.generateLinkVolumeMesh = generateLinkVolumeMesh;
@@ -41251,8 +41184,6 @@ exports.redrawLinks = redrawLinks;
 exports.updateVisibleLinks = updateVisibleLinks;
 
 var THREE = _interopRequireWildcard(require("three"));
-
-var _compute_link_shape = require("./compute_link_shape");
 
 var _draw_sensors = require("./draw_sensors");
 
@@ -41375,7 +41306,7 @@ function _drawLinks() {
             try {
               for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
                 link = _step4.value;
-                splinePoints = (0, _compute_link_shape.getSplinePoints)(link, L); //Change here the generate link method to get volume, or just a line
+                splinePoints = _setup_gui.guiParams.getSplinePoints(link, L); //Change here the generate link method to get volume, or just a line
 
                 curveObject = _setup_gui.guiParams.generateLinkMesh(splinePoints, link);
                 curveObject.layers.set(_main.LINK_LAYER);
@@ -41462,7 +41393,8 @@ function deleteMesh(mesh) {
 function disposeMesh(mesh) {
   mesh.geometry.dispose();
   mesh.material.dispose();
-}
+} //TODO: adapt to remove only links and nodes
+
 
 function clearAll() {
   while (_main.scene.children.length > 0) {
@@ -41516,7 +41448,151 @@ function updateVisibleLinks(minStrength, maxStrength) {
     _iterator3.f();
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","./compute_link_shape":"../js/compute_link_shape.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js"}],"../js/setup_gui.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSplinePoints = getSplinePoints;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _draw_sensors = require("../draw_sensors");
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function getSplinePoints(link, L) {
+  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
+  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+  var pointA = {
+    controlPoint: link.node1.position
+  };
+  var pointB = {
+    controlPoint: link.node2.position
+  };
+  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+
+  var normalisedDistance = linkBasisA.distanceTo(linkBasisB) / _draw_sensors.maxSensorDistance;
+
+  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).distanceTo(new THREE.Vector3(0, 0, 0));
+  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
+  var quaternionA = new THREE.Quaternion();
+  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  var quaternionB = new THREE.Quaternion();
+  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
+  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
+  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
+  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
+  var curvePath = new THREE.CurvePath();
+  curvePath.add(splineLeft);
+  curvePath.add(splineRight);
+  return curvePath;
+} //This function is to get the rotation to be in the link plan
+//It makes it easier to write 3d operations in such a plan
+
+
+function getLinkToGlobalMatrix(A, B) {
+  var i = A.clone().addScaledVector(B, -1).normalize();
+  var j = B.clone().add(A).normalize();
+  var k = i.clone().cross(j);
+  var m = new THREE.Matrix3();
+  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
+  return m;
+}
+
+function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
+  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
+  0);
+  var leftHandleRotation = new THREE.Quaternion();
+  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  var rightHandleRotation = new THREE.Quaternion();
+  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  return {
+    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
+    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    controlPointLinkBasis: controlPointC
+  };
+}
+
+function flattenDistanceProportion(normalisedDistance) {
+  if (normalisedDistance == 1 || normalisedDistance == 0) {
+    return normalisedDistance;
+  }
+
+  var k = 2.3;
+  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
+}
+},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSplinePointsPlane = getSplinePointsPlane;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _draw_sensors = require("../draw_sensors");
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function getSplinePointsPlane(link, L) {
+  var pointA = link.node1.position;
+  var pointB = link.node2.position;
+  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
+  var curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB); //const curvePath = new THREE.CurvePath();
+
+  return curvePath;
+} // function getSplinePointsPlane(link, L){
+//     const pointA = {controlPoint: link.node1.position};
+//     const pointB = {controlPoint: link.node2.position};
+//     const pointC = computePointCPlane(pointA.controlPoint, pointB.controlPoint);
+//     pointA.handleRight = new THREE.Vector3(pointA.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
+//     pointB.handleLeft  = new THREE.Vector3(pointB.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
+//     const splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
+//     const splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
+//     const curvePath = new THREE.CurvePath();
+//     curvePath.add(splineLeft);
+//     curvePath.add(splineRight);
+//     return curvePath;
+// }
+// function computePointCPlane(pointA, pointB){
+//     const controlPointC = new THREE.Vector3(
+//         (pointA.x + pointB.x)/2,
+//         pointA.distanceTo(pointB) * guiParams.linkHeight,
+//         (pointA.z + pointB.z)/2
+//     );
+//     const leftHandleRotation = new THREE.Quaternion();
+//     leftHandleRotation.setFromAxisAngle(new Vector3(0,+1,0), Math.PI * guiParams.linkTopPointAngle );
+//     const rightHandleRotation = new THREE.Quaternion();
+//     rightHandleRotation.setFromAxisAngle(new Vector3(0,-1,0), Math.PI * guiParams.linkTopPointAngle );
+//     return {controlPoint: controlPointC.clone(),
+//         handleLeft: controlPointC.clone()
+//             .add( new Vector3(pointA.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
+//         handleRight: controlPointC.clone()
+//             .add( new Vector3(pointB.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
+//         controlPointLinkBasis: controlPointC
+//     };
+// }
+},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../data/2d/sensor_labels.csv":[function(require,module,exports) {
+module.exports = "/sensor_labels.c2119944.csv";
+},{}],"../data/2d/sensor_coordinates.csv":[function(require,module,exports) {
+module.exports = "/sensor_coordinates.fc344167.csv";
+},{}],"../data/2d/conn_matrix.csv":[function(require,module,exports) {
+module.exports = "/conn_matrix.70e1003c.csv";
+},{}],"../js/setup_gui.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41530,6 +41606,12 @@ var _main = require("../public/main");
 var _draw_links = require("./draw_links");
 
 var _draw_cortex = require("./draw_cortex");
+
+var _compute_link_shape = require("./link_builder/compute_link_shape");
+
+var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D");
+
+var _draw_sensors = require("./draw_sensors");
 
 var guiParams = {
   loadFile: function loadFile() {
@@ -41545,6 +41627,33 @@ var guiParams = {
   linkSensorAngles: 3 / 8,
   linkSensorHandleDistances: 1,
   linkTopPointAngle: 0,
+  generateLinkMesh: _draw_links.generateLinkLineMesh,
+  makeLinkLineMesh: function makeLinkLineMesh() {
+    return changeLinkMesh(_draw_links.generateLinkLineMesh);
+  },
+  makeLinkVolumeMesh: function makeLinkVolumeMesh() {
+    return changeLinkMesh(_draw_links.generateLinkVolumeMesh);
+  },
+  linkThickness: 1.,
+  getSplinePoints: _compute_link_shape.getSplinePoints,
+  link2dTest: function link2dTest() {
+    (0, _draw_sensors.clearAllSensors)();
+    (0, _draw_links.clearLinks)();
+    (0, _draw_cortex.hideBrain)();
+    guiParams.getSplinePoints = _compute_link_shape_2D.getSplinePointsPlane;
+
+    var sensorLabelsUrl = require('../data/2d/sensor_labels.csv');
+
+    var sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
+
+    var connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
+
+    (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+    (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
+  }
+};
+exports.guiParams = guiParams;
+var premadeLinkGeometriesParam = {
   defaultLinkGeometry: function defaultLinkGeometry() {
     guiParams.linkHeight = 0.75;
     guiParams.linkTopPointHandleDistances = 0.5;
@@ -41579,21 +41688,8 @@ var guiParams = {
     guiParams.linkSensorAngles = 0.;
     guiParams.linkSensorHandleDistances = 1.;
     (0, _draw_links.redrawLinks)();
-  },
-  generateLinkMesh: _draw_links.generateLinkLineMesh,
-  makeLinkLineMesh: function makeLinkLineMesh() {
-    return changeLinkMesh(_draw_links.generateLinkLineMesh);
-  },
-  makeLinkVolumeMesh: function makeLinkVolumeMesh() {
-    return changeLinkMesh(_draw_links.generateLinkVolumeMesh);
-  },
-  linkThickness: 1.,
-  link2dTest: function link2dTest() {
-    (0, _draw_links.clearAll)();
-  },
-  test: _draw_links.clearAll
+  }
 };
-exports.guiParams = guiParams;
 
 function changeLinkMesh(generateLinkMethod) {
   guiParams.generateLinkMesh = generateLinkMethod;
@@ -41631,11 +41727,11 @@ function setupGui() {
 
   var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
 
-  premadeLinkGeometries.add(guiParams, 'defaultLinkGeometry').name('Default');
-  premadeLinkGeometries.add(guiParams, 'bellLinkGeometry').name('Bell');
-  premadeLinkGeometries.add(guiParams, 'triangleLinkGeometry').name('Triangle');
-  premadeLinkGeometries.add(guiParams, 'roundedSquareLinkGeometry').name('Rounded square');
-  premadeLinkGeometries.add(guiParams, 'peakLinkGeometry').name('Peak');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
   var linkVolume = _main.gui.addFolder('linkVolume');
 
@@ -41646,10 +41742,8 @@ function setupGui() {
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
 
   _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
-
-  _main.gui.add(guiParams, 'test').name('test');
 }
-},{"../public/main":"main.js","./draw_links":"../js/draw_links.js","./draw_cortex":"../js/draw_cortex.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
+},{"../public/main":"main.js","./draw_links":"../js/draw_links.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41657,6 +41751,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadAndDrawCortexModel = loadAndDrawCortexModel;
 exports.updateBrainMeshVisibility = updateBrainMeshVisibility;
+exports.hideBrain = hideBrain;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -41766,6 +41861,11 @@ function updateBrainMeshVisibility() {
   brainMesh.visible = _setup_gui.guiParams.showBrain;
   brainMesh.layers.toggle(_main.GLOBAL_LAYER);
 }
+
+function hideBrain() {
+  _setup_gui.guiParams.showBrain = false;
+  updateBrainMeshVisibility();
+}
 },{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../js/setup_camera.js":[function(require,module,exports) {
 "use strict";
 
@@ -41817,15 +41917,13 @@ module.exports = "/sensor_labels.87a1706e.csv";
 module.exports = "/sensor_coordinates.7c286084.csv";
 },{}],"../data/conn_matrix_0.csv":[function(require,module,exports) {
 module.exports = "/conn_matrix_0.5c498bf8.csv";
-},{}],"../data/imag_conn_matrix_0.csv":[function(require,module,exports) {
-module.exports = "/imag_conn_matrix_0.deb38406.csv";
 },{}],"main.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.SENSOR_RINGS = exports.SENSOR_SEGMENTS = exports.SENSOR_RADIUS = exports.sensorMaterial = exports.cortexMaterial = exports.imConnectivityMatrixUrl = exports.connectivityMatrixUrl = exports.sensorCoordinatesUrl = exports.sensorLabelsUrl = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.SENSOR_RINGS = exports.SENSOR_SEGMENTS = exports.SENSOR_RADIUS = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -41869,19 +41967,11 @@ exports.cortexTriUrl = cortexTriUrl;
 
 var sensorLabelsUrl = require('../data/sensor_labels.csv');
 
-exports.sensorLabelsUrl = sensorLabelsUrl;
-
 var sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 
-exports.sensorCoordinatesUrl = sensorCoordinatesUrl;
+var connectivityMatrixUrl = require('../data/conn_matrix_0.csv'); //const imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
 
-var connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
-exports.connectivityMatrixUrl = connectivityMatrixUrl;
-
-var imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
-
-exports.imConnectivityMatrixUrl = imConnectivityMatrixUrl;
 var GLOBAL_LAYER = 0,
     LINK_LAYER = 1;
 exports.LINK_LAYER = LINK_LAYER;
@@ -41936,11 +42026,11 @@ function init() {
   (0, _setup_camera.setupCamera)();
   (0, _add_light_and_background.addLightAndBackground)();
   (0, _draw_cortex.loadAndDrawCortexModel)();
-  (0, _draw_sensors.loadAndDrawSensors)();
+  (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
   (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
-  fileInput.addEventListener("change", handleFileSelect, false);
+  fileInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
 }
 
 function onWindowResize() {
@@ -42036,17 +42126,21 @@ function fillIntersected() {
   }
 }
 
-function handleFileSelect(evt) {
+function getNewFileUrl(evt) {
   if (evt.target.files.length === 0) {
     return;
   }
 
   var file = evt.target.files[0];
-  var fileUrl = window.URL.createObjectURL(file);
+  return window.URL.createObjectURL(file);
+}
+
+function handleConnectivityMatrixFileSelect(evt) {
+  var fileUrl = getNewFileUrl(evt);
   (0, _draw_links.clearLinks)();
   (0, _draw_links.loadAndDrawLinks)(fileUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/draw_links":"../js/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv","../data/imag_conn_matrix_0.csv":"../data/imag_conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/draw_links":"../js/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42074,7 +42168,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61894" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55072" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

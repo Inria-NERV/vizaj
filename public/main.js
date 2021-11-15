@@ -18,7 +18,7 @@ const cortexTriUrl = require('../data/cortex_tri.csv');
 const sensorLabelsUrl = require('../data/sensor_labels.csv');
 const sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
-const imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
+//const imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
@@ -68,12 +68,12 @@ function init() {
   setupCamera();
   addLightAndBackground();
   loadAndDrawCortexModel();
-  loadAndDrawSensors();
+  loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
   loadAndDrawLinks(connectivityMatrixUrl);
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
-  fileInput.addEventListener("change", handleFileSelect, false);
+  fileInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
 }
 
 function onWindowResize() {
@@ -153,10 +153,14 @@ function fillIntersected() {
   }
 }
 
-function handleFileSelect(evt) {
+function getNewFileUrl(evt){
   if (evt.target.files.length === 0) { return; }
   const file = evt.target.files[0];
-  const fileUrl = window.URL.createObjectURL(file);
+  return window.URL.createObjectURL(file);         
+}
+
+function handleConnectivityMatrixFileSelect(evt) {
+  const fileUrl = getNewFileUrl(evt);
   clearLinks();
   loadAndDrawLinks(fileUrl);
 }
@@ -171,10 +175,6 @@ export {
     gui,
     cortexVertUrl, 
     cortexTriUrl, 
-    sensorLabelsUrl, 
-    sensorCoordinatesUrl, 
-    connectivityMatrixUrl,
-    imConnectivityMatrixUrl,
     cortexMaterial,
     sensorMaterial,
     SENSOR_RADIUS,

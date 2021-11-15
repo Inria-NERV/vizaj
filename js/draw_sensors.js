@@ -1,30 +1,31 @@
 import * as THREE from 'three';
-import { scene, sensorLabelsUrl, sensorCoordinatesUrl, sensorMaterial,
+import { scene, 
+    sensorMaterial,
     SENSOR_RADIUS, SENSOR_RINGS, SENSOR_SEGMENTS } from "../public/main.js";
 import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
+import { guiParams } from "./setup_gui";
+import { deleteMesh } from "./draw_links"
 
 const sensorMeshList = [];
 let maxSensorDistance = 0.;
 
-export function loadAndDrawSensors()
-{   
-    loadAllSensorData()
+export function loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl) {  
+    loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl)
     .then((response) => {
         drawAllSensors(response[0], response[1]);
         getMaxSensorDistance(response[1]);
     });
 }
 
-function loadAllSensorData()
-{
-    return Promise.all([loadSensorLabels(), loadSensorCoordinates()]);
+function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
+    return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
 }
 
-async function loadSensorCoordinates() {
+async function loadSensorCoordinates(sensorCoordinatesUrl) {
     return loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
 }
 
-async function loadSensorLabels(){
+async function loadSensorLabels(sensorLabelsUrl){
     return loadData(sensorLabelsUrl, 'sensor labels', (x) => x);
 }
 
@@ -52,6 +53,7 @@ function drawSensor(label, coordinates){
 
 function getMaxSensorDistance(positions)
 {
+    maxSensorDistance = 0.;
     for (var i = 0; i < positions.length; i++) {
         for (var j = 0; j < i; j++) {
             const _dist = new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2])
@@ -63,4 +65,11 @@ function getMaxSensorDistance(positions)
     }
 }
 
-export {sensorMeshList, maxSensorDistance};
+function clearAllSensors(){
+    while (sensorMeshList.length){
+        const sensor = sensorMeshList.pop();
+        deleteMesh(sensor);
+    } 
+}
+
+export {sensorMeshList, maxSensorDistance, clearAllSensors};

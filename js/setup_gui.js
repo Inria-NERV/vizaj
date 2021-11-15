@@ -1,6 +1,9 @@
 import { gui, controls } from '../public/main';
-import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks, clearAll } from './draw_links';
-import { updateBrainMeshVisibility } from './draw_cortex';
+import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks, clearLinks, loadAndDrawLinks } from './draw_links';
+import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
+import { getSplinePoints } from './link_builder/compute_link_shape';
+import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
+import { clearAllSensors, loadAndDrawSensors } from './draw_sensors';
 
 const guiParams = {
     loadFile: () => document.getElementById('fileInput').click(),
@@ -17,6 +20,30 @@ const guiParams = {
     linkSensorHandleDistances: 1,
     linkTopPointAngle: 0,
 
+    generateLinkMesh: generateLinkLineMesh,
+    makeLinkLineMesh: () => changeLinkMesh(generateLinkLineMesh),
+    makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
+    linkThickness: 1.,
+
+    getSplinePoints: getSplinePoints,
+
+    link2dTest: () => { 
+        clearAllSensors();
+        clearLinks();
+        hideBrain();
+        guiParams.getSplinePoints = getSplinePointsPlane;
+
+        const sensorLabelsUrl = require('../data/2d/sensor_labels.csv');
+        const sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
+        const connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
+
+        loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+        loadAndDrawLinks(connectivityMatrixUrl);
+    }
+    
+  };
+
+  const premadeLinkGeometriesParam = {
     defaultLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0.5;
@@ -53,19 +80,7 @@ const guiParams = {
         redrawLinks();
     },
 
-    generateLinkMesh: generateLinkLineMesh,
-    makeLinkLineMesh: () => changeLinkMesh(generateLinkLineMesh),
-    makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
-    linkThickness: 1.,
-
-    link2dTest: () => { 
-        clearAll();
-        
-
-    },
-    test: clearAll
-    
-  };
+  }
 
 function changeLinkMesh(generateLinkMethod){
     guiParams.generateLinkMesh = generateLinkMethod;
@@ -91,11 +106,11 @@ function setupGui() {
     //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
     const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
-    premadeLinkGeometries.add(guiParams, 'defaultLinkGeometry').name('Default');
-    premadeLinkGeometries.add(guiParams, 'bellLinkGeometry').name('Bell');
-    premadeLinkGeometries.add(guiParams, 'triangleLinkGeometry').name('Triangle');
-    premadeLinkGeometries.add(guiParams, 'roundedSquareLinkGeometry').name('Rounded square');
-    premadeLinkGeometries.add(guiParams, 'peakLinkGeometry').name('Peak');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
     const linkVolume = gui.addFolder('linkVolume');
     linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
@@ -105,7 +120,7 @@ function setupGui() {
     gui.add(guiParams, 'loadFile').name('Load CSV file');
 
     gui.add(guiParams, 'link2dTest').name('link2dTest');
-    gui.add(guiParams, 'test').name('test');
+
 }
 
 export {

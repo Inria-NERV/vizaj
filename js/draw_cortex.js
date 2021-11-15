@@ -60,6 +60,12 @@ function updateBrainMeshVisibility()
     brainMesh.layers.toggle(GLOBAL_LAYER);
 }
 
+function hideBrain(){
+    guiParams.showBrain = false;
+    updateBrainMeshVisibility();
+}
+
 export {
-    updateBrainMeshVisibility
+    updateBrainMeshVisibility,
+    hideBrain
 };

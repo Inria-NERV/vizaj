@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { getSplinePoints } from './compute_link_shape';
 import { sensorMeshList } from './draw_sensors';
 import { scene, linkMeshList, LINK_LAYER} from '../public/main';
 import { loadData } from './load_data';
@@ -44,7 +43,7 @@ async function drawLinksAndUpdateVisibility(linkList){
 async function drawLinks(linkList){
     const L = maxSensorDistance * .5;
     for (const link of linkList){
-        const splinePoints = getSplinePoints(link, L);
+        const splinePoints = guiParams.getSplinePoints(link, L);
         //Change here the generate link method to get volume, or just a line
         const curveObject = guiParams.generateLinkMesh(splinePoints, link);
         curveObject.layers.set(LINK_LAYER);
@@ -110,6 +109,7 @@ function disposeMesh(mesh){
     mesh.material.dispose();
 }
 
+//TODO: adapt to remove only links and nodes
 function clearAll(){
     while(scene.children.length > 0){ 
         scene.remove(scene.children[0]); 
@@ -136,6 +136,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
  export {
     clearAllLinks as clearLinks,
     clearAll,
+    deleteMesh,
     loadAndDrawLinks,
     generateLinkLineMesh,
     generateLinkVolumeMesh,
