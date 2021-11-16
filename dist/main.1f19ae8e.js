@@ -41458,8 +41458,6 @@ exports.getSplinePoints = getSplinePoints;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _draw_sensors = require("../draw_sensors");
-
 var _setup_gui = require("../setup_gui");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -41477,11 +41475,8 @@ function getSplinePoints(link, L) {
   };
   var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
   var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-
-  var normalisedDistance = linkBasisA.distanceTo(linkBasisB) / _draw_sensors.maxSensorDistance;
-
-  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).distanceTo(new THREE.Vector3(0, 0, 0));
-  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
+  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).length();
+  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
   var quaternionA = new THREE.Quaternion();
   quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
   var quaternionB = new THREE.Quaternion();
@@ -41507,9 +41502,8 @@ function getLinkToGlobalMatrix(A, B) {
   return m;
 }
 
-function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance) {
-  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, //flattenedNormalisedDistance * L / 2 + l,
-  0);
+function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
+  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, 0);
   var leftHandleRotation = new THREE.Quaternion();
   leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
   var rightHandleRotation = new THREE.Quaternion();
@@ -41521,16 +41515,7 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flatten
     controlPointLinkBasis: controlPointC
   };
 }
-
-function flattenDistanceProportion(normalisedDistance) {
-  if (normalisedDistance == 1 || normalisedDistance == 0) {
-    return normalisedDistance;
-  }
-
-  var k = 2.3;
-  return 1 / (1 + Math.pow(normalisedDistance / (1 - normalisedDistance), -k));
-}
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41552,8 +41537,7 @@ function getSplinePointsPlane(link, L) {
   var pointA = link.node1.position;
   var pointB = link.node2.position;
   var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
-  var curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB); //const curvePath = new THREE.CurvePath();
-
+  var curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
   return curvePath;
 } // function getSplinePointsPlane(link, L){
 //     const pointA = {controlPoint: link.node1.position};

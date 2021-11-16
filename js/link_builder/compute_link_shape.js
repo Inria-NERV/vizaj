@@ -1,22 +1,33 @@
 import * as THREE from "three";
 import { Matrix3, Vector3 } from "three";
-import { maxSensorDistance } from '../draw_sensors';
 import { guiParams } from '../setup_gui';
 
 function getSplinePoints(link, L){
     const linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
     const globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+
     const pointA = {controlPoint: link.node1.position};
     const pointB = {controlPoint: link.node2.position};
     const linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
     const linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-    const normalisedDistance = linkBasisA.distanceTo(linkBasisB) / maxSensorDistance;
-    const l = new Vector3((linkBasisA.x + linkBasisB.x)/2, (linkBasisA.y + linkBasisB.y)/2, (linkBasisA.z + linkBasisB.z)/2).distanceTo(new Vector3(0,0,0));
-    const pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, normalisedDistance);
+
+    const l = new Vector3(
+        (linkBasisA.x + linkBasisB.x)/2, 
+        (linkBasisA.y + linkBasisB.y)/2, 
+        (linkBasisA.z + linkBasisB.z)/2).length();
+
+    const pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
+
     const quaternionA = new THREE.Quaternion();
-    quaternionA.setFromAxisAngle( new Vector3(0,0,1), Math.PI * (1 - guiParams.linkSensorAngles ) );
+    quaternionA.setFromAxisAngle( 
+        new Vector3(0,0,1), 
+        Math.PI * (1 - guiParams.linkSensorAngles ) );
+
     const quaternionB = new THREE.Quaternion();
-    quaternionB.setFromAxisAngle( new Vector3(0,0,-1), Math.PI  * ( 1 - guiParams.linkSensorAngles ) );
+    quaternionB.setFromAxisAngle( 
+        new Vector3(0,0,-1), 
+        Math.PI  * ( 1 - guiParams.linkSensorAngles ) );
+
     pointA.handleRight = new THREE.Vector3(linkBasisA.x * guiParams.linkSensorHandleDistances,0,0)
         .applyQuaternion( quaternionA )
         .add( linkBasisA )
@@ -25,6 +36,7 @@ function getSplinePoints(link, L){
         .applyQuaternion( quaternionB )
         .add( linkBasisB )
         .applyMatrix3(linkToGlobalMatrix);
+
     const splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
     const splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
     const curvePath = new THREE.CurvePath();
@@ -47,11 +59,10 @@ function getLinkToGlobalMatrix(A, B){
     return m;
 }
 
-
-function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flattenedNormalisedDistance){
+function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l){
     const controlPointC = new THREE.Vector3(
         0,
-        linkBasisA.distanceTo(linkBasisB) * guiParams.linkHeight + l,//flattenedNormalisedDistance * L / 2 + l,
+        linkBasisA.distanceTo(linkBasisB) * guiParams.linkHeight + l,
         0
     );
     const leftHandleRotation = new THREE.Quaternion();
@@ -69,12 +80,6 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l, L, flatten
             .applyMatrix3(linkToGlobalMatrix),
         controlPointLinkBasis: controlPointC
     };
-}
-
-function flattenDistanceProportion(normalisedDistance){
-    if (normalisedDistance == 1 || normalisedDistance == 0) {return normalisedDistance;}
-    const k = 2.3;
-    return 1 / ( 1 + (normalisedDistance / ( 1 - normalisedDistance) ) ** ( -k ) );
 }
 
 export { getSplinePoints }

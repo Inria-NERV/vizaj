@@ -9,11 +9,10 @@ function getSplinePointsPlane(link, L){
     const pointB = link.node2.position;
     const pointC = new THREE.Vector3(
         (pointA.x + pointB.x)/2,
-        pointA.distanceTo(pointB) * guiParams.linkHeight,
+        (pointA.distanceTo(pointB)) * guiParams.linkHeight,
         (pointA.z + pointB.z)/2
     );
     const curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
-    //const curvePath = new THREE.CurvePath();
     return curvePath;
 }
 
