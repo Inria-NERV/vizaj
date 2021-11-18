@@ -41511,8 +41511,8 @@ var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
     }
   }, {
     key: "getGeometry",
-    value: function getGeometry(curvePath) {
-      var link = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : None;
+    value: function getGeometry(curvePath, link) {
+      //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
       var splinePoints = curvePath.getPoints((ARC_SEGMENTS - 1) / curvePath.curves.length);
       return new THREE.BufferGeometry().setFromPoints(splinePoints);
     }

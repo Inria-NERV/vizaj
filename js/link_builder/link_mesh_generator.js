@@ -24,7 +24,8 @@ class linkLineGenerator extends linkMeshGenerator{
         } );
     }
 
-    static getGeometry(curvePath, link=None){
+    static getGeometry(curvePath, link){
+        //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
         const splinePoints = curvePath.getPoints((ARC_SEGMENTS-1)/curvePath.curves.length);
         return new THREE.BufferGeometry().setFromPoints( splinePoints );
     }
