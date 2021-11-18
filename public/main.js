@@ -6,7 +6,7 @@ import "regenerator-runtime/runtime.js";
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, sensorMeshList } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, clearLinks } from "../js/draw_links";
+import { loadAndDrawLinks, clearLinks } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 
