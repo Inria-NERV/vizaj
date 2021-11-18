@@ -41056,7 +41056,7 @@ var _load_data = require("./load_data.js");
 
 var _setup_gui = require("./setup_gui");
 
-var _draw_links = require("./draw_links");
+var _draw_links = require("./link_builder/draw_links");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41168,30 +41168,28 @@ function clearAllSensors() {
     (0, _draw_links.deleteMesh)(sensor);
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./draw_links":"../js/draw_links.js"}],"../js/draw_links.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./link_builder/draw_links":"../js/link_builder/draw_links.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.clearLinks = clearAllLinks;
-exports.clearAll = clearAll;
 exports.deleteMesh = deleteMesh;
 exports.loadAndDrawLinks = loadAndDrawLinks;
-exports.generateLinkLineMesh = generateLinkLineMesh;
-exports.generateLinkVolumeMesh = generateLinkVolumeMesh;
 exports.redrawLinks = redrawLinks;
+exports.updateLinkOutline = updateLinkOutline;
 exports.updateVisibleLinks = updateVisibleLinks;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _draw_sensors = require("./draw_sensors");
+var _draw_sensors = require("../draw_sensors");
 
-var _main = require("../public/main");
+var _main = require("../../public/main");
 
-var _load_data = require("./load_data");
+var _load_data = require("../load_data");
 
-var _setup_gui = require("./setup_gui");
+var _setup_gui = require("../setup_gui");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41294,21 +41292,19 @@ function drawLinks(_x3) {
 
 function _drawLinks() {
   _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
-    var L, _iterator4, _step4, link, splinePoints, curveObject;
+    var _iterator5, _step5, link, splinePoints, curveObject;
 
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            L = _draw_sensors.maxSensorDistance * .5;
-            _iterator4 = _createForOfIteratorHelper(linkList);
+            _iterator5 = _createForOfIteratorHelper(linkList);
 
             try {
-              for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-                link = _step4.value;
-                splinePoints = _setup_gui.guiParams.getSplinePoints(link, L); //Change here the generate link method to get volume, or just a line
-
-                curveObject = _setup_gui.guiParams.generateLinkMesh(splinePoints, link);
+              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+                link = _step5.value;
+                splinePoints = _setup_gui.guiParams.getSplinePoints(link);
+                curveObject = _setup_gui.guiParams.linkGenerator.generateLink(splinePoints, link);
                 curveObject.layers.set(_main.LINK_LAYER);
 
                 _main.scene.add(curveObject);
@@ -41319,12 +41315,12 @@ function _drawLinks() {
                 });
               }
             } catch (err) {
-              _iterator4.e(err);
+              _iterator5.e(err);
             } finally {
-              _iterator4.f();
+              _iterator5.f();
             }
 
-          case 3:
+          case 2:
           case "end":
             return _context3.stop();
         }
@@ -41334,33 +41330,32 @@ function _drawLinks() {
   return _drawLinks.apply(this, arguments);
 }
 
-function generateLinkLineMesh(curvePath, link) {
-  var splinePoints = curvePath.getPoints(24);
-  var geometry = new THREE.BufferGeometry().setFromPoints(splinePoints);
-  var linkMat = new THREE.LineBasicMaterial({
-    color: new THREE.Color(link.strength, 0, 1 - link.strength),
-    opacity: link.strength,
-    transparent: true
-  });
-  var curveObject = new THREE.Line(geometry, linkMat);
-  return curveObject;
-}
+function updateLinkOutline() {
+  var _iterator = _createForOfIteratorHelper(_main.linkMeshList),
+      _step;
 
-function generateLinkVolumeMesh(curvePath, link) {
-  var linkMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color(link.strength, 0, 1 - link.strength),
-    opacity: link.strength,
-    transparent: true
-  });
-  var linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
-  var extrudeSettings = {
-    steps: 24,
-    bevelEnabled: false,
-    extrudePath: curvePath
-  };
-  var geometry = new THREE.ExtrudeGeometry(linkProfileShape, extrudeSettings);
-  var curveObject = new THREE.Mesh(geometry, linkMat);
-  return curveObject;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var linkTuple = _step.value;
+
+      var splinePoints = _setup_gui.guiParams.getSplinePoints(linkTuple.link);
+
+      var curveGeometry = _setup_gui.guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
+
+      var position = linkTuple.mesh.geometry.attributes.position;
+      var target = curveGeometry.attributes.position;
+
+      for (var i = 0; i < target.count; i++) {
+        position.setXYZ(i, target.array[i * 3], target.array[i * 3 + 1], target.array[i * 3 + 2]);
+      }
+
+      position.needsUpdate = true;
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
 }
 
 function redrawLinks() {
@@ -41393,40 +41388,19 @@ function deleteMesh(mesh) {
 function disposeMesh(mesh) {
   mesh.geometry.dispose();
   mesh.material.dispose();
-} //TODO: adapt to remove only links and nodes
-
-
-function clearAll() {
-  while (_main.scene.children.length > 0) {
-    _main.scene.remove(_main.scene.children[0]);
-  }
 }
 
 function updateVisibleLinks(minStrength, maxStrength) {
   var minVisibleLinkIndice = _main.linkMeshList.length * minStrength;
   var maxVisibleLinkIndice = _main.linkMeshList.length * maxStrength;
 
-  var _iterator = _createForOfIteratorHelper(_main.linkMeshList.slice(0, minVisibleLinkIndice)),
-      _step;
-
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var link = _step.value;
-      link.mesh.visible = false;
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-
-  var _iterator2 = _createForOfIteratorHelper(_main.linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)),
+  var _iterator2 = _createForOfIteratorHelper(_main.linkMeshList.slice(0, minVisibleLinkIndice)),
       _step2;
 
   try {
     for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var _link = _step2.value;
-      _link.mesh.visible = true;
+      var link = _step2.value;
+      link.mesh.visible = false;
     }
   } catch (err) {
     _iterator2.e(err);
@@ -41434,21 +41408,167 @@ function updateVisibleLinks(minStrength, maxStrength) {
     _iterator2.f();
   }
 
-  var _iterator3 = _createForOfIteratorHelper(_main.linkMeshList.slice(maxVisibleLinkIndice, _main.linkMeshList.length)),
+  var _iterator3 = _createForOfIteratorHelper(_main.linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)),
       _step3;
 
   try {
     for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-      var _link2 = _step3.value;
-      _link2.mesh.visible = false;
+      var _link = _step3.value;
+      _link.mesh.visible = true;
     }
   } catch (err) {
     _iterator3.e(err);
   } finally {
     _iterator3.f();
   }
+
+  var _iterator4 = _createForOfIteratorHelper(_main.linkMeshList.slice(maxVisibleLinkIndice, _main.linkMeshList.length)),
+      _step4;
+
+  try {
+    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+      var _link2 = _step4.value;
+      _link2.mesh.visible = false;
+    }
+  } catch (err) {
+    _iterator4.e(err);
+  } finally {
+    _iterator4.f();
+  }
 }
-},{"three":"../node_modules/three/build/three.module.js","./draw_sensors":"../js/draw_sensors.js","../public/main":"main.js","./load_data":"../js/load_data.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../../public/main":"main.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.linkVolumeGenerator = exports.linkLineGenerator = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ARC_SEGMENTS = 48;
+
+var linkMeshGenerator = function linkMeshGenerator() {
+  _classCallCheck(this, linkMeshGenerator);
+};
+
+var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
+  _inherits(linkLineGenerator, _linkMeshGenerator);
+
+  var _super = _createSuper(linkLineGenerator);
+
+  function linkLineGenerator() {
+    _classCallCheck(this, linkLineGenerator);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(linkLineGenerator, null, [{
+    key: "generateLink",
+    value: function generateLink(curvePath, link) {
+      var geometry = this.getGeometry(curvePath, link);
+      var linkMat = this.getMaterial(link.strength);
+      var curveObject = new THREE.Line(geometry, linkMat);
+      return curveObject;
+    }
+  }, {
+    key: "getMaterial",
+    value: function getMaterial(strength) {
+      return new THREE.LineBasicMaterial({
+        color: new THREE.Color(strength, 0, 1 - strength),
+        linewidth: 0.001,
+        opacity: strength,
+        transparent: false
+      });
+    }
+  }, {
+    key: "getGeometry",
+    value: function getGeometry(curvePath) {
+      var link = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : None;
+      var splinePoints = curvePath.getPoints((ARC_SEGMENTS - 1) / curvePath.curves.length);
+      return new THREE.BufferGeometry().setFromPoints(splinePoints);
+    }
+  }]);
+
+  return linkLineGenerator;
+}(linkMeshGenerator);
+
+exports.linkLineGenerator = linkLineGenerator;
+
+var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
+  _inherits(linkVolumeGenerator, _linkMeshGenerator2);
+
+  var _super2 = _createSuper(linkVolumeGenerator);
+
+  function linkVolumeGenerator() {
+    _classCallCheck(this, linkVolumeGenerator);
+
+    return _super2.apply(this, arguments);
+  }
+
+  _createClass(linkVolumeGenerator, null, [{
+    key: "generateLink",
+    value: function generateLink(curvePath, link) {
+      var geometry = this.getGeometry(curvePath, link);
+      var linkMat = this.getMaterial(link.strength);
+      var curveObject = new THREE.Mesh(geometry, linkMat);
+      return curveObject;
+    }
+  }, {
+    key: "getMaterial",
+    value: function getMaterial(strength) {
+      return new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(strength, 0, 1 - strength),
+        opacity: strength,
+        transparent: false
+      });
+    }
+  }, {
+    key: "getGeometry",
+    value: function getGeometry(curvePath, link) {
+      var extrudeSettings = {
+        steps: ARC_SEGMENTS,
+        bevelEnabled: false,
+        extrudePath: curvePath
+      };
+      var linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
+      return new THREE.ExtrudeGeometry(linkProfileShape, extrudeSettings);
+    }
+  }]);
+
+  return linkVolumeGenerator;
+}(linkMeshGenerator);
+
+exports.linkVolumeGenerator = linkVolumeGenerator;
+},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41464,7 +41584,7 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-function getSplinePoints(link, L) {
+function getSplinePoints(link) {
   var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
   var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
   var pointA = {
@@ -41533,11 +41653,13 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-function getSplinePointsPlane(link, L) {
+function getSplinePointsPlane(link) {
   var pointA = link.node1.position;
   var pointB = link.node2.position;
   var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
-  var curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
+  var curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
+  var curvePath = new THREE.CurvePath();
+  curvePath.add(curve);
   return curvePath;
 } // function getSplinePointsPlane(link, L){
 //     const pointA = {controlPoint: link.node1.position};
@@ -41587,7 +41709,9 @@ exports.guiParams = void 0;
 
 var _main = require("../public/main");
 
-var _draw_links = require("./draw_links");
+var _draw_links = require("./link_builder/draw_links");
+
+var _link_mesh_generator = require("./link_builder/link_mesh_generator");
 
 var _draw_cortex = require("./draw_cortex");
 
@@ -41611,12 +41735,12 @@ var guiParams = {
   linkSensorAngles: 3 / 8,
   linkSensorHandleDistances: 1,
   linkTopPointAngle: 0,
-  generateLinkMesh: _draw_links.generateLinkLineMesh,
+  linkGenerator: _link_mesh_generator.linkLineGenerator,
   makeLinkLineMesh: function makeLinkLineMesh() {
-    return changeLinkMesh(_draw_links.generateLinkLineMesh);
+    return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
   },
   makeLinkVolumeMesh: function makeLinkVolumeMesh() {
-    return changeLinkMesh(_draw_links.generateLinkVolumeMesh);
+    return changeLinkMesh(_link_mesh_generator.linkVolumeGenerator);
   },
   linkThickness: 1.,
   getSplinePoints: _compute_link_shape.getSplinePoints,
@@ -41643,40 +41767,40 @@ var premadeLinkGeometriesParam = {
     guiParams.linkTopPointHandleDistances = 0.5;
     guiParams.linkSensorAngles = 3 / 8;
     guiParams.linkSensorHandleDistances = 0.;
-    (0, _draw_links.redrawLinks)();
+    (0, _draw_links.updateLinkOutline)();
   },
   bellLinkGeometry: function bellLinkGeometry() {
     guiParams.linkHeight = 0.75;
     guiParams.linkTopPointHandleDistances = 0.5;
     guiParams.linkSensorAngles = 0.;
     guiParams.linkSensorHandleDistances = .5;
-    (0, _draw_links.redrawLinks)();
+    (0, _draw_links.updateLinkOutline)();
   },
   triangleLinkGeometry: function triangleLinkGeometry() {
     guiParams.linkHeight = 0.75;
     guiParams.linkTopPointHandleDistances = 0;
     guiParams.linkSensorAngles = 0.;
     guiParams.linkSensorHandleDistances = 0.;
-    (0, _draw_links.redrawLinks)();
+    (0, _draw_links.updateLinkOutline)();
   },
   roundedSquareLinkGeometry: function roundedSquareLinkGeometry() {
     guiParams.linkHeight = 0.5;
     guiParams.linkTopPointHandleDistances = 1.;
     guiParams.linkSensorAngles = 0.5;
     guiParams.linkSensorHandleDistances = 1.;
-    (0, _draw_links.redrawLinks)();
+    (0, _draw_links.updateLinkOutline)();
   },
   peakLinkGeometry: function peakLinkGeometry() {
     guiParams.linkHeight = 0.75;
     guiParams.linkTopPointHandleDistances = 0;
     guiParams.linkSensorAngles = 0.;
     guiParams.linkSensorHandleDistances = 1.;
-    (0, _draw_links.redrawLinks)();
+    (0, _draw_links.updateLinkOutline)();
   }
 };
 
-function changeLinkMesh(generateLinkMethod) {
-  guiParams.generateLinkMesh = generateLinkMethod;
+function changeLinkMesh(linkGenerator) {
+  guiParams.linkGenerator = linkGenerator;
   (0, _draw_links.redrawLinks)();
 }
 
@@ -41703,10 +41827,10 @@ function setupGui() {
 
   var linkGeometry = _main.gui.addFolder('linkGeometry');
 
-  linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(_draw_links.redrawLinks).listen();
-  linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(_draw_links.redrawLinks).listen();
-  linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(_draw_links.redrawLinks).listen();
-  linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(_draw_links.redrawLinks).listen(); //This one below is messy
+  linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen(); //This one below is messy
   //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
   var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
@@ -41720,14 +41844,15 @@ function setupGui() {
   var linkVolume = _main.gui.addFolder('linkVolume');
 
   linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
-  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
+  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume'); //TODO: adapt redrawLinks
+
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
 
   _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
 }
-},{"../public/main":"main.js","./draw_links":"../js/draw_links.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
+},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41923,7 +42048,7 @@ var _draw_cortex = require("../js/draw_cortex.js");
 
 var _draw_sensors = require("../js/draw_sensors.js");
 
-var _draw_links = require("../js/draw_links");
+var _draw_links = require("../js/link_builder/draw_links");
 
 var _setup_camera = require("../js/setup_camera");
 
@@ -42124,7 +42249,7 @@ function handleConnectivityMatrixFileSelect(evt) {
   (0, _draw_links.clearLinks)();
   (0, _draw_links.loadAndDrawLinks)(fileUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/draw_links":"../js/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42152,7 +42277,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55072" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62276" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

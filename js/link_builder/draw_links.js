@@ -1,10 +1,9 @@
 import * as THREE from "three";
-import { sensorMeshList } from './draw_sensors';
-import { scene, linkMeshList, LINK_LAYER} from '../public/main';
-import { loadData } from './load_data';
-import { guiParams } from './setup_gui';
-import { maxSensorDistance } from './draw_sensors';
-
+import { sensorMeshList } from '../draw_sensors';
+import { scene, linkMeshList, LINK_LAYER} from '../../public/main';
+import { loadData } from '../load_data';
+import { guiParams } from '../setup_gui';
+import { maxSensorDistance } from '../draw_sensors';
 
 
 function loadAndDrawLinks(linksDataFileUrl){
@@ -41,44 +40,27 @@ async function drawLinksAndUpdateVisibility(linkList){
 }
 
 async function drawLinks(linkList){
-    const L = maxSensorDistance * .5;
     for (const link of linkList){
-        const splinePoints = guiParams.getSplinePoints(link, L);
-        //Change here the generate link method to get volume, or just a line
-        const curveObject = guiParams.generateLinkMesh(splinePoints, link);
+        const splinePoints = guiParams.getSplinePoints(link);
+        const curveObject = guiParams.linkGenerator.generateLink(splinePoints, link);
         curveObject.layers.set(LINK_LAYER);
         scene.add(curveObject);
         linkMeshList.push({link: link, mesh: curveObject});
     }
 }
 
+function updateLinkOutline(){
+    for (let linkTuple of linkMeshList){
+        const splinePoints = guiParams.getSplinePoints(linkTuple.link);
+        const curveGeometry = guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
 
-function generateLinkLineMesh(curvePath, link){
-    const splinePoints = curvePath.getPoints(24);
-    const geometry = new THREE.BufferGeometry().setFromPoints( splinePoints );
-    const linkMat = new THREE.LineBasicMaterial( { 
-        color : new THREE.Color(link.strength, 0, 1-link.strength), 
-        opacity: link.strength,
-    transparent: true } );
-    const curveObject = new THREE.Line( geometry, linkMat );
-    return curveObject;
-}
-
-function generateLinkVolumeMesh(curvePath, link){
-    const linkMat = new THREE.MeshPhysicalMaterial({
-        color : new THREE.Color(link.strength, 0, 1-link.strength), 
-        opacity: link.strength,
-        transparent: true
-    });
-    const linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * guiParams.linkThickness, 0, Math.PI * 2, false);
-    const extrudeSettings = {
-        steps: 24,
-        bevelEnabled: false,
-        extrudePath: curvePath
-    };
-    const geometry = new THREE.ExtrudeGeometry( linkProfileShape, extrudeSettings );
-    const curveObject = new THREE.Mesh( geometry, linkMat );
-    return curveObject;
+        const position = linkTuple.mesh.geometry.attributes.position;
+        const target = curveGeometry.attributes.position;
+        for (let i = 0; i < target.count; i++){
+            position.setXYZ(i, target.array[i*3], target.array[i*3+1], target.array[i*3+2]);
+        }
+        position.needsUpdate = true;
+    }
 }
 
 function redrawLinks(){
@@ -109,13 +91,6 @@ function disposeMesh(mesh){
     mesh.material.dispose();
 }
 
-//TODO: adapt to remove only links and nodes
-function clearAll(){
-    while(scene.children.length > 0){ 
-        scene.remove(scene.children[0]); 
-    }
-}
-
 function updateVisibleLinks(minStrength, maxStrength) {
     const minVisibleLinkIndice = (linkMeshList.length) * minStrength;
     const maxVisibleLinkIndice = (linkMeshList.length) * maxStrength;
@@ -135,11 +110,9 @@ function updateVisibleLinks(minStrength, maxStrength) {
 
  export {
     clearAllLinks as clearLinks,
-    clearAll,
     deleteMesh,
     loadAndDrawLinks,
-    generateLinkLineMesh,
-    generateLinkVolumeMesh,
     redrawLinks,
+    updateLinkOutline,
     updateVisibleLinks}
      

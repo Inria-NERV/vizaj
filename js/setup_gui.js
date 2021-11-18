@@ -1,5 +1,6 @@
 import { gui, controls } from '../public/main';
-import { generateLinkLineMesh, generateLinkVolumeMesh, redrawLinks, updateVisibleLinks, clearLinks, loadAndDrawLinks } from './draw_links';
+import { redrawLinks, updateLinkOutline, updateVisibleLinks, clearLinks, loadAndDrawLinks } from './link_builder/draw_links';
+import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
@@ -20,9 +21,10 @@ const guiParams = {
     linkSensorHandleDistances: 1,
     linkTopPointAngle: 0,
 
-    generateLinkMesh: generateLinkLineMesh,
-    makeLinkLineMesh: () => changeLinkMesh(generateLinkLineMesh),
-    makeLinkVolumeMesh: () => changeLinkMesh(generateLinkVolumeMesh),
+    linkGenerator: linkLineGenerator,
+
+    makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
+    makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
     linkThickness: 1.,
 
     getSplinePoints: getSplinePoints,
@@ -49,41 +51,41 @@ const guiParams = {
         guiParams.linkTopPointHandleDistances = 0.5;
         guiParams.linkSensorAngles = 3 / 8;
         guiParams.linkSensorHandleDistances = 0.;
-        redrawLinks();
+        updateLinkOutline();
     },
     bellLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0.5;
         guiParams.linkSensorAngles = 0.;
         guiParams.linkSensorHandleDistances = .5;
-        redrawLinks();
+        updateLinkOutline();
     },
     triangleLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0;
         guiParams.linkSensorAngles = 0.;
         guiParams.linkSensorHandleDistances = 0.;
-        redrawLinks();
+        updateLinkOutline();
     },
     roundedSquareLinkGeometry: () => {
         guiParams.linkHeight = 0.5;
         guiParams.linkTopPointHandleDistances = 1.;
         guiParams.linkSensorAngles = 0.5;
         guiParams.linkSensorHandleDistances = 1.;
-        redrawLinks();
+        updateLinkOutline();
     },
     peakLinkGeometry: () => {
         guiParams.linkHeight = 0.75;
         guiParams.linkTopPointHandleDistances = 0;
         guiParams.linkSensorAngles = 0.;
         guiParams.linkSensorHandleDistances = 1.;
-        redrawLinks();
+        updateLinkOutline();
     },
 
   }
 
-function changeLinkMesh(generateLinkMethod){
-    guiParams.generateLinkMesh = generateLinkMethod;
+function changeLinkMesh(linkGenerator){
+    guiParams.linkGenerator = linkGenerator;
     redrawLinks();
 }
 
@@ -98,10 +100,10 @@ function setupGui() {
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
     const linkGeometry = gui.addFolder('linkGeometry');
-    linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(redrawLinks).listen();
-    linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(redrawLinks).listen();
-    linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(redrawLinks).listen();
-    linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(redrawLinks).listen();
+    linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen();
+    linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen();
+    linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen();
+    linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen();
     //This one below is messy
     //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
@@ -115,6 +117,7 @@ function setupGui() {
     const linkVolume = gui.addFolder('linkVolume');
     linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
     linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
+    //TODO: adapt redrawLinks
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     gui.add(guiParams, 'loadFile').name('Load CSV file');

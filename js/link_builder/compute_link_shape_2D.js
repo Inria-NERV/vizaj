@@ -4,7 +4,7 @@ import { maxSensorDistance } from '../draw_sensors';
 import { guiParams } from '../setup_gui';
 
 
-function getSplinePointsPlane(link, L){
+function getSplinePointsPlane(link){
     const pointA = link.node1.position;
     const pointB = link.node2.position;
     const pointC = new THREE.Vector3(
@@ -12,7 +12,9 @@ function getSplinePointsPlane(link, L){
         (pointA.distanceTo(pointB)) * guiParams.linkHeight,
         (pointA.z + pointB.z)/2
     );
-    const curvePath = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
+    const curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
+    const curvePath = new THREE.CurvePath();
+    curvePath.add(curve);
     return curvePath;
 }
 

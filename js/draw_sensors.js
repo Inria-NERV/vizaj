@@ -4,7 +4,7 @@ import { scene,
     SENSOR_RADIUS, SENSOR_RINGS, SENSOR_SEGMENTS } from "../public/main.js";
 import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { guiParams } from "./setup_gui";
-import { deleteMesh } from "./draw_links"
+import { deleteMesh } from "./link_builder/draw_links"
 
 const sensorMeshList = [];
 let maxSensorDistance = 0.;
