@@ -5,8 +5,9 @@ import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
-import { loadAndDrawSensors, sensorMeshList } from '../js/draw_sensors.js';
+import { loadAndDrawSensors } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearLinks } from "../js/link_builder/draw_links";
+import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 
@@ -18,7 +19,6 @@ const cortexTriUrl = require('../data/cortex_tri.csv');
 const sensorLabelsUrl = require('../data/sensor_labels.csv');
 const sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
-//const imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
@@ -42,6 +42,7 @@ const enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
 });
 
 const linkMeshList = [];
+const sensorMeshList = [];
 
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
@@ -65,11 +66,7 @@ animate();
 function init() {
   THREE.Cache.enabled = true;
   setupGui();
-  setupCamera();
-  addLightAndBackground();
-  loadAndDrawCortexModel();
-  loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
-  loadAndDrawLinks(connectivityMatrixUrl);
+  generateSceneElements();
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
@@ -82,6 +79,15 @@ function onWindowResize() {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 
+}
+
+async function generateSceneElements(){
+  setupCamera();
+  addLightAndBackground();
+  loadAndDrawCortexModel();
+  await loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+  await loadAndDrawLinks(connectivityMatrixUrl);
+  drawAllDegreeLines();
 }
 
 function onDocumentMouseMove(event) {
@@ -103,8 +109,7 @@ function animate() {
 function hoverDisplayUpdate() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
-
-  if (intersects.length !== 0 && sensorMeshList.includes(intersects[0].object)) {
+  if (intersects.length !== 0 && sensorMeshList.map(x=>x.mesh).includes(intersects[0].object)) {
     if (INTERSECTED != intersects[0].object) {
       emptyIntersected();
       INTERSECTED = intersects[0].object;
@@ -171,6 +176,7 @@ export {
     camera,
     controls,
     renderer,
+    sensorMeshList,
     linkMeshList,
     gui,
     cortexVertUrl, 

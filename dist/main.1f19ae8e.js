@@ -41046,7 +41046,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadAndDrawSensors = loadAndDrawSensors;
 exports.clearAllSensors = clearAllSensors;
-exports.maxSensorDistance = exports.sensorMeshList = void 0;
+Object.defineProperty(exports, "sensorMeshList", {
+  enumerable: true,
+  get: function () {
+    return _main.sensorMeshList;
+  }
+});
+exports.maxSensorDistance = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -41066,86 +41072,126 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var sensorMeshList = [];
-exports.sensorMeshList = sensorMeshList;
-var maxSensorDistance = 0.;
+var maxSensorDistance = 0.; //TODO: add await to draw all sensors to ensure sensorMeshList is populated before being used
+
 exports.maxSensorDistance = maxSensorDistance;
 
-function loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl) {
-  loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl).then(function (response) {
-    drawAllSensors(response[0], response[1]);
-    getMaxSensorDistance(response[1]);
-  });
+function loadAndDrawSensors(_x, _x2) {
+  return _loadAndDrawSensors.apply(this, arguments);
 }
 
-function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
-  return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
-}
-
-function loadSensorCoordinates(_x) {
-  return _loadSensorCoordinates.apply(this, arguments);
-}
-
-function _loadSensorCoordinates() {
-  _loadSensorCoordinates = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl) {
+function _loadAndDrawSensors() {
+  _loadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl, sensorLabelsUrl) {
+    var data;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt("return", (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow));
+            _context.next = 2;
+            return loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
 
-          case 1:
+          case 2:
+            data = _context.sent;
+            _context.next = 5;
+            return drawAllSensors(data[0], data[1]);
+
+          case 5:
+            getMaxSensorDistance(data[1]);
+
+          case 6:
           case "end":
             return _context.stop();
         }
       }
     }, _callee);
   }));
-  return _loadSensorCoordinates.apply(this, arguments);
+  return _loadAndDrawSensors.apply(this, arguments);
 }
 
-function loadSensorLabels(_x2) {
-  return _loadSensorLabels.apply(this, arguments);
+function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
+  return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
 }
 
-function _loadSensorLabels() {
-  _loadSensorLabels = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(sensorLabelsUrl) {
+function loadSensorCoordinates(sensorCoordinatesUrl) {
+  return (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow);
+}
+
+function loadSensorLabels(sensorLabelsUrl) {
+  return (0, _load_data.loadData)(sensorLabelsUrl, 'sensor labels', function (x) {
+    return x;
+  });
+}
+
+function drawAllSensors(_x3, _x4) {
+  return _drawAllSensors.apply(this, arguments);
+}
+
+function _drawAllSensors() {
+  _drawAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(labelList, coordinatesList) {
+    var i;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            return _context2.abrupt("return", (0, _load_data.loadData)(sensorLabelsUrl, 'sensor labels', function (x) {
-              return x;
-            }));
+            i = 0;
 
           case 1:
+            if (!(i < labelList.length)) {
+              _context2.next = 7;
+              break;
+            }
+
+            _context2.next = 4;
+            return drawSensor(labelList[i], coordinatesList[i]);
+
+          case 4:
+            i++;
+            _context2.next = 1;
+            break;
+
+          case 7:
           case "end":
             return _context2.stop();
         }
       }
     }, _callee2);
   }));
-  return _loadSensorLabels.apply(this, arguments);
+  return _drawAllSensors.apply(this, arguments);
 }
 
-function drawAllSensors(labelList, coordinatesList) {
-  for (var i = 0; i < labelList.length; i++) {
-    drawSensor(labelList[i], coordinatesList[i]);
-  }
+function drawSensor(_x5, _x6) {
+  return _drawSensor.apply(this, arguments);
 }
 
-function drawSensor(label, coordinates) {
-  var sensorGeometry = new THREE.SphereGeometry(_main.SENSOR_RADIUS, _main.SENSOR_SEGMENTS, _main.SENSOR_RINGS);
-  var sensor = new THREE.Mesh(sensorGeometry, _main.sensorMaterial);
-  sensor.castShadow = false;
-  sensor.name = label;
-  sensor.position.x = coordinates[0];
-  sensor.position.y = coordinates[1];
-  sensor.position.z = coordinates[2];
+function _drawSensor() {
+  _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(label, coordinates) {
+    var sensorGeometry, sensor;
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            sensorGeometry = new THREE.SphereGeometry(_main.SENSOR_RADIUS, _main.SENSOR_SEGMENTS, _main.SENSOR_RINGS);
+            sensor = new THREE.Mesh(sensorGeometry, _main.sensorMaterial);
+            sensor.castShadow = false;
+            sensor.name = label;
+            sensor.position.x = coordinates[0];
+            sensor.position.y = coordinates[1];
+            sensor.position.z = coordinates[2];
 
-  _main.scene.add(sensor);
+            _main.scene.add(sensor);
 
-  sensorMeshList.push(sensor);
+            _main.sensorMeshList.push({
+              mesh: sensor
+            });
+
+          case 9:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+  return _drawSensor.apply(this, arguments);
 }
 
 function getMaxSensorDistance(positions) {
@@ -41163,12 +41209,145 @@ function getMaxSensorDistance(positions) {
 }
 
 function clearAllSensors() {
-  while (sensorMeshList.length) {
-    var sensor = sensorMeshList.pop();
-    (0, _draw_links.deleteMesh)(sensor);
+  while (_main.sensorMeshList.length) {
+    var sensor = _main.sensorMeshList.pop();
+
+    (0, _draw_links.deleteMesh)(sensor.mesh);
   }
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./link_builder/draw_links":"../js/link_builder/draw_links.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./link_builder/draw_links":"../js/link_builder/draw_links.js"}],"../js/draw_degree_line.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.drawDegreeLine = drawDegreeLine;
+exports.drawAllDegreeLines = drawAllDegreeLines;
+exports.updateAllDegreeLines = updateAllDegreeLines;
+exports.updateDegreeLinesVisibility = updateDegreeLinesVisibility;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _main = require("../public/main");
+
+var _draw_sensors = require("./draw_sensors");
+
+var _setup_gui = require("./setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var degreeLineMaterial = new THREE.MeshBasicMaterial({
+  color: 0x5555ff,
+  opacity: .6,
+  transparent: true
+});
+var DEGREE_LINE_TUBULAR_SEGMENTS = 2;
+var DEGREE_LINE_RADIUS = 1.3;
+var DEGREE_LINE_RADIAL_SEGMENTS = 8;
+
+function drawDegreeLine(sensor) {
+  var sensorMesh = sensor.mesh;
+  var unitVector = sensorMesh.position.clone().normalize();
+  var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, 150);
+  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .1);
+  var curve = new THREE.LineCurve(sensorMesh.position, endPoint);
+  var flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
+  var geometry = new THREE.TubeGeometry(curve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
+  var flatGeometry = new THREE.TubeGeometry(flatCurve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
+  geometry.morphAttributes.position = [];
+  geometry.morphAttributes.position[0] = new THREE.Float32BufferAttribute(flatGeometry.attributes.position.array, 3);
+  var line = new THREE.Mesh(geometry, degreeLineMaterial);
+  line.morphTargetInfluences = [];
+  line.layers.set(_main.LINK_LAYER);
+
+  _main.scene.add(line);
+
+  sensor.degreeLine = line;
+  updateNodeDegreeLine(sensor);
+  return sensor;
+}
+
+function drawAllDegreeLines() {
+  for (var i = 0; i < _draw_sensors.sensorMeshList.length; i++) {
+    _draw_sensors.sensorMeshList[i] = drawDegreeLine(_draw_sensors.sensorMeshList[i]);
+  }
+}
+
+function getNodeDegree(sensorMesh) {
+  var nodeDegree = 0;
+
+  var _iterator = _createForOfIteratorHelper(_main.linkMeshList.filter(function (linkMesh) {
+    return linkMesh.mesh.visible === true;
+  })),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var linkMesh = _step.value;
+      var link = linkMesh.link;
+
+      if (link.node1.name == sensorMesh.name || link.node2.name == sensorMesh.name) {
+        nodeDegree++;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return nodeDegree;
+}
+
+function updateNodeDegreeLine(sensor) {
+  var sensorCount = _draw_sensors.sensorMeshList.length;
+  var nodeDegree = getNodeDegree(sensor.mesh);
+  sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (sensorCount - 1);
+}
+
+function updateAllDegreeLines() {
+  var _iterator2 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var sensor = _step2.value;
+
+      if (sensor.mesh && sensor.degreeLine) {
+        updateNodeDegreeLine(sensor);
+      }
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+}
+
+function updateDegreeLinesVisibility() {
+  var _iterator3 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
+      _step3;
+
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var sensor = _step3.value;
+      sensor.degreeLine.visible = _setup_gui.guiParams.showDegreeLines;
+    }
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+}
+},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41183,13 +41362,15 @@ exports.updateVisibleLinks = updateVisibleLinks;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _draw_sensors = require("../draw_sensors");
-
 var _main = require("../../public/main");
+
+var _draw_degree_line = require("../draw_degree_line");
 
 var _load_data = require("../load_data");
 
 var _setup_gui = require("../setup_gui");
+
+var _draw_sensors = require("../draw_sensors");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -41205,32 +41386,55 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function loadAndDrawLinks(linksDataFileUrl) {
-  loadLinks(linksDataFileUrl).then(function (response) {
-    return drawLinksAndUpdateVisibility(response);
-  });
+function loadAndDrawLinks(_x) {
+  return _loadAndDrawLinks.apply(this, arguments);
 }
 
-function loadLinks(_x) {
-  return _loadLinks.apply(this, arguments);
-}
-
-function _loadLinks() {
-  _loadLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(linksDataFileUrl) {
+function _loadAndDrawLinks() {
+  _loadAndDrawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(linksDataFileUrl) {
+    var links;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            return _context.abrupt("return", (0, _load_data.loadData)(linksDataFileUrl, 'connectivity matrix', function (x) {
-              return x;
-            }, connectivityMatrixOnLoadCallBack));
+            _context.next = 2;
+            return loadLinks(linksDataFileUrl);
 
-          case 1:
+          case 2:
+            links = _context.sent;
+            _context.next = 5;
+            return drawLinksAndUpdateVisibility(links);
+
+          case 5:
           case "end":
             return _context.stop();
         }
       }
     }, _callee);
+  }));
+  return _loadAndDrawLinks.apply(this, arguments);
+}
+
+function loadLinks(_x2) {
+  return _loadLinks.apply(this, arguments);
+}
+
+function _loadLinks() {
+  _loadLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linksDataFileUrl) {
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            return _context2.abrupt("return", (0, _load_data.loadData)(linksDataFileUrl, 'connectivity matrix', function (x) {
+              return x;
+            }, connectivityMatrixOnLoadCallBack));
+
+          case 1:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
   }));
   return _loadLinks.apply(this, arguments);
 }
@@ -41247,10 +41451,10 @@ function connectivityMatrixOnLoadCallBack(data) {
 
     for (var j = 0; j < i; j++) {
       outList.push({
-        node1: _draw_sensors.sensorMeshList[i],
-        node2: _draw_sensors.sensorMeshList[j],
+        node1: _main.sensorMeshList[i].mesh,
+        node2: _main.sensorMeshList[j].mesh,
         strength: parseFloat(splittedRow[j]),
-        normDist: _draw_sensors.sensorMeshList[i].position.distanceTo(_draw_sensors.sensorMeshList[j].position) / _draw_sensors.maxSensorDistance
+        normDist: _main.sensorMeshList[i].mesh.position.distanceTo(_main.sensorMeshList[j].mesh.position) / _draw_sensors.maxSensorDistance
       });
     }
   }
@@ -41258,15 +41462,15 @@ function connectivityMatrixOnLoadCallBack(data) {
   return outList;
 }
 
-function drawLinksAndUpdateVisibility(_x2) {
+function drawLinksAndUpdateVisibility(_x3) {
   return _drawLinksAndUpdateVisibility.apply(this, arguments);
 }
 
 function _drawLinksAndUpdateVisibility() {
-  _drawLinksAndUpdateVisibility = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linkList) {
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+  _drawLinksAndUpdateVisibility = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
             drawLinks(linkList).then(function () {
               _main.linkMeshList.sort(function (x1, x2) {
@@ -41278,25 +41482,25 @@ function _drawLinksAndUpdateVisibility() {
 
           case 1:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
-    }, _callee2);
+    }, _callee3);
   }));
   return _drawLinksAndUpdateVisibility.apply(this, arguments);
 }
 
-function drawLinks(_x3) {
+function drawLinks(_x4) {
   return _drawLinks.apply(this, arguments);
 }
 
 function _drawLinks() {
-  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
+  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(linkList) {
     var _iterator5, _step5, link, splinePoints, curveObject;
 
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context4.prev = _context4.next) {
           case 0:
             _iterator5 = _createForOfIteratorHelper(linkList);
 
@@ -41322,10 +41526,10 @@ function _drawLinks() {
 
           case 2:
           case "end":
-            return _context3.stop();
+            return _context4.stop();
         }
       }
-    }, _callee3);
+    }, _callee4);
   }));
   return _drawLinks.apply(this, arguments);
 }
@@ -41435,8 +41639,10 @@ function updateVisibleLinks(minStrength, maxStrength) {
   } finally {
     _iterator4.f();
   }
+
+  (0, _draw_degree_line.updateAllDegreeLines)();
 }
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../../public/main":"main.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41721,6 +41927,8 @@ var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D");
 
 var _draw_sensors = require("./draw_sensors");
 
+var _draw_degree_line = require("./draw_degree_line");
+
 var guiParams = {
   loadFile: function loadFile() {
     return document.getElementById('fileInput').click();
@@ -41730,6 +41938,7 @@ var guiParams = {
   minStrengthToDisplay: 0.,
   maxStrengthToDisplay: .2,
   showBrain: true,
+  showDegreeLines: true,
   linkHeight: 0.5,
   linkTopPointHandleDistances: .25,
   linkSensorAngles: 3 / 8,
@@ -41848,11 +42057,13 @@ function setupGui() {
 
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
+  _main.gui.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility);
+
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
 
   _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
 }
-},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
+},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42032,7 +42243,7 @@ module.exports = "/conn_matrix_0.5c498bf8.csv";
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.SENSOR_RINGS = exports.SENSOR_SEGMENTS = exports.SENSOR_RADIUS = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.SENSOR_RINGS = exports.SENSOR_SEGMENTS = exports.SENSOR_RADIUS = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -42050,6 +42261,8 @@ var _draw_sensors = require("../js/draw_sensors.js");
 
 var _draw_links = require("../js/link_builder/draw_links");
 
+var _draw_degree_line = require("../js/draw_degree_line");
+
 var _setup_camera = require("../js/setup_camera");
 
 var _setup_gui = require("../js/setup_gui");
@@ -42063,6 +42276,10 @@ function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 var highlightedLinksPreviousMaterials = [];
 
@@ -42078,8 +42295,7 @@ var sensorLabelsUrl = require('../data/sensor_labels.csv');
 
 var sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 
-var connectivityMatrixUrl = require('../data/conn_matrix_0.csv'); //const imConnectivityMatrixUrl = require('../data/imag_conn_matrix_0.csv');
-
+var connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 var GLOBAL_LAYER = 0,
     LINK_LAYER = 1;
@@ -42109,6 +42325,8 @@ var enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
 });
 var linkMeshList = [];
 exports.linkMeshList = linkMeshList;
+var sensorMeshList = [];
+exports.sensorMeshList = sensorMeshList;
 var scene = new THREE.Scene();
 exports.scene = scene;
 var renderer = new THREE.WebGLRenderer();
@@ -42132,11 +42350,7 @@ animate();
 function init() {
   THREE.Cache.enabled = true;
   (0, _setup_gui.setupGui)();
-  (0, _setup_camera.setupCamera)();
-  (0, _add_light_and_background.addLightAndBackground)();
-  (0, _draw_cortex.loadAndDrawCortexModel)();
-  (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
-  (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
+  generateSceneElements();
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
   fileInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
@@ -42146,6 +42360,39 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function generateSceneElements() {
+  return _generateSceneElements.apply(this, arguments);
+}
+
+function _generateSceneElements() {
+  _generateSceneElements = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            (0, _setup_camera.setupCamera)();
+            (0, _add_light_and_background.addLightAndBackground)();
+            (0, _draw_cortex.loadAndDrawCortexModel)();
+            _context.next = 5;
+            return (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+
+          case 5:
+            _context.next = 7;
+            return (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
+
+          case 7:
+            (0, _draw_degree_line.drawAllDegreeLines)();
+
+          case 8:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _generateSceneElements.apply(this, arguments);
 }
 
 function onDocumentMouseMove(event) {
@@ -42168,7 +42415,9 @@ function hoverDisplayUpdate() {
   raycaster.setFromCamera(mouse, camera);
   var intersects = raycaster.intersectObjects(scene.children);
 
-  if (intersects.length !== 0 && _draw_sensors.sensorMeshList.includes(intersects[0].object)) {
+  if (intersects.length !== 0 && sensorMeshList.map(function (x) {
+    return x.mesh;
+  }).includes(intersects[0].object)) {
     if (INTERSECTED != intersects[0].object) {
       emptyIntersected();
       INTERSECTED = intersects[0].object;
@@ -42249,7 +42498,7 @@ function handleConnectivityMatrixFileSelect(evt) {
   (0, _draw_links.clearLinks)();
   (0, _draw_links.loadAndDrawLinks)(fileUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

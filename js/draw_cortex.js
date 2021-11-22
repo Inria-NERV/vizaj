@@ -6,7 +6,7 @@ import { guiParams } from './setup_gui';
 
 let brainMesh;
 
-export function loadAndDrawCortexModel()
+function loadAndDrawCortexModel()
 {   
     loadCortexModel()
     .then((response) => makeVertCoordsList(response[0], response[1]))
@@ -54,8 +54,7 @@ function drawCortexModel(vertices){
     scene.add( brainMesh );
 }
 
-function updateBrainMeshVisibility()
-{
+function updateBrainMeshVisibility(){
     brainMesh.visible = guiParams.showBrain;
     brainMesh.layers.toggle(GLOBAL_LAYER);
 }
@@ -66,6 +65,7 @@ function hideBrain(){
 }
 
 export {
+    loadAndDrawCortexModel,
     updateBrainMeshVisibility,
     hideBrain
 };

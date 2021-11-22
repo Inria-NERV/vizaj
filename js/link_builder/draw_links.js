@@ -1,14 +1,14 @@
-import * as THREE from "three";
-import { sensorMeshList } from '../draw_sensors';
-import { scene, linkMeshList, LINK_LAYER} from '../../public/main';
+import * as THREE from "three"
+import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
+import { updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 
 
-function loadAndDrawLinks(linksDataFileUrl){
-    loadLinks(linksDataFileUrl)
-    .then((response) => drawLinksAndUpdateVisibility(response));
+async function loadAndDrawLinks(linksDataFileUrl){
+    const links = await loadLinks(linksDataFileUrl);
+    await drawLinksAndUpdateVisibility(links);
 }
 
 async function loadLinks(linksDataFileUrl){
@@ -23,10 +23,10 @@ function connectivityMatrixOnLoadCallBack(data){
         const splittedRow = row.split(',');
         for (let j = 0; j < i; j++){
             outList.push({
-                node1:sensorMeshList[i],
-                node2:sensorMeshList[j],
+                node1:sensorMeshList[i].mesh,
+                node2:sensorMeshList[j].mesh,
                 strength: parseFloat(splittedRow[j]),
-                normDist: sensorMeshList[i].position.distanceTo(sensorMeshList[j].position) / maxSensorDistance
+                normDist: sensorMeshList[i].mesh.position.distanceTo(sensorMeshList[j].mesh.position) / maxSensorDistance
             });
         }
     }
@@ -94,18 +94,17 @@ function disposeMesh(mesh){
 function updateVisibleLinks(minStrength, maxStrength) {
     const minVisibleLinkIndice = (linkMeshList.length) * minStrength;
     const maxVisibleLinkIndice = (linkMeshList.length) * maxStrength;
-    for (const link of linkMeshList.slice(0, minVisibleLinkIndice))
-    {
+    for (const link of linkMeshList.slice(0, minVisibleLinkIndice)){
         link.mesh.visible = false;
     }
-    for (const link of linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice))
-    {
+    for (const link of linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)){
         link.mesh.visible = true;
     }
-    for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length))
-    {
+    for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length)){
         link.mesh.visible = false;
     }
+    updateAllDegreeLines();
+
 }
 
  export {
