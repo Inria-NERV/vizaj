@@ -41682,9 +41682,9 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ARC_SEGMENTS = 48;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var linkMeshGenerator = function linkMeshGenerator() {
   _classCallCheck(this, linkMeshGenerator);
@@ -41723,7 +41723,7 @@ var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
     key: "getGeometry",
     value: function getGeometry(curvePath, link) {
       //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
-      var splinePoints = curvePath.getPoints((ARC_SEGMENTS - 1) / curvePath.curves.length);
+      var splinePoints = curvePath.getPoints((this.ARC_SEGMENTS - 1) / curvePath.curves.length);
       return new THREE.BufferGeometry().setFromPoints(splinePoints);
     }
   }]);
@@ -41732,6 +41732,8 @@ var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
 }(linkMeshGenerator);
 
 exports.linkLineGenerator = linkLineGenerator;
+
+_defineProperty(linkLineGenerator, "ARC_SEGMENTS", 48);
 
 var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
   _inherits(linkVolumeGenerator, _linkMeshGenerator2);
@@ -41764,13 +41766,8 @@ var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
   }, {
     key: "getGeometry",
     value: function getGeometry(curvePath, link) {
-      var extrudeSettings = {
-        steps: ARC_SEGMENTS,
-        bevelEnabled: false,
-        extrudePath: curvePath
-      };
-      var linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * _setup_gui.guiParams.linkThickness, 0, Math.PI * 2, false);
-      return new THREE.ExtrudeGeometry(linkProfileShape, extrudeSettings);
+      var geometry = new THREE.TubeGeometry(curvePath, this.LINK_SEGMENTS, (1 - link.normDist) * _setup_gui.guiParams.linkThickness, this.LINK_RADIAL_SEGMENTS, false);
+      return geometry;
     }
   }]);
 
@@ -41778,6 +41775,10 @@ var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
 }(linkMeshGenerator);
 
 exports.linkVolumeGenerator = linkVolumeGenerator;
+
+_defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 48);
+
+_defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 20);
 },{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
 "use strict";
 

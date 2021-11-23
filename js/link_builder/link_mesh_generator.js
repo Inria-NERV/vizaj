@@ -1,13 +1,13 @@
 import * as THREE from "three";
 import { guiParams } from '../setup_gui';
 
-const ARC_SEGMENTS = 48;
-
 class linkMeshGenerator{
     
 }
 
 class linkLineGenerator extends linkMeshGenerator{
+    static ARC_SEGMENTS = 48;
+
     static generateLink(curvePath, link){
         const geometry = this.getGeometry(curvePath, link);
         const linkMat = this.getMaterial(link.strength);
@@ -26,12 +26,15 @@ class linkLineGenerator extends linkMeshGenerator{
 
     static getGeometry(curvePath, link){
         //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
-        const splinePoints = curvePath.getPoints((ARC_SEGMENTS-1)/curvePath.curves.length);
+        const splinePoints = curvePath.getPoints((this.ARC_SEGMENTS-1)/curvePath.curves.length);
         return new THREE.BufferGeometry().setFromPoints( splinePoints );
     }
 }
 
 class linkVolumeGenerator extends linkMeshGenerator{
+    static LINK_SEGMENTS = 48;
+    static LINK_RADIAL_SEGMENTS = 20;
+
     static generateLink(curvePath, link){
         const geometry = this.getGeometry(curvePath, link);
         const linkMat = this.getMaterial(link.strength);
@@ -48,13 +51,14 @@ class linkVolumeGenerator extends linkMeshGenerator{
     }
 
     static getGeometry(curvePath, link){
-        const extrudeSettings = {
-            steps: ARC_SEGMENTS,
-            bevelEnabled: false,
-            extrudePath: curvePath
-        };
-        const linkProfileShape = new THREE.Shape().absarc(0., 0., (1. - link.normDist) * guiParams.linkThickness, 0, Math.PI * 2, false);
-        return new THREE.ExtrudeGeometry( linkProfileShape, extrudeSettings );
+        const geometry = new THREE.TubeGeometry(
+            curvePath,
+            this.LINK_SEGMENTS,
+            (1 - link.normDist) * guiParams.linkThickness,
+            this.LINK_RADIAL_SEGMENTS,
+            false
+        );
+        return geometry;
     }
 }
 

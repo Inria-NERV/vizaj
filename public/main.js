@@ -122,8 +122,7 @@ function emptyIntersected() {
   }
   INTERSECTED = null;
   sensorNameDiv.innerHTML = "";
-  while (highlightedLinksPreviousMaterials.length > 0)
-  {
+  while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
     for (const linkMesh of linkMeshList.filter((linkMesh) => linkMesh.link.node1.name === elem.node1Name && linkMesh.link.node2.name === elem.node2Name))
     {
@@ -135,8 +134,7 @@ function emptyIntersected() {
 function fillIntersected() {
   INTERSECTED.material = enlightenedSensorMaterial;
   sensorNameDiv.innerHTML = INTERSECTED.name;
-  for (const linkMesh of linkMeshList)
-  {
+  for (const linkMesh of linkMeshList){
     if (linkMesh.link.node1.name == INTERSECTED.name || linkMesh.link.node2.name == INTERSECTED.name)
     {
       highlightedLinksPreviousMaterials.push({

@@ -1,4 +1,4 @@
-import * as THREE from "three"
+import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import { updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';

@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { loadData, parseCsv3dCoordinatesRow } from './load_data.js';
 import { scene, cortexVertUrl, cortexTriUrl, cortexMaterial, GLOBAL_LAYER } from "../public/main.js";
