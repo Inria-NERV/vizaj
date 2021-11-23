@@ -5,9 +5,11 @@ import { sensorMeshList } from './draw_sensors';
 import { guiParams } from './setup_gui';
 
 const degreeLineMaterial = new THREE.MeshBasicMaterial( 
-    { color: 0x5555ff, 
+    { color: 0x9999ff, 
         opacity: .6, 
         transparent: true } );
+
+const DEGREE_LINE_UNIT_MAX_SCALE = 200;
 
 const DEGREE_LINE_TUBULAR_SEGMENTS = 2;
 const DEGREE_LINE_RADIUS = 1.3;
@@ -18,8 +20,8 @@ function drawDegreeLine(sensor){
     const sensorMesh = sensor.mesh;
 
     const unitVector = sensorMesh.position.clone().normalize();
-    const endPoint = sensorMesh.position.clone().addScaledVector(unitVector, 150 );
-    const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .1);
+    const endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_UNIT_MAX_SCALE );
+    const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
 
     const curve = new THREE.LineCurve(sensorMesh.position, endPoint);
     const flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
@@ -79,7 +81,7 @@ function getNodeDegree(sensorMesh){
 function updateNodeDegreeLine(sensor){
     const sensorCount = sensorMeshList.length;
     const nodeDegree = getNodeDegree(sensor.mesh);
-    sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (sensorCount - 1);
+    sensor.degreeLine.morphTargetInfluences[0] = (1 - nodeDegree / (sensorCount - 1));
 }
 
 function updateAllDegreeLines(){

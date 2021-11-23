@@ -5,7 +5,7 @@ import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
 import { clearAllSensors, loadAndDrawSensors } from './draw_sensors';
-import { updateDegreeLinesVisibility } from './draw_degree_line';
+import { updateDegreeLinesVisibility, updateAllDegreeLines } from './draw_degree_line';
 
 const guiParams = {
     loadFile: () => document.getElementById('fileInput').click(),
@@ -122,7 +122,8 @@ function setupGui() {
     //TODO: adapt redrawLinks
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
-    gui.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility);
+    const degreeLineFolder = gui.addFolder('degree line');
+    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('show');
 
     gui.add(guiParams, 'loadFile').name('Load CSV file');
 

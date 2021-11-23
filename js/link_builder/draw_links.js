@@ -104,7 +104,6 @@ function updateVisibleLinks(minStrength, maxStrength) {
         link.mesh.visible = false;
     }
     updateAllDegreeLines();
-
 }
 
  export {

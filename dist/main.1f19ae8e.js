@@ -41245,10 +41245,11 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 var degreeLineMaterial = new THREE.MeshBasicMaterial({
-  color: 0x5555ff,
+  color: 0x9999ff,
   opacity: .6,
   transparent: true
 });
+var DEGREE_LINE_UNIT_MAX_SCALE = 200;
 var DEGREE_LINE_TUBULAR_SEGMENTS = 2;
 var DEGREE_LINE_RADIUS = 1.3;
 var DEGREE_LINE_RADIAL_SEGMENTS = 8;
@@ -41256,8 +41257,8 @@ var DEGREE_LINE_RADIAL_SEGMENTS = 8;
 function drawDegreeLine(sensor) {
   var sensorMesh = sensor.mesh;
   var unitVector = sensorMesh.position.clone().normalize();
-  var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, 150);
-  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .1);
+  var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_UNIT_MAX_SCALE);
+  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
   var curve = new THREE.LineCurve(sensorMesh.position, endPoint);
   var flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
   var geometry = new THREE.TubeGeometry(curve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
@@ -42057,7 +42058,9 @@ function setupGui() {
 
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
-  _main.gui.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility);
+  var degreeLineFolder = _main.gui.addFolder('degree line');
+
+  degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
 
   _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
 
