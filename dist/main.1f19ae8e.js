@@ -41776,9 +41776,9 @@ var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
 
 exports.linkVolumeGenerator = linkVolumeGenerator;
 
-_defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 48);
+_defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
 
-_defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 20);
+_defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
 },{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
 "use strict";
 

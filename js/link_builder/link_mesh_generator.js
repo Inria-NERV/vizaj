@@ -1,9 +1,7 @@
 import * as THREE from "three";
 import { guiParams } from '../setup_gui';
 
-class linkMeshGenerator{
-    
-}
+class linkMeshGenerator{ }
 
 class linkLineGenerator extends linkMeshGenerator{
     static ARC_SEGMENTS = 48;
@@ -32,8 +30,8 @@ class linkLineGenerator extends linkMeshGenerator{
 }
 
 class linkVolumeGenerator extends linkMeshGenerator{
-    static LINK_SEGMENTS = 48;
-    static LINK_RADIAL_SEGMENTS = 20;
+    static LINK_SEGMENTS = 64;
+    static LINK_RADIAL_SEGMENTS = 10;
 
     static generateLink(curvePath, link){
         const geometry = this.getGeometry(curvePath, link);
