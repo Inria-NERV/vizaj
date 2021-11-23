@@ -17,11 +17,11 @@ const guiParams = {
     showBrain: true,
     showDegreeLines: true,
 
-    linkHeight: 0.5,
-    linkTopPointHandleDistances: .25,
+    linkHeight: 0.75,
+    linkTopPointHandleDistances: .5,
     linkSensorAngles: 3 / 8,
-    linkSensorHandleDistances: 1,
-    linkTopPointAngle: 0,
+    linkSensorHandleDistances: 0.,
+    linkTopPointAngle: 0.,
 
     linkGenerator: linkLineGenerator,
 
@@ -119,7 +119,6 @@ function setupGui() {
     const linkVolume = gui.addFolder('linkVolume');
     linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
     linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
-    //TODO: adapt redrawLinks
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     const degreeLineFolder = gui.addFolder('degree line');

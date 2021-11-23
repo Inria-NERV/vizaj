@@ -41072,6 +41072,9 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+var SENSOR_RADIUS = 3;
+var SENSOR_SEGMENTS = 20;
+var SENSOR_RINGS = 50;
 var maxSensorDistance = 0.; //TODO: add await to draw all sensors to ensure sensorMeshList is populated before being used
 
 exports.maxSensorDistance = maxSensorDistance;
@@ -41170,7 +41173,7 @@ function _drawSensor() {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            sensorGeometry = new THREE.SphereGeometry(_main.SENSOR_RADIUS, _main.SENSOR_SEGMENTS, _main.SENSOR_RINGS);
+            sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
             sensor = new THREE.Mesh(sensorGeometry, _main.sensorMaterial);
             sensor.castShadow = false;
             sensor.name = label;
@@ -41940,11 +41943,11 @@ var guiParams = {
   maxStrengthToDisplay: .2,
   showBrain: true,
   showDegreeLines: true,
-  linkHeight: 0.5,
-  linkTopPointHandleDistances: .25,
+  linkHeight: 0.75,
+  linkTopPointHandleDistances: .5,
   linkSensorAngles: 3 / 8,
-  linkSensorHandleDistances: 1,
-  linkTopPointAngle: 0,
+  linkSensorHandleDistances: 0.,
+  linkTopPointAngle: 0.,
   linkGenerator: _link_mesh_generator.linkLineGenerator,
   makeLinkLineMesh: function makeLinkLineMesh() {
     return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
@@ -42054,8 +42057,7 @@ function setupGui() {
   var linkVolume = _main.gui.addFolder('linkVolume');
 
   linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
-  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume'); //TODO: adapt redrawLinks
-
+  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
   var degreeLineFolder = _main.gui.addFolder('degree line');
@@ -42246,7 +42248,7 @@ module.exports = "/conn_matrix_0.5c498bf8.csv";
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.SENSOR_RINGS = exports.SENSOR_SEGMENTS = exports.SENSOR_RADIUS = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -42304,12 +42306,6 @@ var GLOBAL_LAYER = 0,
     LINK_LAYER = 1;
 exports.LINK_LAYER = LINK_LAYER;
 exports.GLOBAL_LAYER = GLOBAL_LAYER;
-var SENSOR_RADIUS = 3;
-exports.SENSOR_RADIUS = SENSOR_RADIUS;
-var SENSOR_SEGMENTS = 20;
-exports.SENSOR_SEGMENTS = SENSOR_SEGMENTS;
-var SENSOR_RINGS = 50;
-exports.SENSOR_RINGS = SENSOR_RINGS;
 var cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide

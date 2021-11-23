@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 import { scene, 
     sensorMeshList,
-    sensorMaterial,
-    SENSOR_RADIUS, SENSOR_RINGS, SENSOR_SEGMENTS } from "../public/main.js";
+    sensorMaterial } from "../public/main.js";
 import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { guiParams } from "./setup_gui";
 import { deleteMesh } from "./link_builder/draw_links";
+
+const SENSOR_RADIUS = 3;
+const SENSOR_SEGMENTS = 20;
+const SENSOR_RINGS = 50;
 
 let maxSensorDistance = 0.;
 

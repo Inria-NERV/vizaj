@@ -22,10 +22,6 @@ const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
-const SENSOR_RADIUS = 3;
-const SENSOR_SEGMENTS = 20;
-const SENSOR_RINGS = 50;
-
 const cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide
@@ -55,7 +51,6 @@ const gui = new GUI();
 document.body.appendChild(renderer.domElement);
 const sensorNameDiv = document.getElementById("sensorName");
 const fileInput = document.getElementById("fileInput");
-
 
 //INTERSECTED is used to check wether the mouse intersects with a sensor
 var INTERSECTED;
@@ -183,9 +178,6 @@ export {
     cortexTriUrl, 
     cortexMaterial,
     sensorMaterial,
-    SENSOR_RADIUS,
-    SENSOR_SEGMENTS,
-    SENSOR_RINGS,
     GLOBAL_LAYER,
     LINK_LAYER
 };
