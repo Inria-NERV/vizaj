@@ -37240,7 +37240,1524 @@ class MapControls extends OrbitControls {
 }
 
 exports.MapControls = MapControls;
-},{"three":"../node_modules/three/build/three.module.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js"}],"../js/load_data.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.loadData = loadData;
+exports.parseCsv3dCoordinatesRow = parseCsv3dCoordinatesRow;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function loadData(_x, _x2) {
+  return _loadData.apply(this, arguments);
+}
+
+function _loadData() {
+  _loadData = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, dataName) {
+    var parseRowMethod,
+        onLoadCallback,
+        loader,
+        dataOut,
+        _args = arguments;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            parseRowMethod = _args.length > 2 && _args[2] !== undefined ? _args[2] : function (x) {
+              return x;
+            };
+            onLoadCallback = _args.length > 3 && _args[3] !== undefined ? _args[3] : defaultOnLoadCallBack;
+            loader = new THREE.FileLoader();
+            dataOut = [];
+            _context.next = 6;
+            return new Promise(function (resolve, reject) {
+              return loader.load(url, function (data) {
+                dataOut = onLoadCallback(data, parseRowMethod);
+                resolve();
+              }, function (xhr) {
+                console.log('Loading ' + dataName + ' : ' + xhr.loaded / xhr.total * 100 + '% loaded');
+              }, function (err) {
+                console.error(err);
+              });
+            });
+
+          case 6:
+            return _context.abrupt("return", dataOut);
+
+          case 7:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _loadData.apply(this, arguments);
+}
+
+function defaultOnLoadCallBack(data, parseRowMethod) {
+  var dataOut = [];
+
+  var _iterator = _createForOfIteratorHelper(data.split('\n')),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var row = _step.value;
+      dataOut.push(parseRowMethod(row));
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return dataOut;
+}
+
+function parseCsv3dCoordinatesRow(row) {
+  var splitted_row = row.split(",").map(function (x) {
+    return parseFloat(x);
+  });
+  return [splitted_row[1], splitted_row[2], splitted_row[0]];
+}
+},{"three":"../node_modules/three/build/three.module.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.linkVolumeGenerator = exports.linkLineGenerator = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var linkMeshGenerator = function linkMeshGenerator() {
+  _classCallCheck(this, linkMeshGenerator);
+};
+
+var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
+  _inherits(linkLineGenerator, _linkMeshGenerator);
+
+  var _super = _createSuper(linkLineGenerator);
+
+  function linkLineGenerator() {
+    _classCallCheck(this, linkLineGenerator);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(linkLineGenerator, null, [{
+    key: "generateLink",
+    value: function generateLink(curvePath, link) {
+      var geometry = this.getGeometry(curvePath, link);
+      var linkMat = this.getMaterial(link.strength);
+      var curveObject = new THREE.Line(geometry, linkMat);
+      return curveObject;
+    }
+  }, {
+    key: "getMaterial",
+    value: function getMaterial(strength) {
+      return new THREE.LineBasicMaterial({
+        color: new THREE.Color(strength, 0, 1 - strength),
+        linewidth: 0.001,
+        opacity: strength,
+        transparent: false
+      });
+    }
+  }, {
+    key: "getGeometry",
+    value: function getGeometry(curvePath, link) {
+      //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
+      var splinePoints = curvePath.getPoints((this.ARC_SEGMENTS - 1) / curvePath.curves.length);
+      return new THREE.BufferGeometry().setFromPoints(splinePoints);
+    }
+  }]);
+
+  return linkLineGenerator;
+}(linkMeshGenerator);
+
+exports.linkLineGenerator = linkLineGenerator;
+
+_defineProperty(linkLineGenerator, "ARC_SEGMENTS", 48);
+
+var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
+  _inherits(linkVolumeGenerator, _linkMeshGenerator2);
+
+  var _super2 = _createSuper(linkVolumeGenerator);
+
+  function linkVolumeGenerator() {
+    _classCallCheck(this, linkVolumeGenerator);
+
+    return _super2.apply(this, arguments);
+  }
+
+  _createClass(linkVolumeGenerator, null, [{
+    key: "generateLink",
+    value: function generateLink(curvePath, link) {
+      var geometry = this.getGeometry(curvePath, link);
+      var linkMat = this.getMaterial(link.strength);
+      var curveObject = new THREE.Mesh(geometry, linkMat);
+      return curveObject;
+    }
+  }, {
+    key: "getMaterial",
+    value: function getMaterial(strength) {
+      return new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(strength, 0, 1 - strength),
+        opacity: strength,
+        transparent: false
+      });
+    }
+  }, {
+    key: "getGeometry",
+    value: function getGeometry(curvePath, link) {
+      var geometry = new THREE.TubeGeometry(curvePath, this.LINK_SEGMENTS, (1 - link.normDist) * _setup_gui.guiParams.linkThickness, this.LINK_RADIAL_SEGMENTS, false);
+      return geometry;
+    }
+  }]);
+
+  return linkVolumeGenerator;
+}(linkMeshGenerator);
+
+exports.linkVolumeGenerator = linkVolumeGenerator;
+
+_defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
+
+_defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
+},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.loadAndDrawCortexModel = loadAndDrawCortexModel;
+exports.updateBrainMeshVisibility = updateBrainMeshVisibility;
+exports.hideBrain = hideBrain;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _load_data = require("./load_data.js");
+
+var _main = require("../public/main.js");
+
+var _setup_gui = require("./setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var brainMesh;
+
+function loadAndDrawCortexModel() {
+  loadCortexModel().then(function (response) {
+    return makeVertCoordsList(response[0], response[1]);
+  }).then(function (response) {
+    return drawCortexModel(response);
+  });
+  return;
+}
+
+function loadCortexModel() {
+  return Promise.all([loadCortexVert(), loadCortexTri()]);
+}
+
+function parseRowCortexTri(row) {
+  var splitted_row = row.split(",");
+  return [parseInt(splitted_row[0]), parseInt(splitted_row[1]), parseInt(splitted_row[2])];
+}
+
+function loadCortexVert() {
+  return (0, _load_data.loadData)(_main.cortexVertUrl, 'cortex vertices', _load_data.parseCsv3dCoordinatesRow);
+}
+
+function loadCortexTri() {
+  return (0, _load_data.loadData)(_main.cortexTriUrl, 'cortex faces', parseRowCortexTri);
+}
+
+function makeVertCoordsList(_x, _x2) {
+  return _makeVertCoordsList.apply(this, arguments);
+}
+
+function _makeVertCoordsList() {
+  _makeVertCoordsList = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(cortexVert, cortexTri) {
+    var positions, _iterator, _step, coords;
+
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            positions = [];
+            _iterator = _createForOfIteratorHelper(cortexTri);
+
+            try {
+              for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                coords = _step.value;
+                Array.prototype.push.apply(positions, cortexVert[coords[0]]);
+                Array.prototype.push.apply(positions, cortexVert[coords[1]]);
+                Array.prototype.push.apply(positions, cortexVert[coords[2]]);
+              }
+            } catch (err) {
+              _iterator.e(err);
+            } finally {
+              _iterator.f();
+            }
+
+            return _context.abrupt("return", new Float32Array(positions));
+
+          case 4:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _makeVertCoordsList.apply(this, arguments);
+}
+
+function drawCortexModel(vertices) {
+  var geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3)); //geometry.setFromPoints(vertices);
+
+  geometry.computeVertexNormals();
+  brainMesh = new THREE.Mesh(geometry, _main.cortexMaterial);
+  brainMesh.receiveShadow = true;
+  brainMesh.castShadow = true;
+  brainMesh.translateY(50);
+  brainMesh.name = 'cortex';
+
+  _main.scene.add(brainMesh);
+}
+
+function updateBrainMeshVisibility() {
+  brainMesh.visible = _setup_gui.guiParams.showBrain;
+  brainMesh.layers.toggle(_main.GLOBAL_LAYER);
+}
+
+function hideBrain() {
+  _setup_gui.guiParams.showBrain = false;
+  updateBrainMeshVisibility();
+}
+},{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSplinePoints = getSplinePoints;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function getSplinePoints(link) {
+  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
+  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+  var pointA = {
+    controlPoint: link.node1.position
+  };
+  var pointB = {
+    controlPoint: link.node2.position
+  };
+  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).length();
+  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
+  var quaternionA = new THREE.Quaternion();
+  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  var quaternionB = new THREE.Quaternion();
+  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
+  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
+  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
+  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
+  var curvePath = new THREE.CurvePath();
+  curvePath.add(splineLeft);
+  curvePath.add(splineRight);
+  return curvePath;
+} //This function is to get the rotation to be in the link plan
+//It makes it easier to write 3d operations in such a plan
+
+
+function getLinkToGlobalMatrix(A, B) {
+  var i = A.clone().addScaledVector(B, -1).normalize();
+  var j = B.clone().add(A).normalize();
+  var k = i.clone().cross(j);
+  var m = new THREE.Matrix3();
+  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
+  return m;
+}
+
+function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
+  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, 0);
+  var leftHandleRotation = new THREE.Quaternion();
+  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  var rightHandleRotation = new THREE.Quaternion();
+  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
+  return {
+    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
+    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    controlPointLinkBasis: controlPointC
+  };
+}
+},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getSplinePointsPlane = getSplinePointsPlane;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _draw_sensors = require("../draw_sensors");
+
+var _setup_gui = require("../setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function getSplinePointsPlane(link) {
+  var pointA = link.node1.position;
+  var pointB = link.node2.position;
+  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
+  var curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
+  var curvePath = new THREE.CurvePath();
+  curvePath.add(curve);
+  return curvePath;
+} // function getSplinePointsPlane(link, L){
+//     const pointA = {controlPoint: link.node1.position};
+//     const pointB = {controlPoint: link.node2.position};
+//     const pointC = computePointCPlane(pointA.controlPoint, pointB.controlPoint);
+//     pointA.handleRight = new THREE.Vector3(pointA.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
+//     pointB.handleLeft  = new THREE.Vector3(pointB.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
+//     const splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
+//     const splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
+//     const curvePath = new THREE.CurvePath();
+//     curvePath.add(splineLeft);
+//     curvePath.add(splineRight);
+//     return curvePath;
+// }
+// function computePointCPlane(pointA, pointB){
+//     const controlPointC = new THREE.Vector3(
+//         (pointA.x + pointB.x)/2,
+//         pointA.distanceTo(pointB) * guiParams.linkHeight,
+//         (pointA.z + pointB.z)/2
+//     );
+//     const leftHandleRotation = new THREE.Quaternion();
+//     leftHandleRotation.setFromAxisAngle(new Vector3(0,+1,0), Math.PI * guiParams.linkTopPointAngle );
+//     const rightHandleRotation = new THREE.Quaternion();
+//     rightHandleRotation.setFromAxisAngle(new Vector3(0,-1,0), Math.PI * guiParams.linkTopPointAngle );
+//     return {controlPoint: controlPointC.clone(),
+//         handleLeft: controlPointC.clone()
+//             .add( new Vector3(pointA.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
+//         handleRight: controlPointC.clone()
+//             .add( new Vector3(pointB.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
+//         controlPointLinkBasis: controlPointC
+//     };
+// }
+},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../data/2d/sensor_labels.csv":[function(require,module,exports) {
+module.exports = "/sensor_labels.c2119944.csv";
+},{}],"../data/2d/sensor_coordinates.csv":[function(require,module,exports) {
+module.exports = "/sensor_coordinates.fc344167.csv";
+},{}],"../data/2d/conn_matrix.csv":[function(require,module,exports) {
+module.exports = "/conn_matrix.70e1003c.csv";
+},{}],"../data/sensor_montages/EGI_256_coordinates.csv":[function(require,module,exports) {
+module.exports = "/EGI_256_coordinates.d12422db.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-128_coordinates.7b562dcb.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-129_coordinates.15f56377.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-256_coordinates.83812c93.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-257_coordinates.9650b385.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-32_coordinates.07fd1f36.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-64_1.0_coordinates.26391a73.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-65_1.0_coordinates.d2db04a5.csv";
+},{}],"../data/sensor_montages/biosemi128_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi128_coordinates.4b8ffb2e.csv";
+},{}],"../data/sensor_montages/biosemi16_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi16_coordinates.09f857db.csv";
+},{}],"../data/sensor_montages/biosemi160_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi160_coordinates.a6c9643f.csv";
+},{}],"../data/sensor_montages/biosemi256_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi256_coordinates.7fee11a1.csv";
+},{}],"../data/sensor_montages/biosemi32_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi32_coordinates.6d5d3121.csv";
+},{}],"../data/sensor_montages/biosemi64_coordinates.csv":[function(require,module,exports) {
+module.exports = "/biosemi64_coordinates.62a0a68e.csv";
+},{}],"../data/sensor_montages/easycap-M1_coordinates.csv":[function(require,module,exports) {
+module.exports = "/easycap-M1_coordinates.26a540c4.csv";
+},{}],"../data/sensor_montages/easycap-M10_coordinates.csv":[function(require,module,exports) {
+module.exports = "/easycap-M10_coordinates.4bbbff7f.csv";
+},{}],"../data/sensor_montages/mgh60_coordinates.csv":[function(require,module,exports) {
+module.exports = "/mgh60_coordinates.1c619c59.csv";
+},{}],"../data/sensor_montages/mgh70_coordinates.csv":[function(require,module,exports) {
+module.exports = "/mgh70_coordinates.04d972c5.csv";
+},{}],"../data/sensor_montages/standard_1005_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_1005_coordinates.6a910b57.csv";
+},{}],"../data/sensor_montages/standard_1020_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_1020_coordinates.1e7e8393.csv";
+},{}],"../data/sensor_montages/standard_alphabetic_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_alphabetic_coordinates.bd41074d.csv";
+},{}],"../data/sensor_montages/standard_postfixed_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_postfixed_coordinates.b4fc7dce.csv";
+},{}],"../data/sensor_montages/standard_prefixed_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_prefixed_coordinates.c4cd2922.csv";
+},{}],"../data/sensor_montages/standard_primed_coordinates.csv":[function(require,module,exports) {
+module.exports = "/standard_primed_coordinates.53e8160c.csv";
+},{}],"../data/sensor_montages/EGI_256_labels.csv":[function(require,module,exports) {
+module.exports = "/EGI_256_labels.b868904e.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-128_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-128_labels.e3cba527.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-129_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-129_labels.35ed28ff.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-256_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-256_labels.368a970f.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-257_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-257_labels.91e94dbc.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-32_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-32_labels.12391cd3.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-64_1.0_labels.cd90872b.csv";
+},{}],"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":[function(require,module,exports) {
+module.exports = "/GSN-HydroCel-65_1.0_labels.0462d280.csv";
+},{}],"../data/sensor_montages/biosemi128_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi128_labels.cd2cf255.csv";
+},{}],"../data/sensor_montages/biosemi16_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi16_labels.03842837.csv";
+},{}],"../data/sensor_montages/biosemi160_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi160_labels.d3678c7b.csv";
+},{}],"../data/sensor_montages/biosemi256_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi256_labels.8ceba71e.csv";
+},{}],"../data/sensor_montages/biosemi32_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi32_labels.5446bfb1.csv";
+},{}],"../data/sensor_montages/biosemi64_labels.csv":[function(require,module,exports) {
+module.exports = "/biosemi64_labels.5601a737.csv";
+},{}],"../data/sensor_montages/easycap-M1_labels.csv":[function(require,module,exports) {
+module.exports = "/easycap-M1_labels.a9773957.csv";
+},{}],"../data/sensor_montages/easycap-M10_labels.csv":[function(require,module,exports) {
+module.exports = "/easycap-M10_labels.0e56f88c.csv";
+},{}],"../data/sensor_montages/mgh60_labels.csv":[function(require,module,exports) {
+module.exports = "/mgh60_labels.366911de.csv";
+},{}],"../data/sensor_montages/mgh70_labels.csv":[function(require,module,exports) {
+module.exports = "/mgh70_labels.67909ea3.csv";
+},{}],"../data/sensor_montages/standard_1005_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_1005_labels.a9d8231d.csv";
+},{}],"../data/sensor_montages/standard_1020_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_1020_labels.e1c73d32.csv";
+},{}],"../data/sensor_montages/standard_alphabetic_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_alphabetic_labels.4ecf41d8.csv";
+},{}],"../data/sensor_montages/standard_postfixed_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_postfixed_labels.067658ee.csv";
+},{}],"../data/sensor_montages/standard_prefixed_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_prefixed_labels.7be38259.csv";
+},{}],"../data/sensor_montages/standard_primed_labels.csv":[function(require,module,exports) {
+module.exports = "/standard_primed_labels.cdf3d1b7.csv";
+},{}],"../js/setup_gui.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupGui = setupGui;
+exports.defaultMontageLabels = exports.defaultMontageCoordinates = exports.guiParams = void 0;
+
+var _main = require("../public/main");
+
+var _draw_links = require("./link_builder/draw_links");
+
+var _link_mesh_generator = require("./link_builder/link_mesh_generator");
+
+var _draw_cortex = require("./draw_cortex");
+
+var _compute_link_shape = require("./link_builder/compute_link_shape");
+
+var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D");
+
+var _draw_sensors = require("./draw_sensors");
+
+var _draw_degree_line = require("./draw_degree_line");
+
+var guiParams = {
+  loadFile: function loadFile() {
+    return document.getElementById('fileInput').click();
+  },
+  autoRotateCamera: false,
+  autoRotateSpeed: 2.0,
+  minStrengthToDisplay: 0.,
+  maxStrengthToDisplay: .2,
+  showBrain: true,
+  showDegreeLines: true,
+  linkHeight: 0.75,
+  linkTopPointHandleDistances: .5,
+  linkSensorAngles: 3 / 8,
+  linkSensorHandleDistances: 0.,
+  linkTopPointAngle: 0.,
+  linkGenerator: _link_mesh_generator.linkLineGenerator,
+  makeLinkLineMesh: function makeLinkLineMesh() {
+    return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
+  },
+  makeLinkVolumeMesh: function makeLinkVolumeMesh() {
+    return changeLinkMesh(_link_mesh_generator.linkVolumeGenerator);
+  },
+  linkThickness: 1.,
+  getSplinePoints: _compute_link_shape.getSplinePoints,
+  montage: 24,
+  link2dTest: function link2dTest() {
+    (0, _draw_sensors.clearAllSensors)();
+    (0, _draw_links.clearAllLinks)();
+    (0, _draw_cortex.hideBrain)();
+    guiParams.getSplinePoints = _compute_link_shape_2D.getSplinePointsPlane;
+
+    var sensorLabelsUrl = require('../data/2d/sensor_labels.csv');
+
+    var sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
+
+    var connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
+
+    (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+    (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
+  }
+};
+exports.guiParams = guiParams;
+var premadeLinkGeometriesParam = {
+  defaultLinkGeometry: function defaultLinkGeometry() {
+    guiParams.linkHeight = 0.75;
+    guiParams.linkTopPointHandleDistances = 0.5;
+    guiParams.linkSensorAngles = 3 / 8;
+    guiParams.linkSensorHandleDistances = 0.;
+    (0, _draw_links.updateLinkOutline)();
+  },
+  bellLinkGeometry: function bellLinkGeometry() {
+    guiParams.linkHeight = 0.75;
+    guiParams.linkTopPointHandleDistances = 0.5;
+    guiParams.linkSensorAngles = 0.;
+    guiParams.linkSensorHandleDistances = .5;
+    (0, _draw_links.updateLinkOutline)();
+  },
+  triangleLinkGeometry: function triangleLinkGeometry() {
+    guiParams.linkHeight = 0.75;
+    guiParams.linkTopPointHandleDistances = 0;
+    guiParams.linkSensorAngles = 0.;
+    guiParams.linkSensorHandleDistances = 0.;
+    (0, _draw_links.updateLinkOutline)();
+  },
+  roundedSquareLinkGeometry: function roundedSquareLinkGeometry() {
+    guiParams.linkHeight = 0.5;
+    guiParams.linkTopPointHandleDistances = 1.;
+    guiParams.linkSensorAngles = 0.5;
+    guiParams.linkSensorHandleDistances = 1.;
+    (0, _draw_links.updateLinkOutline)();
+  },
+  peakLinkGeometry: function peakLinkGeometry() {
+    guiParams.linkHeight = 0.75;
+    guiParams.linkTopPointHandleDistances = 0;
+    guiParams.linkSensorAngles = 0.;
+    guiParams.linkSensorHandleDistances = 1.;
+    (0, _draw_links.updateLinkOutline)();
+  }
+};
+
+function changeLinkMesh(linkGenerator) {
+  guiParams.linkGenerator = linkGenerator;
+  (0, _draw_links.redrawLinks)();
+}
+
+var montages = {
+  'EGI_256': 0,
+  'GSN-HydroCel-128': 1,
+  'GSN-HydroCel-129': 2,
+  'GSN-HydroCel-256': 3,
+  'GSN-HydroCel-257': 4,
+  'GSN-HydroCel-32': 5,
+  'GSN-HydroCel-64_1.0': 6,
+  'GSN-HydroCel-65_1.0': 7,
+  'biosemi128': 8,
+  'biosemi16': 9,
+  'biosemi160': 10,
+  'biosemi256': 11,
+  'biosemi32': 12,
+  'biosemi64': 13,
+  'easycap-M1': 14,
+  'easycap-M10': 15,
+  'mgh60': 16,
+  'mgh70': 17,
+  'standard_1005': 18,
+  'standard_1020': 19,
+  'standard_alphabetic': 20,
+  'standard_postfixed': 21,
+  'standard_prefixed': 22,
+  'standard_primed': 23,
+  'custom': 24
+};
+var defaultMontageCoordinates = [require('../data/sensor_montages/EGI_256_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-128_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-129_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-256_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-257_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-32_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv'), require('../data/sensor_montages/biosemi128_coordinates.csv'), require('../data/sensor_montages/biosemi16_coordinates.csv'), require('../data/sensor_montages/biosemi160_coordinates.csv'), require('../data/sensor_montages/biosemi256_coordinates.csv'), require('../data/sensor_montages/biosemi32_coordinates.csv'), require('../data/sensor_montages/biosemi64_coordinates.csv'), require('../data/sensor_montages/easycap-M1_coordinates.csv'), require('../data/sensor_montages/easycap-M10_coordinates.csv'), require('../data/sensor_montages/mgh60_coordinates.csv'), require('../data/sensor_montages/mgh70_coordinates.csv'), require('../data/sensor_montages/standard_1005_coordinates.csv'), require('../data/sensor_montages/standard_1020_coordinates.csv'), require('../data/sensor_montages/standard_alphabetic_coordinates.csv'), require('../data/sensor_montages/standard_postfixed_coordinates.csv'), require('../data/sensor_montages/standard_prefixed_coordinates.csv'), require('../data/sensor_montages/standard_primed_coordinates.csv')];
+exports.defaultMontageCoordinates = defaultMontageCoordinates;
+var defaultMontageLabels = [require('../data/sensor_montages/EGI_256_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-128_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-129_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-256_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-257_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-32_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv'), require('../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv'), require('../data/sensor_montages/biosemi128_labels.csv'), require('../data/sensor_montages/biosemi16_labels.csv'), require('../data/sensor_montages/biosemi160_labels.csv'), require('../data/sensor_montages/biosemi256_labels.csv'), require('../data/sensor_montages/biosemi32_labels.csv'), require('../data/sensor_montages/biosemi64_labels.csv'), require('../data/sensor_montages/easycap-M1_labels.csv'), require('../data/sensor_montages/easycap-M10_labels.csv'), require('../data/sensor_montages/mgh60_labels.csv'), require('../data/sensor_montages/mgh70_labels.csv'), require('../data/sensor_montages/standard_1005_labels.csv'), require('../data/sensor_montages/standard_1020_labels.csv'), require('../data/sensor_montages/standard_alphabetic_labels.csv'), require('../data/sensor_montages/standard_postfixed_labels.csv'), require('../data/sensor_montages/standard_prefixed_labels.csv'), require('../data/sensor_montages/standard_primed_labels.csv')];
+exports.defaultMontageLabels = defaultMontageLabels;
+
+function setupGui() {
+  var cameraFolder = _main.gui.addFolder('Camera');
+
+  cameraFolder.add(guiParams, 'autoRotateCamera').onChange(function () {
+    _main.controls.autoRotate = guiParams.autoRotateCamera;
+  });
+  cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35).onChange(function (value) {
+    _main.controls.autoRotateSpeed = value;
+  });
+
+  var linksToDisplayFolder = _main.gui.addFolder('LinksToDisplay');
+
+  linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.).onChange(function () {
+    return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
+  });
+  linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.).onChange(function () {
+    return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
+  });
+
+  _main.gui.add(guiParams, 'showBrain').onChange(_draw_cortex.updateBrainMeshVisibility);
+
+  var linkGeometry = _main.gui.addFolder('linkGeometry');
+
+  linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
+  linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen(); //This one below is messy
+  //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
+
+  var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
+
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
+
+  var linkVolume = _main.gui.addFolder('linkVolume');
+
+  linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
+  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
+  linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
+
+  var degreeLineFolder = _main.gui.addFolder('degree line');
+
+  degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
+
+  _main.gui.add(guiParams, 'montage').options(montages).onChange(_draw_sensors.changeMontage);
+
+  _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
+
+  _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
+}
+},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv","../data/sensor_montages/EGI_256_coordinates.csv":"../data/sensor_montages/EGI_256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv","../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv","../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv","../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv","../data/sensor_montages/biosemi128_coordinates.csv":"../data/sensor_montages/biosemi128_coordinates.csv","../data/sensor_montages/biosemi16_coordinates.csv":"../data/sensor_montages/biosemi16_coordinates.csv","../data/sensor_montages/biosemi160_coordinates.csv":"../data/sensor_montages/biosemi160_coordinates.csv","../data/sensor_montages/biosemi256_coordinates.csv":"../data/sensor_montages/biosemi256_coordinates.csv","../data/sensor_montages/biosemi32_coordinates.csv":"../data/sensor_montages/biosemi32_coordinates.csv","../data/sensor_montages/biosemi64_coordinates.csv":"../data/sensor_montages/biosemi64_coordinates.csv","../data/sensor_montages/easycap-M1_coordinates.csv":"../data/sensor_montages/easycap-M1_coordinates.csv","../data/sensor_montages/easycap-M10_coordinates.csv":"../data/sensor_montages/easycap-M10_coordinates.csv","../data/sensor_montages/mgh60_coordinates.csv":"../data/sensor_montages/mgh60_coordinates.csv","../data/sensor_montages/mgh70_coordinates.csv":"../data/sensor_montages/mgh70_coordinates.csv","../data/sensor_montages/standard_1005_coordinates.csv":"../data/sensor_montages/standard_1005_coordinates.csv","../data/sensor_montages/standard_1020_coordinates.csv":"../data/sensor_montages/standard_1020_coordinates.csv","../data/sensor_montages/standard_alphabetic_coordinates.csv":"../data/sensor_montages/standard_alphabetic_coordinates.csv","../data/sensor_montages/standard_postfixed_coordinates.csv":"../data/sensor_montages/standard_postfixed_coordinates.csv","../data/sensor_montages/standard_prefixed_coordinates.csv":"../data/sensor_montages/standard_prefixed_coordinates.csv","../data/sensor_montages/standard_primed_coordinates.csv":"../data/sensor_montages/standard_primed_coordinates.csv","../data/sensor_montages/EGI_256_labels.csv":"../data/sensor_montages/EGI_256_labels.csv","../data/sensor_montages/GSN-HydroCel-128_labels.csv":"../data/sensor_montages/GSN-HydroCel-128_labels.csv","../data/sensor_montages/GSN-HydroCel-129_labels.csv":"../data/sensor_montages/GSN-HydroCel-129_labels.csv","../data/sensor_montages/GSN-HydroCel-256_labels.csv":"../data/sensor_montages/GSN-HydroCel-256_labels.csv","../data/sensor_montages/GSN-HydroCel-257_labels.csv":"../data/sensor_montages/GSN-HydroCel-257_labels.csv","../data/sensor_montages/GSN-HydroCel-32_labels.csv":"../data/sensor_montages/GSN-HydroCel-32_labels.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv","../data/sensor_montages/biosemi128_labels.csv":"../data/sensor_montages/biosemi128_labels.csv","../data/sensor_montages/biosemi16_labels.csv":"../data/sensor_montages/biosemi16_labels.csv","../data/sensor_montages/biosemi160_labels.csv":"../data/sensor_montages/biosemi160_labels.csv","../data/sensor_montages/biosemi256_labels.csv":"../data/sensor_montages/biosemi256_labels.csv","../data/sensor_montages/biosemi32_labels.csv":"../data/sensor_montages/biosemi32_labels.csv","../data/sensor_montages/biosemi64_labels.csv":"../data/sensor_montages/biosemi64_labels.csv","../data/sensor_montages/easycap-M1_labels.csv":"../data/sensor_montages/easycap-M1_labels.csv","../data/sensor_montages/easycap-M10_labels.csv":"../data/sensor_montages/easycap-M10_labels.csv","../data/sensor_montages/mgh60_labels.csv":"../data/sensor_montages/mgh60_labels.csv","../data/sensor_montages/mgh70_labels.csv":"../data/sensor_montages/mgh70_labels.csv","../data/sensor_montages/standard_1005_labels.csv":"../data/sensor_montages/standard_1005_labels.csv","../data/sensor_montages/standard_1020_labels.csv":"../data/sensor_montages/standard_1020_labels.csv","../data/sensor_montages/standard_alphabetic_labels.csv":"../data/sensor_montages/standard_alphabetic_labels.csv","../data/sensor_montages/standard_postfixed_labels.csv":"../data/sensor_montages/standard_postfixed_labels.csv","../data/sensor_montages/standard_prefixed_labels.csv":"../data/sensor_montages/standard_prefixed_labels.csv","../data/sensor_montages/standard_primed_labels.csv":"../data/sensor_montages/standard_primed_labels.csv"}],"../js/draw_degree_line.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.drawDegreeLine = drawDegreeLine;
+exports.drawAllDegreeLines = drawAllDegreeLines;
+exports.updateAllDegreeLines = updateAllDegreeLines;
+exports.updateDegreeLinesVisibility = updateDegreeLinesVisibility;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _main = require("../public/main");
+
+var _draw_sensors = require("./draw_sensors");
+
+var _setup_gui = require("./setup_gui");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+var degreeLineMaterial = new THREE.MeshBasicMaterial({
+  color: 0x9999ff,
+  opacity: .6,
+  transparent: true
+});
+var DEGREE_LINE_UNIT_MAX_SCALE = 200;
+var DEGREE_LINE_TUBULAR_SEGMENTS = 2;
+var DEGREE_LINE_RADIUS = 1.3;
+var DEGREE_LINE_RADIAL_SEGMENTS = 8;
+
+function drawDegreeLine(sensor) {
+  var sensorMesh = sensor.mesh;
+  var unitVector = sensorMesh.position.clone().normalize();
+  var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_UNIT_MAX_SCALE);
+  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
+  var curve = new THREE.LineCurve(sensorMesh.position, endPoint);
+  var flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
+  var geometry = new THREE.TubeGeometry(curve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
+  var flatGeometry = new THREE.TubeGeometry(flatCurve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
+  geometry.morphAttributes.position = [];
+  geometry.morphAttributes.position[0] = new THREE.Float32BufferAttribute(flatGeometry.attributes.position.array, 3);
+  var line = new THREE.Mesh(geometry, degreeLineMaterial);
+  line.morphTargetInfluences = [];
+  line.layers.set(_main.LINK_LAYER);
+
+  _main.scene.add(line);
+
+  sensor.degreeLine = line;
+  updateNodeDegreeLine(sensor);
+  return sensor;
+}
+
+function drawAllDegreeLines() {
+  for (var i = 0; i < _draw_sensors.sensorMeshList.length; i++) {
+    _draw_sensors.sensorMeshList[i] = drawDegreeLine(_draw_sensors.sensorMeshList[i]);
+  }
+}
+
+function getNodeDegree(sensorMesh) {
+  var nodeDegree = 0;
+
+  var _iterator = _createForOfIteratorHelper(_main.linkMeshList.filter(function (linkMesh) {
+    return linkMesh.mesh.visible === true;
+  })),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var linkMesh = _step.value;
+      var link = linkMesh.link;
+
+      if (link.node1.name == sensorMesh.name || link.node2.name == sensorMesh.name) {
+        nodeDegree++;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+
+  return nodeDegree;
+}
+
+function updateNodeDegreeLine(sensor) {
+  var sensorCount = _draw_sensors.sensorMeshList.length;
+  var nodeDegree = getNodeDegree(sensor.mesh);
+  sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (sensorCount - 1);
+}
+
+function updateAllDegreeLines() {
+  var _iterator2 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var sensor = _step2.value;
+
+      if (sensor.mesh && sensor.degreeLine) {
+        updateNodeDegreeLine(sensor);
+      }
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+}
+
+function updateDegreeLinesVisibility() {
+  var _iterator3 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
+      _step3;
+
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var sensor = _step3.value;
+      sensor.degreeLine.visible = _setup_gui.guiParams.showDegreeLines;
+    }
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+}
+},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.deleteMesh = deleteMesh;
+exports.disposeMesh = disposeMesh;
+
+var _main = require("../public/main");
+
+function deleteMesh(mesh) {
+  disposeMesh(mesh);
+
+  _main.scene.remove(mesh);
+}
+
+function disposeMesh(mesh) {
+  mesh.geometry.dispose();
+  mesh.material.dispose();
+}
+},{"../public/main":"main.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.clearAllLinks = clearAllLinks;
+exports.loadAndDrawLinks = loadAndDrawLinks;
+exports.redrawLinks = redrawLinks;
+exports.updateLinkOutline = updateLinkOutline;
+exports.updateVisibleLinks = updateVisibleLinks;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _main = require("../../public/main");
+
+var _draw_degree_line = require("../draw_degree_line");
+
+var _load_data = require("../load_data");
+
+var _setup_gui = require("../setup_gui");
+
+var _draw_sensors = require("../draw_sensors");
+
+var _mesh_helper = require("../mesh_helper");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function loadAndDrawLinks(_x) {
+  return _loadAndDrawLinks.apply(this, arguments);
+}
+
+function _loadAndDrawLinks() {
+  _loadAndDrawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(linksDataFileUrl) {
+    var links;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return loadLinks(linksDataFileUrl);
+
+          case 2:
+            links = _context.sent;
+            _context.next = 5;
+            return drawLinksAndUpdateVisibility(links);
+
+          case 5:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _loadAndDrawLinks.apply(this, arguments);
+}
+
+function loadLinks(_x2) {
+  return _loadLinks.apply(this, arguments);
+}
+
+function _loadLinks() {
+  _loadLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linksDataFileUrl) {
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            return _context2.abrupt("return", (0, _load_data.loadData)(linksDataFileUrl, 'connectivity matrix', function (x) {
+              return x;
+            }, connectivityMatrixOnLoadCallBack));
+
+          case 1:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+  return _loadLinks.apply(this, arguments);
+}
+
+function connectivityMatrixOnLoadCallBack(data) {
+  var outList = [];
+  var splittedData = data.split('\n').filter(function (d) {
+    return d !== '';
+  });
+
+  for (var i = 0; i < splittedData.length; i++) {
+    var row = splittedData[i];
+    var splittedRow = row.split(',');
+
+    for (var j = 0; j < i; j++) {
+      outList.push({
+        node1: _main.sensorMeshList[i].mesh,
+        node2: _main.sensorMeshList[j].mesh,
+        strength: parseFloat(splittedRow[j]),
+        normDist: _main.sensorMeshList[i].mesh.position.distanceTo(_main.sensorMeshList[j].mesh.position) / _draw_sensors.maxSensorDistance
+      });
+    }
+  }
+
+  return outList;
+}
+
+function drawLinksAndUpdateVisibility(_x3) {
+  return _drawLinksAndUpdateVisibility.apply(this, arguments);
+}
+
+function _drawLinksAndUpdateVisibility() {
+  _drawLinksAndUpdateVisibility = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            drawLinks(linkList).then(function () {
+              _main.linkMeshList.sort(function (x1, x2) {
+                return x2.link.strength - x1.link.strength;
+              });
+            }).then(function () {
+              return updateVisibleLinks(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
+            });
+
+          case 1:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+  return _drawLinksAndUpdateVisibility.apply(this, arguments);
+}
+
+function drawLinks(_x4) {
+  return _drawLinks.apply(this, arguments);
+}
+
+function _drawLinks() {
+  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(linkList) {
+    var _iterator5, _step5, link, splinePoints, curveObject;
+
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            _iterator5 = _createForOfIteratorHelper(linkList);
+
+            try {
+              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+                link = _step5.value;
+                splinePoints = _setup_gui.guiParams.getSplinePoints(link);
+                curveObject = _setup_gui.guiParams.linkGenerator.generateLink(splinePoints, link);
+                curveObject.layers.set(_main.LINK_LAYER);
+
+                _main.scene.add(curveObject);
+
+                _main.linkMeshList.push({
+                  link: link,
+                  mesh: curveObject
+                });
+              }
+            } catch (err) {
+              _iterator5.e(err);
+            } finally {
+              _iterator5.f();
+            }
+
+          case 2:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4);
+  }));
+  return _drawLinks.apply(this, arguments);
+}
+
+function updateLinkOutline() {
+  var _iterator = _createForOfIteratorHelper(_main.linkMeshList),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var linkTuple = _step.value;
+
+      var splinePoints = _setup_gui.guiParams.getSplinePoints(linkTuple.link);
+
+      var curveGeometry = _setup_gui.guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
+
+      var position = linkTuple.mesh.geometry.attributes.position;
+      var target = curveGeometry.attributes.position;
+
+      for (var i = 0; i < target.count; i++) {
+        position.setXYZ(i, target.array[i * 3], target.array[i * 3 + 1], target.array[i * 3 + 2]);
+      }
+
+      position.needsUpdate = true;
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}
+
+function redrawLinks() {
+  var linkListTemp = [];
+
+  while (_main.linkMeshList.length) {
+    var link = _main.linkMeshList.pop();
+
+    (0, _mesh_helper.deleteMesh)(link.mesh);
+    linkListTemp.push(link.link);
+  }
+
+  drawLinksAndUpdateVisibility(linkListTemp);
+}
+
+function clearAllLinks() {
+  while (_main.linkMeshList.length) {
+    var link = _main.linkMeshList.pop();
+
+    (0, _mesh_helper.deleteMesh)(link.mesh);
+  }
+}
+
+function updateVisibleLinks(minStrength, maxStrength) {
+  var minVisibleLinkIndice = _main.linkMeshList.length * minStrength;
+  var maxVisibleLinkIndice = _main.linkMeshList.length * maxStrength;
+
+  var _iterator2 = _createForOfIteratorHelper(_main.linkMeshList.slice(0, minVisibleLinkIndice)),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var link = _step2.value;
+      link.mesh.visible = false;
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+
+  var _iterator3 = _createForOfIteratorHelper(_main.linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)),
+      _step3;
+
+  try {
+    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+      var _link = _step3.value;
+      _link.mesh.visible = true;
+    }
+  } catch (err) {
+    _iterator3.e(err);
+  } finally {
+    _iterator3.f();
+  }
+
+  var _iterator4 = _createForOfIteratorHelper(_main.linkMeshList.slice(maxVisibleLinkIndice, _main.linkMeshList.length)),
+      _step4;
+
+  try {
+    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+      var _link2 = _step4.value;
+      _link2.mesh.visible = false;
+    }
+  } catch (err) {
+    _iterator4.e(err);
+  } finally {
+    _iterator4.f();
+  }
+
+  (0, _draw_degree_line.updateAllDegreeLines)();
+}
+},{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js","../mesh_helper":"../js/mesh_helper.js"}],"../js/draw_sensors.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.loadAndDrawSensors = loadAndDrawSensors;
+exports.clearAllSensors = clearAllSensors;
+exports.changeMontage = changeMontage;
+Object.defineProperty(exports, "sensorMeshList", {
+  enumerable: true,
+  get: function () {
+    return _main.sensorMeshList;
+  }
+});
+exports.maxSensorDistance = exports.sensorMaterial = void 0;
+
+var THREE = _interopRequireWildcard(require("three"));
+
+var _main = require("../public/main.js");
+
+var _load_data = require("./load_data.js");
+
+var _draw_links = require("./link_builder/draw_links");
+
+var _setup_gui = require("./setup_gui");
+
+var _mesh_helper = require("./mesh_helper");
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var SENSOR_RADIUS = 3;
+var SENSOR_SEGMENTS = 20;
+var SENSOR_RINGS = 50;
+var CENTER_POINT_OFFSET_X = 16;
+var CENTER_POINT_OFFSET_Y = 63;
+var CENTER_POINT_OFFSET_Z = 1;
+var SCALE_FACTOR = 100;
+var sensorMaterial = new THREE.MeshPhysicalMaterial({
+  color: 0xaaaaaa,
+  opacity: 1.,
+  transparent: true,
+  reflectivity: 1
+});
+exports.sensorMaterial = sensorMaterial;
+var maxSensorDistance = 0.;
+exports.maxSensorDistance = maxSensorDistance;
+var meanSensorDistance = 0.;
+
+function loadAndDrawSensors(_x, _x2) {
+  return _loadAndDrawSensors.apply(this, arguments);
+}
+
+function _loadAndDrawSensors() {
+  _loadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl, sensorLabelsUrl) {
+    var data;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            _context.next = 2;
+            return loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
+
+          case 2:
+            data = _context.sent;
+            _context.next = 5;
+            return getCenterPoint(data[1]);
+
+          case 5:
+            _context.next = 7;
+            return getMaxMeanSensorDistance(data[1]);
+
+          case 7:
+            _context.next = 9;
+            return drawAllSensors(data[0], data[1]);
+
+          case 9:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _loadAndDrawSensors.apply(this, arguments);
+}
+
+function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
+  return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
+}
+
+function loadSensorCoordinates(sensorCoordinatesUrl) {
+  return (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow);
+}
+
+function loadSensorLabels(sensorLabelsUrl) {
+  return (0, _load_data.loadData)(sensorLabelsUrl, 'sensor labels', function (x) {
+    return x;
+  });
+}
+
+function drawAllSensors(_x3, _x4) {
+  return _drawAllSensors.apply(this, arguments);
+}
+
+function _drawAllSensors() {
+  _drawAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(labelList, coordinatesList) {
+    var i;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            i = 0;
+
+          case 1:
+            if (!(i < labelList.length)) {
+              _context2.next = 7;
+              break;
+            }
+
+            _context2.next = 4;
+            return drawSensor(labelList[i], coordinatesList[i]);
+
+          case 4:
+            i++;
+            _context2.next = 1;
+            break;
+
+          case 7:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
+  }));
+  return _drawAllSensors.apply(this, arguments);
+}
+
+function drawSensor(_x5, _x6) {
+  return _drawSensor.apply(this, arguments);
+}
+
+function _drawSensor() {
+  _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(label, coordinates) {
+    var sensorGeometry, sensor;
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
+            sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
+            sensor.castShadow = false;
+            sensor.name = label;
+            sensor.position.x = coordinates[0] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.x;
+            sensor.position.y = coordinates[1] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.y;
+            sensor.position.z = coordinates[2] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.z;
+
+            _main.scene.add(sensor);
+
+            _main.sensorMeshList.push({
+              mesh: sensor
+            });
+
+          case 9:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+  return _drawSensor.apply(this, arguments);
+}
+
+function getMaxMeanSensorDistance(_x7) {
+  return _getMaxMeanSensorDistance.apply(this, arguments);
+}
+
+function _getMaxMeanSensorDistance() {
+  _getMaxMeanSensorDistance = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(positions) {
+    var count, i, j, _dist;
+
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            exports.maxSensorDistance = maxSensorDistance = 0.;
+            meanSensorDistance = 0.;
+            count = 0;
+
+            for (i = 0; i < positions.length; i++) {
+              for (j = 0; j < i; j++) {
+                _dist = new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2]).distanceTo(new THREE.Vector3(positions[j][0], positions[j][1], positions[j][2]));
+
+                if (maxSensorDistance <= _dist) {
+                  exports.maxSensorDistance = maxSensorDistance = _dist;
+                }
+
+                count++;
+                meanSensorDistance += _dist;
+              }
+            }
+
+            meanSensorDistance = meanSensorDistance / count;
+
+          case 5:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, _callee4);
+  }));
+  return _getMaxMeanSensorDistance.apply(this, arguments);
+}
+
+function getCenterPoint(_x8) {
+  return _getCenterPoint.apply(this, arguments);
+}
+
+function _getCenterPoint() {
+  _getCenterPoint = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(positions) {
+    var x, y, z, _iterator, _step, position;
+
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            x = 0;
+            y = 0;
+            z = 0;
+            _iterator = _createForOfIteratorHelper(positions);
+
+            try {
+              for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                position = _step.value;
+                x += position[0];
+                y += position[1];
+                z += position[2];
+              }
+            } catch (err) {
+              _iterator.e(err);
+            } finally {
+              _iterator.f();
+            }
+
+            _main.centerPoint.set(x / positions.length - CENTER_POINT_OFFSET_X, y / positions.length - CENTER_POINT_OFFSET_Y, z / positions.length - CENTER_POINT_OFFSET_Z);
+
+          case 6:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5);
+  }));
+  return _getCenterPoint.apply(this, arguments);
+}
+
+function clearAllSensors() {
+  return _clearAllSensors.apply(this, arguments);
+}
+
+function _clearAllSensors() {
+  _clearAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+    var sensor;
+    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+      while (1) {
+        switch (_context6.prev = _context6.next) {
+          case 0:
+            while (_main.sensorMeshList.length) {
+              sensor = _main.sensorMeshList.pop();
+              (0, _mesh_helper.deleteMesh)(sensor.mesh);
+
+              if (sensor.degreeLine) {
+                (0, _mesh_helper.deleteMesh)(sensor.degreeLine);
+              }
+            }
+
+          case 1:
+          case "end":
+            return _context6.stop();
+        }
+      }
+    }, _callee6);
+  }));
+  return _clearAllSensors.apply(this, arguments);
+}
+
+function changeMontage() {
+  var newSensorCoordinatesUrl = _setup_gui.defaultMontageCoordinates[_setup_gui.guiParams.montage];
+  var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.montage];
+  clearAllSensors();
+  (0, _draw_links.clearAllLinks)();
+  loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
+}
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40941,1258 +42458,7 @@ function addLightAndBackground() {
 
   _main.scene.add(bottomLight);
 }
-},{"../public/main":"main.js","three":"../node_modules/three/build/three.module.js"}],"../js/load_data.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.loadData = loadData;
-exports.parseCsv3dCoordinatesRow = parseCsv3dCoordinatesRow;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function loadData(_x, _x2) {
-  return _loadData.apply(this, arguments);
-}
-
-function _loadData() {
-  _loadData = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url, dataName) {
-    var parseRowMethod,
-        onLoadCallback,
-        loader,
-        dataOut,
-        _args = arguments;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            parseRowMethod = _args.length > 2 && _args[2] !== undefined ? _args[2] : function (x) {
-              return x;
-            };
-            onLoadCallback = _args.length > 3 && _args[3] !== undefined ? _args[3] : defaultOnLoadCallBack;
-            loader = new THREE.FileLoader();
-            dataOut = [];
-            _context.next = 6;
-            return new Promise(function (resolve, reject) {
-              return loader.load(url, function (data) {
-                dataOut = onLoadCallback(data, parseRowMethod);
-                resolve();
-              }, function (xhr) {
-                console.log('Loading ' + dataName + ' : ' + xhr.loaded / xhr.total * 100 + '% loaded');
-              }, function (err) {
-                console.error(err);
-              });
-            });
-
-          case 6:
-            return _context.abrupt("return", dataOut);
-
-          case 7:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-  return _loadData.apply(this, arguments);
-}
-
-function defaultOnLoadCallBack(data, parseRowMethod) {
-  var dataOut = [];
-
-  var _iterator = _createForOfIteratorHelper(data.split('\n')),
-      _step;
-
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var row = _step.value;
-      dataOut.push(parseRowMethod(row));
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-
-  return dataOut;
-}
-
-function parseCsv3dCoordinatesRow(row) {
-  var splitted_row = row.split(",").map(function (x) {
-    return parseFloat(x);
-  });
-  return [splitted_row[1], splitted_row[2], splitted_row[0]];
-}
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/draw_sensors.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.loadAndDrawSensors = loadAndDrawSensors;
-exports.clearAllSensors = clearAllSensors;
-Object.defineProperty(exports, "sensorMeshList", {
-  enumerable: true,
-  get: function () {
-    return _main.sensorMeshList;
-  }
-});
-exports.maxSensorDistance = void 0;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _main = require("../public/main.js");
-
-var _load_data = require("./load_data.js");
-
-var _setup_gui = require("./setup_gui");
-
-var _draw_links = require("./link_builder/draw_links");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-var SENSOR_RADIUS = 3;
-var SENSOR_SEGMENTS = 20;
-var SENSOR_RINGS = 50;
-var maxSensorDistance = 0.; //TODO: add await to draw all sensors to ensure sensorMeshList is populated before being used
-
-exports.maxSensorDistance = maxSensorDistance;
-
-function loadAndDrawSensors(_x, _x2) {
-  return _loadAndDrawSensors.apply(this, arguments);
-}
-
-function _loadAndDrawSensors() {
-  _loadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl, sensorLabelsUrl) {
-    var data;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
-
-          case 2:
-            data = _context.sent;
-            _context.next = 5;
-            return drawAllSensors(data[0], data[1]);
-
-          case 5:
-            getMaxSensorDistance(data[1]);
-
-          case 6:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-  return _loadAndDrawSensors.apply(this, arguments);
-}
-
-function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
-  return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
-}
-
-function loadSensorCoordinates(sensorCoordinatesUrl) {
-  return (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow);
-}
-
-function loadSensorLabels(sensorLabelsUrl) {
-  return (0, _load_data.loadData)(sensorLabelsUrl, 'sensor labels', function (x) {
-    return x;
-  });
-}
-
-function drawAllSensors(_x3, _x4) {
-  return _drawAllSensors.apply(this, arguments);
-}
-
-function _drawAllSensors() {
-  _drawAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(labelList, coordinatesList) {
-    var i;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            i = 0;
-
-          case 1:
-            if (!(i < labelList.length)) {
-              _context2.next = 7;
-              break;
-            }
-
-            _context2.next = 4;
-            return drawSensor(labelList[i], coordinatesList[i]);
-
-          case 4:
-            i++;
-            _context2.next = 1;
-            break;
-
-          case 7:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2);
-  }));
-  return _drawAllSensors.apply(this, arguments);
-}
-
-function drawSensor(_x5, _x6) {
-  return _drawSensor.apply(this, arguments);
-}
-
-function _drawSensor() {
-  _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(label, coordinates) {
-    var sensorGeometry, sensor;
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
-            sensor = new THREE.Mesh(sensorGeometry, _main.sensorMaterial);
-            sensor.castShadow = false;
-            sensor.name = label;
-            sensor.position.x = coordinates[0];
-            sensor.position.y = coordinates[1];
-            sensor.position.z = coordinates[2];
-
-            _main.scene.add(sensor);
-
-            _main.sensorMeshList.push({
-              mesh: sensor
-            });
-
-          case 9:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3);
-  }));
-  return _drawSensor.apply(this, arguments);
-}
-
-function getMaxSensorDistance(positions) {
-  exports.maxSensorDistance = maxSensorDistance = 0.;
-
-  for (var i = 0; i < positions.length; i++) {
-    for (var j = 0; j < i; j++) {
-      var _dist = new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2]).distanceTo(new THREE.Vector3(positions[j][0], positions[j][1], positions[j][2]));
-
-      if (maxSensorDistance <= _dist) {
-        exports.maxSensorDistance = maxSensorDistance = _dist;
-      }
-    }
-  }
-}
-
-function clearAllSensors() {
-  while (_main.sensorMeshList.length) {
-    var sensor = _main.sensorMeshList.pop();
-
-    (0, _draw_links.deleteMesh)(sensor.mesh);
-  }
-}
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./setup_gui":"../js/setup_gui.js","./link_builder/draw_links":"../js/link_builder/draw_links.js"}],"../js/draw_degree_line.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.drawDegreeLine = drawDegreeLine;
-exports.drawAllDegreeLines = drawAllDegreeLines;
-exports.updateAllDegreeLines = updateAllDegreeLines;
-exports.updateDegreeLinesVisibility = updateDegreeLinesVisibility;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _main = require("../public/main");
-
-var _draw_sensors = require("./draw_sensors");
-
-var _setup_gui = require("./setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-var degreeLineMaterial = new THREE.MeshBasicMaterial({
-  color: 0x9999ff,
-  opacity: .6,
-  transparent: true
-});
-var DEGREE_LINE_UNIT_MAX_SCALE = 200;
-var DEGREE_LINE_TUBULAR_SEGMENTS = 2;
-var DEGREE_LINE_RADIUS = 1.3;
-var DEGREE_LINE_RADIAL_SEGMENTS = 8;
-
-function drawDegreeLine(sensor) {
-  var sensorMesh = sensor.mesh;
-  var unitVector = sensorMesh.position.clone().normalize();
-  var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_UNIT_MAX_SCALE);
-  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
-  var curve = new THREE.LineCurve(sensorMesh.position, endPoint);
-  var flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
-  var geometry = new THREE.TubeGeometry(curve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
-  var flatGeometry = new THREE.TubeGeometry(flatCurve, DEGREE_LINE_TUBULAR_SEGMENTS, DEGREE_LINE_RADIUS, DEGREE_LINE_RADIAL_SEGMENTS, true);
-  geometry.morphAttributes.position = [];
-  geometry.morphAttributes.position[0] = new THREE.Float32BufferAttribute(flatGeometry.attributes.position.array, 3);
-  var line = new THREE.Mesh(geometry, degreeLineMaterial);
-  line.morphTargetInfluences = [];
-  line.layers.set(_main.LINK_LAYER);
-
-  _main.scene.add(line);
-
-  sensor.degreeLine = line;
-  updateNodeDegreeLine(sensor);
-  return sensor;
-}
-
-function drawAllDegreeLines() {
-  for (var i = 0; i < _draw_sensors.sensorMeshList.length; i++) {
-    _draw_sensors.sensorMeshList[i] = drawDegreeLine(_draw_sensors.sensorMeshList[i]);
-  }
-}
-
-function getNodeDegree(sensorMesh) {
-  var nodeDegree = 0;
-
-  var _iterator = _createForOfIteratorHelper(_main.linkMeshList.filter(function (linkMesh) {
-    return linkMesh.mesh.visible === true;
-  })),
-      _step;
-
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var linkMesh = _step.value;
-      var link = linkMesh.link;
-
-      if (link.node1.name == sensorMesh.name || link.node2.name == sensorMesh.name) {
-        nodeDegree++;
-      }
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-
-  return nodeDegree;
-}
-
-function updateNodeDegreeLine(sensor) {
-  var sensorCount = _draw_sensors.sensorMeshList.length;
-  var nodeDegree = getNodeDegree(sensor.mesh);
-  sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (sensorCount - 1);
-}
-
-function updateAllDegreeLines() {
-  var _iterator2 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
-      _step2;
-
-  try {
-    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var sensor = _step2.value;
-
-      if (sensor.mesh && sensor.degreeLine) {
-        updateNodeDegreeLine(sensor);
-      }
-    }
-  } catch (err) {
-    _iterator2.e(err);
-  } finally {
-    _iterator2.f();
-  }
-}
-
-function updateDegreeLinesVisibility() {
-  var _iterator3 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
-      _step3;
-
-  try {
-    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-      var sensor = _step3.value;
-      sensor.degreeLine.visible = _setup_gui.guiParams.showDegreeLines;
-    }
-  } catch (err) {
-    _iterator3.e(err);
-  } finally {
-    _iterator3.f();
-  }
-}
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.clearLinks = clearAllLinks;
-exports.deleteMesh = deleteMesh;
-exports.loadAndDrawLinks = loadAndDrawLinks;
-exports.redrawLinks = redrawLinks;
-exports.updateLinkOutline = updateLinkOutline;
-exports.updateVisibleLinks = updateVisibleLinks;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _main = require("../../public/main");
-
-var _draw_degree_line = require("../draw_degree_line");
-
-var _load_data = require("../load_data");
-
-var _setup_gui = require("../setup_gui");
-
-var _draw_sensors = require("../draw_sensors");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function loadAndDrawLinks(_x) {
-  return _loadAndDrawLinks.apply(this, arguments);
-}
-
-function _loadAndDrawLinks() {
-  _loadAndDrawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(linksDataFileUrl) {
-    var links;
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return loadLinks(linksDataFileUrl);
-
-          case 2:
-            links = _context.sent;
-            _context.next = 5;
-            return drawLinksAndUpdateVisibility(links);
-
-          case 5:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-  return _loadAndDrawLinks.apply(this, arguments);
-}
-
-function loadLinks(_x2) {
-  return _loadLinks.apply(this, arguments);
-}
-
-function _loadLinks() {
-  _loadLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(linksDataFileUrl) {
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            return _context2.abrupt("return", (0, _load_data.loadData)(linksDataFileUrl, 'connectivity matrix', function (x) {
-              return x;
-            }, connectivityMatrixOnLoadCallBack));
-
-          case 1:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2);
-  }));
-  return _loadLinks.apply(this, arguments);
-}
-
-function connectivityMatrixOnLoadCallBack(data) {
-  var outList = [];
-  var splittedData = data.split('\n').filter(function (d) {
-    return d !== '';
-  });
-
-  for (var i = 0; i < splittedData.length; i++) {
-    var row = splittedData[i];
-    var splittedRow = row.split(',');
-
-    for (var j = 0; j < i; j++) {
-      outList.push({
-        node1: _main.sensorMeshList[i].mesh,
-        node2: _main.sensorMeshList[j].mesh,
-        strength: parseFloat(splittedRow[j]),
-        normDist: _main.sensorMeshList[i].mesh.position.distanceTo(_main.sensorMeshList[j].mesh.position) / _draw_sensors.maxSensorDistance
-      });
-    }
-  }
-
-  return outList;
-}
-
-function drawLinksAndUpdateVisibility(_x3) {
-  return _drawLinksAndUpdateVisibility.apply(this, arguments);
-}
-
-function _drawLinksAndUpdateVisibility() {
-  _drawLinksAndUpdateVisibility = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(linkList) {
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            drawLinks(linkList).then(function () {
-              _main.linkMeshList.sort(function (x1, x2) {
-                return x2.link.strength - x1.link.strength;
-              });
-            }).then(function () {
-              return updateVisibleLinks(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
-            });
-
-          case 1:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3);
-  }));
-  return _drawLinksAndUpdateVisibility.apply(this, arguments);
-}
-
-function drawLinks(_x4) {
-  return _drawLinks.apply(this, arguments);
-}
-
-function _drawLinks() {
-  _drawLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(linkList) {
-    var _iterator5, _step5, link, splinePoints, curveObject;
-
-    return regeneratorRuntime.wrap(function _callee4$(_context4) {
-      while (1) {
-        switch (_context4.prev = _context4.next) {
-          case 0:
-            _iterator5 = _createForOfIteratorHelper(linkList);
-
-            try {
-              for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-                link = _step5.value;
-                splinePoints = _setup_gui.guiParams.getSplinePoints(link);
-                curveObject = _setup_gui.guiParams.linkGenerator.generateLink(splinePoints, link);
-                curveObject.layers.set(_main.LINK_LAYER);
-
-                _main.scene.add(curveObject);
-
-                _main.linkMeshList.push({
-                  link: link,
-                  mesh: curveObject
-                });
-              }
-            } catch (err) {
-              _iterator5.e(err);
-            } finally {
-              _iterator5.f();
-            }
-
-          case 2:
-          case "end":
-            return _context4.stop();
-        }
-      }
-    }, _callee4);
-  }));
-  return _drawLinks.apply(this, arguments);
-}
-
-function updateLinkOutline() {
-  var _iterator = _createForOfIteratorHelper(_main.linkMeshList),
-      _step;
-
-  try {
-    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-      var linkTuple = _step.value;
-
-      var splinePoints = _setup_gui.guiParams.getSplinePoints(linkTuple.link);
-
-      var curveGeometry = _setup_gui.guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
-
-      var position = linkTuple.mesh.geometry.attributes.position;
-      var target = curveGeometry.attributes.position;
-
-      for (var i = 0; i < target.count; i++) {
-        position.setXYZ(i, target.array[i * 3], target.array[i * 3 + 1], target.array[i * 3 + 2]);
-      }
-
-      position.needsUpdate = true;
-    }
-  } catch (err) {
-    _iterator.e(err);
-  } finally {
-    _iterator.f();
-  }
-}
-
-function redrawLinks() {
-  var linkListTemp = [];
-
-  while (_main.linkMeshList.length) {
-    var link = _main.linkMeshList.pop();
-
-    deleteMesh(link.mesh);
-    linkListTemp.push(link.link);
-  }
-
-  drawLinksAndUpdateVisibility(linkListTemp);
-}
-
-function clearAllLinks() {
-  while (_main.linkMeshList.length) {
-    var link = _main.linkMeshList.pop();
-
-    deleteMesh(link.mesh);
-  }
-}
-
-function deleteMesh(mesh) {
-  disposeMesh(mesh);
-
-  _main.scene.remove(mesh);
-}
-
-function disposeMesh(mesh) {
-  mesh.geometry.dispose();
-  mesh.material.dispose();
-}
-
-function updateVisibleLinks(minStrength, maxStrength) {
-  var minVisibleLinkIndice = _main.linkMeshList.length * minStrength;
-  var maxVisibleLinkIndice = _main.linkMeshList.length * maxStrength;
-
-  var _iterator2 = _createForOfIteratorHelper(_main.linkMeshList.slice(0, minVisibleLinkIndice)),
-      _step2;
-
-  try {
-    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-      var link = _step2.value;
-      link.mesh.visible = false;
-    }
-  } catch (err) {
-    _iterator2.e(err);
-  } finally {
-    _iterator2.f();
-  }
-
-  var _iterator3 = _createForOfIteratorHelper(_main.linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)),
-      _step3;
-
-  try {
-    for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-      var _link = _step3.value;
-      _link.mesh.visible = true;
-    }
-  } catch (err) {
-    _iterator3.e(err);
-  } finally {
-    _iterator3.f();
-  }
-
-  var _iterator4 = _createForOfIteratorHelper(_main.linkMeshList.slice(maxVisibleLinkIndice, _main.linkMeshList.length)),
-      _step4;
-
-  try {
-    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
-      var _link2 = _step4.value;
-      _link2.mesh.visible = false;
-    }
-  } catch (err) {
-    _iterator4.e(err);
-  } finally {
-    _iterator4.f();
-  }
-
-  (0, _draw_degree_line.updateAllDegreeLines)();
-}
-},{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.linkVolumeGenerator = exports.linkLineGenerator = void 0;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _setup_gui = require("../setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var linkMeshGenerator = function linkMeshGenerator() {
-  _classCallCheck(this, linkMeshGenerator);
-};
-
-var linkLineGenerator = /*#__PURE__*/function (_linkMeshGenerator) {
-  _inherits(linkLineGenerator, _linkMeshGenerator);
-
-  var _super = _createSuper(linkLineGenerator);
-
-  function linkLineGenerator() {
-    _classCallCheck(this, linkLineGenerator);
-
-    return _super.apply(this, arguments);
-  }
-
-  _createClass(linkLineGenerator, null, [{
-    key: "generateLink",
-    value: function generateLink(curvePath, link) {
-      var geometry = this.getGeometry(curvePath, link);
-      var linkMat = this.getMaterial(link.strength);
-      var curveObject = new THREE.Line(geometry, linkMat);
-      return curveObject;
-    }
-  }, {
-    key: "getMaterial",
-    value: function getMaterial(strength) {
-      return new THREE.LineBasicMaterial({
-        color: new THREE.Color(strength, 0, 1 - strength),
-        linewidth: 0.001,
-        opacity: strength,
-        transparent: false
-      });
-    }
-  }, {
-    key: "getGeometry",
-    value: function getGeometry(curvePath, link) {
-      //Here we have to divide by the number of curves to get ARC_SEGMENTS points into splinePoints
-      var splinePoints = curvePath.getPoints((this.ARC_SEGMENTS - 1) / curvePath.curves.length);
-      return new THREE.BufferGeometry().setFromPoints(splinePoints);
-    }
-  }]);
-
-  return linkLineGenerator;
-}(linkMeshGenerator);
-
-exports.linkLineGenerator = linkLineGenerator;
-
-_defineProperty(linkLineGenerator, "ARC_SEGMENTS", 48);
-
-var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
-  _inherits(linkVolumeGenerator, _linkMeshGenerator2);
-
-  var _super2 = _createSuper(linkVolumeGenerator);
-
-  function linkVolumeGenerator() {
-    _classCallCheck(this, linkVolumeGenerator);
-
-    return _super2.apply(this, arguments);
-  }
-
-  _createClass(linkVolumeGenerator, null, [{
-    key: "generateLink",
-    value: function generateLink(curvePath, link) {
-      var geometry = this.getGeometry(curvePath, link);
-      var linkMat = this.getMaterial(link.strength);
-      var curveObject = new THREE.Mesh(geometry, linkMat);
-      return curveObject;
-    }
-  }, {
-    key: "getMaterial",
-    value: function getMaterial(strength) {
-      return new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(strength, 0, 1 - strength),
-        opacity: strength,
-        transparent: false
-      });
-    }
-  }, {
-    key: "getGeometry",
-    value: function getGeometry(curvePath, link) {
-      var geometry = new THREE.TubeGeometry(curvePath, this.LINK_SEGMENTS, (1 - link.normDist) * _setup_gui.guiParams.linkThickness, this.LINK_RADIAL_SEGMENTS, false);
-      return geometry;
-    }
-  }]);
-
-  return linkVolumeGenerator;
-}(linkMeshGenerator);
-
-exports.linkVolumeGenerator = linkVolumeGenerator;
-
-_defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
-
-_defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getSplinePoints = getSplinePoints;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _setup_gui = require("../setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function getSplinePoints(link) {
-  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
-  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
-  var pointA = {
-    controlPoint: link.node1.position
-  };
-  var pointB = {
-    controlPoint: link.node2.position
-  };
-  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-  var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).length();
-  var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
-  var quaternionA = new THREE.Quaternion();
-  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  var quaternionB = new THREE.Quaternion();
-  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
-  pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
-  pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
-  var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
-  var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
-  var curvePath = new THREE.CurvePath();
-  curvePath.add(splineLeft);
-  curvePath.add(splineRight);
-  return curvePath;
-} //This function is to get the rotation to be in the link plan
-//It makes it easier to write 3d operations in such a plan
-
-
-function getLinkToGlobalMatrix(A, B) {
-  var i = A.clone().addScaledVector(B, -1).normalize();
-  var j = B.clone().add(A).normalize();
-  var k = i.clone().cross(j);
-  var m = new THREE.Matrix3();
-  m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
-  return m;
-}
-
-function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
-  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, 0);
-  var leftHandleRotation = new THREE.Quaternion();
-  leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  var rightHandleRotation = new THREE.Quaternion();
-  rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
-  return {
-    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
-    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    controlPointLinkBasis: controlPointC
-  };
-}
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getSplinePointsPlane = getSplinePointsPlane;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _draw_sensors = require("../draw_sensors");
-
-var _setup_gui = require("../setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function getSplinePointsPlane(link) {
-  var pointA = link.node1.position;
-  var pointB = link.node2.position;
-  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
-  var curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
-  var curvePath = new THREE.CurvePath();
-  curvePath.add(curve);
-  return curvePath;
-} // function getSplinePointsPlane(link, L){
-//     const pointA = {controlPoint: link.node1.position};
-//     const pointB = {controlPoint: link.node2.position};
-//     const pointC = computePointCPlane(pointA.controlPoint, pointB.controlPoint);
-//     pointA.handleRight = new THREE.Vector3(pointA.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
-//     pointB.handleLeft  = new THREE.Vector3(pointB.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
-//     const splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
-//     const splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
-//     const curvePath = new THREE.CurvePath();
-//     curvePath.add(splineLeft);
-//     curvePath.add(splineRight);
-//     return curvePath;
-// }
-// function computePointCPlane(pointA, pointB){
-//     const controlPointC = new THREE.Vector3(
-//         (pointA.x + pointB.x)/2,
-//         pointA.distanceTo(pointB) * guiParams.linkHeight,
-//         (pointA.z + pointB.z)/2
-//     );
-//     const leftHandleRotation = new THREE.Quaternion();
-//     leftHandleRotation.setFromAxisAngle(new Vector3(0,+1,0), Math.PI * guiParams.linkTopPointAngle );
-//     const rightHandleRotation = new THREE.Quaternion();
-//     rightHandleRotation.setFromAxisAngle(new Vector3(0,-1,0), Math.PI * guiParams.linkTopPointAngle );
-//     return {controlPoint: controlPointC.clone(),
-//         handleLeft: controlPointC.clone()
-//             .add( new Vector3(pointA.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
-//         handleRight: controlPointC.clone()
-//             .add( new Vector3(pointB.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
-//         controlPointLinkBasis: controlPointC
-//     };
-// }
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../data/2d/sensor_labels.csv":[function(require,module,exports) {
-module.exports = "/sensor_labels.c2119944.csv";
-},{}],"../data/2d/sensor_coordinates.csv":[function(require,module,exports) {
-module.exports = "/sensor_coordinates.fc344167.csv";
-},{}],"../data/2d/conn_matrix.csv":[function(require,module,exports) {
-module.exports = "/conn_matrix.70e1003c.csv";
-},{}],"../js/setup_gui.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setupGui = setupGui;
-exports.guiParams = void 0;
-
-var _main = require("../public/main");
-
-var _draw_links = require("./link_builder/draw_links");
-
-var _link_mesh_generator = require("./link_builder/link_mesh_generator");
-
-var _draw_cortex = require("./draw_cortex");
-
-var _compute_link_shape = require("./link_builder/compute_link_shape");
-
-var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D");
-
-var _draw_sensors = require("./draw_sensors");
-
-var _draw_degree_line = require("./draw_degree_line");
-
-var guiParams = {
-  loadFile: function loadFile() {
-    return document.getElementById('fileInput').click();
-  },
-  autoRotateCamera: false,
-  autoRotateSpeed: 2.0,
-  minStrengthToDisplay: 0.,
-  maxStrengthToDisplay: .2,
-  showBrain: true,
-  showDegreeLines: true,
-  linkHeight: 0.75,
-  linkTopPointHandleDistances: .5,
-  linkSensorAngles: 3 / 8,
-  linkSensorHandleDistances: 0.,
-  linkTopPointAngle: 0.,
-  linkGenerator: _link_mesh_generator.linkLineGenerator,
-  makeLinkLineMesh: function makeLinkLineMesh() {
-    return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
-  },
-  makeLinkVolumeMesh: function makeLinkVolumeMesh() {
-    return changeLinkMesh(_link_mesh_generator.linkVolumeGenerator);
-  },
-  linkThickness: 1.,
-  getSplinePoints: _compute_link_shape.getSplinePoints,
-  link2dTest: function link2dTest() {
-    (0, _draw_sensors.clearAllSensors)();
-    (0, _draw_links.clearLinks)();
-    (0, _draw_cortex.hideBrain)();
-    guiParams.getSplinePoints = _compute_link_shape_2D.getSplinePointsPlane;
-
-    var sensorLabelsUrl = require('../data/2d/sensor_labels.csv');
-
-    var sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
-
-    var connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
-
-    (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
-    (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
-  }
-};
-exports.guiParams = guiParams;
-var premadeLinkGeometriesParam = {
-  defaultLinkGeometry: function defaultLinkGeometry() {
-    guiParams.linkHeight = 0.75;
-    guiParams.linkTopPointHandleDistances = 0.5;
-    guiParams.linkSensorAngles = 3 / 8;
-    guiParams.linkSensorHandleDistances = 0.;
-    (0, _draw_links.updateLinkOutline)();
-  },
-  bellLinkGeometry: function bellLinkGeometry() {
-    guiParams.linkHeight = 0.75;
-    guiParams.linkTopPointHandleDistances = 0.5;
-    guiParams.linkSensorAngles = 0.;
-    guiParams.linkSensorHandleDistances = .5;
-    (0, _draw_links.updateLinkOutline)();
-  },
-  triangleLinkGeometry: function triangleLinkGeometry() {
-    guiParams.linkHeight = 0.75;
-    guiParams.linkTopPointHandleDistances = 0;
-    guiParams.linkSensorAngles = 0.;
-    guiParams.linkSensorHandleDistances = 0.;
-    (0, _draw_links.updateLinkOutline)();
-  },
-  roundedSquareLinkGeometry: function roundedSquareLinkGeometry() {
-    guiParams.linkHeight = 0.5;
-    guiParams.linkTopPointHandleDistances = 1.;
-    guiParams.linkSensorAngles = 0.5;
-    guiParams.linkSensorHandleDistances = 1.;
-    (0, _draw_links.updateLinkOutline)();
-  },
-  peakLinkGeometry: function peakLinkGeometry() {
-    guiParams.linkHeight = 0.75;
-    guiParams.linkTopPointHandleDistances = 0;
-    guiParams.linkSensorAngles = 0.;
-    guiParams.linkSensorHandleDistances = 1.;
-    (0, _draw_links.updateLinkOutline)();
-  }
-};
-
-function changeLinkMesh(linkGenerator) {
-  guiParams.linkGenerator = linkGenerator;
-  (0, _draw_links.redrawLinks)();
-}
-
-function setupGui() {
-  var cameraFolder = _main.gui.addFolder('Camera');
-
-  cameraFolder.add(guiParams, 'autoRotateCamera').onChange(function () {
-    _main.controls.autoRotate = guiParams.autoRotateCamera;
-  });
-  cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35).onChange(function (value) {
-    _main.controls.autoRotateSpeed = value;
-  });
-
-  var linksToDisplayFolder = _main.gui.addFolder('LinksToDisplay');
-
-  linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.).onChange(function () {
-    return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
-  });
-  linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.).onChange(function () {
-    return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
-  });
-
-  _main.gui.add(guiParams, 'showBrain').onChange(_draw_cortex.updateBrainMeshVisibility);
-
-  var linkGeometry = _main.gui.addFolder('linkGeometry');
-
-  linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(_draw_links.updateLinkOutline).listen();
-  linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
-  linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(_draw_links.updateLinkOutline).listen();
-  linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen(); //This one below is messy
-  //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
-
-  var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
-
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
-
-  var linkVolume = _main.gui.addFolder('linkVolume');
-
-  linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
-  linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
-  linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
-
-  var degreeLineFolder = _main.gui.addFolder('degree line');
-
-  degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
-
-  _main.gui.add(guiParams, 'loadFile').name('Load CSV file');
-
-  _main.gui.add(guiParams, 'link2dTest').name('link2dTest');
-}
-},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","../data/2d/sensor_labels.csv":"../data/2d/sensor_labels.csv","../data/2d/sensor_coordinates.csv":"../data/2d/sensor_coordinates.csv","../data/2d/conn_matrix.csv":"../data/2d/conn_matrix.csv"}],"../js/draw_cortex.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.loadAndDrawCortexModel = loadAndDrawCortexModel;
-exports.updateBrainMeshVisibility = updateBrainMeshVisibility;
-exports.hideBrain = hideBrain;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _load_data = require("./load_data.js");
-
-var _main = require("../public/main.js");
-
-var _setup_gui = require("./setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-var brainMesh;
-
-function loadAndDrawCortexModel() {
-  loadCortexModel().then(function (response) {
-    return makeVertCoordsList(response[0], response[1]);
-  }).then(function (response) {
-    return drawCortexModel(response);
-  });
-  return;
-}
-
-function loadCortexModel() {
-  return Promise.all([loadCortexVert(), loadCortexTri()]);
-}
-
-function parseRowCortexTri(row) {
-  var splitted_row = row.split(",");
-  return [parseInt(splitted_row[0]), parseInt(splitted_row[1]), parseInt(splitted_row[2])];
-}
-
-function loadCortexVert() {
-  return (0, _load_data.loadData)(_main.cortexVertUrl, 'cortex vertices', _load_data.parseCsv3dCoordinatesRow);
-}
-
-function loadCortexTri() {
-  return (0, _load_data.loadData)(_main.cortexTriUrl, 'cortex faces', parseRowCortexTri);
-}
-
-function makeVertCoordsList(_x, _x2) {
-  return _makeVertCoordsList.apply(this, arguments);
-}
-
-function _makeVertCoordsList() {
-  _makeVertCoordsList = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(cortexVert, cortexTri) {
-    var positions, _iterator, _step, coords;
-
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            positions = [];
-            _iterator = _createForOfIteratorHelper(cortexTri);
-
-            try {
-              for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                coords = _step.value;
-                Array.prototype.push.apply(positions, cortexVert[coords[0]]);
-                Array.prototype.push.apply(positions, cortexVert[coords[1]]);
-                Array.prototype.push.apply(positions, cortexVert[coords[2]]);
-              }
-            } catch (err) {
-              _iterator.e(err);
-            } finally {
-              _iterator.f();
-            }
-
-            return _context.abrupt("return", new Float32Array(positions));
-
-          case 4:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee);
-  }));
-  return _makeVertCoordsList.apply(this, arguments);
-}
-
-function drawCortexModel(vertices) {
-  var geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3)); //geometry.setFromPoints(vertices);
-
-  geometry.computeVertexNormals();
-  brainMesh = new THREE.Mesh(geometry, _main.cortexMaterial);
-  brainMesh.receiveShadow = true;
-  brainMesh.castShadow = true;
-  brainMesh.translateY(50);
-  brainMesh.name = 'cortex';
-
-  _main.scene.add(brainMesh);
-}
-
-function updateBrainMeshVisibility() {
-  brainMesh.visible = _setup_gui.guiParams.showBrain;
-  brainMesh.layers.toggle(_main.GLOBAL_LAYER);
-}
-
-function hideBrain() {
-  _setup_gui.guiParams.showBrain = false;
-  updateBrainMeshVisibility();
-}
-},{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../js/setup_camera.js":[function(require,module,exports) {
+},{"../public/main":"main.js","three":"../node_modules/three/build/three.module.js"}],"../js/setup_camera.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42249,11 +42515,19 @@ module.exports = "/conn_matrix_0.5c498bf8.csv";
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.sensorMaterial = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+Object.defineProperty(exports, "sensorMaterial", {
+  enumerable: true,
+  get: function () {
+    return _draw_sensors.sensorMaterial;
+  }
+});
+exports.centerPoint = exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
 var _OrbitControls = require("../node_modules/three/examples/jsm/controls/OrbitControls");
+
+var _draw_sensors = require("../js/draw_sensors.js");
 
 var _datGui = require("../node_modules/three/examples/jsm/libs/dat.gui.module");
 
@@ -42262,8 +42536,6 @@ require("regenerator-runtime/runtime.js");
 var _add_light_and_background = require("../js/add_light_and_background");
 
 var _draw_cortex = require("../js/draw_cortex.js");
-
-var _draw_sensors = require("../js/draw_sensors.js");
 
 var _draw_links = require("../js/link_builder/draw_links");
 
@@ -42307,18 +42579,13 @@ var GLOBAL_LAYER = 0,
     LINK_LAYER = 1;
 exports.LINK_LAYER = LINK_LAYER;
 exports.GLOBAL_LAYER = GLOBAL_LAYER;
+var centerPoint = new THREE.Vector3();
+exports.centerPoint = centerPoint;
 var cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide
 });
 exports.cortexMaterial = cortexMaterial;
-var sensorMaterial = new THREE.MeshPhysicalMaterial({
-  color: 0xaaaaaa,
-  opacity: 1.,
-  transparent: true,
-  reflectivity: 1
-});
-exports.sensorMaterial = sensorMaterial;
 var enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
   reflectivity: 1
@@ -42430,7 +42697,7 @@ function hoverDisplayUpdate() {
 
 function emptyIntersected() {
   if (INTERSECTED) {
-    INTERSECTED.material = sensorMaterial;
+    INTERSECTED.material = _draw_sensors.sensorMaterial;
   }
 
   INTERSECTED = null;
@@ -42495,10 +42762,10 @@ function getNewFileUrl(evt) {
 
 function handleConnectivityMatrixFileSelect(evt) {
   var fileUrl = getNewFileUrl(evt);
-  (0, _draw_links.clearLinks)();
+  (0, _draw_links.clearAllLinks)();
   (0, _draw_links.loadAndDrawLinks)(fileUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/draw_sensors.js":"../js/draw_sensors.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -42526,7 +42793,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62276" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57725" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

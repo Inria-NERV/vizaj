@@ -4,6 +4,7 @@ import { updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
+import { deleteMesh } from '../mesh_helper';
 
 
 async function loadAndDrawLinks(linksDataFileUrl){
@@ -80,17 +81,6 @@ function clearAllLinks() {
     }
 }
 
-function deleteMesh(mesh){
-    disposeMesh(mesh);
-    scene.remove(mesh);
-}
-
-
-function disposeMesh(mesh){
-    mesh.geometry.dispose();
-    mesh.material.dispose();
-}
-
 function updateVisibleLinks(minStrength, maxStrength) {
     const minVisibleLinkIndice = (linkMeshList.length) * minStrength;
     const maxVisibleLinkIndice = (linkMeshList.length) * maxStrength;
@@ -107,8 +97,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
 }
 
  export {
-    clearAllLinks as clearLinks,
-    deleteMesh,
+    clearAllLinks,
     loadAndDrawLinks,
     redrawLinks,
     updateLinkOutline,

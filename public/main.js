@@ -1,12 +1,13 @@
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
+import { sensorMaterial } from "../js/draw_sensors.js";
 import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, clearLinks } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, clearAllLinks } from "../js/link_builder/draw_links";
 import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
@@ -20,17 +21,15 @@ const sensorLabelsUrl = require('../data/sensor_labels.csv');
 const sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
+
+
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
+
+const centerPoint = new THREE.Vector3();
 
 const cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide
-});
-const sensorMaterial =  new THREE.MeshPhysicalMaterial({
-  color: 0xaaaaaa,
-  opacity: 1.,
-  transparent: true,
-  reflectivity: 1
 });
 const enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
@@ -159,7 +158,7 @@ function getNewFileUrl(evt){
 
 function handleConnectivityMatrixFileSelect(evt) {
   const fileUrl = getNewFileUrl(evt);
-  clearLinks();
+  clearAllLinks();
   loadAndDrawLinks(fileUrl);
 }
 
@@ -177,5 +176,6 @@ export {
     cortexMaterial,
     sensorMaterial,
     GLOBAL_LAYER,
-    LINK_LAYER
+    LINK_LAYER,
+    centerPoint
 };
