@@ -37572,16 +37572,22 @@ function _makeVertCoordsList() {
 
 function drawCortexModel(vertices) {
   var geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3)); //geometry.setFromPoints(vertices);
-
+  geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
   geometry.computeVertexNormals();
   brainMesh = new THREE.Mesh(geometry, _main.cortexMaterial);
   brainMesh.receiveShadow = true;
   brainMesh.castShadow = true;
-  brainMesh.translateY(50);
+  repositionBrainMesh(brainMesh);
   brainMesh.name = 'cortex';
 
   _main.scene.add(brainMesh);
+}
+
+function repositionBrainMesh(brainMesh) {
+  //brainMesh.rotateY(Math.PI);
+  brainMesh.translateY(50);
+  brainMesh.translateX(10); //const scale = .9;
+  //brainMesh.scale.set(scale,scale,scale);
 }
 
 function updateBrainMeshVisibility() {

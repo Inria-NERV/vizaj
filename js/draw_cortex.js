@@ -43,14 +43,21 @@ async function makeVertCoordsList(cortexVert, cortexTri){
 function drawCortexModel(vertices){
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute( vertices, 3 ));
-    //geometry.setFromPoints(vertices);
     geometry.computeVertexNormals();
     brainMesh = new THREE.Mesh( geometry, cortexMaterial );
     brainMesh.receiveShadow = true;
     brainMesh.castShadow = true;
-    brainMesh.translateY(50);
+    repositionBrainMesh( brainMesh );
     brainMesh.name = 'cortex';
     scene.add( brainMesh );
+}
+
+function repositionBrainMesh(brainMesh){
+    //brainMesh.rotateY(Math.PI);
+    brainMesh.translateY(50);
+    brainMesh.translateX(10);
+    //const scale = .9;
+    //brainMesh.scale.set(scale,scale,scale);
 }
 
 function updateBrainMeshVisibility(){

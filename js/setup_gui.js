@@ -116,7 +116,7 @@ const montages = {'EGI_256': 0,
     'standard_postfixed': 21,
     'standard_prefixed': 22,
     'standard_primed': 23,
-    'custom': 24};
+    'custom': 24 };
 
 const defaultMontageCoordinates = [
     require('../data/sensor_montages/EGI_256_coordinates.csv'),
