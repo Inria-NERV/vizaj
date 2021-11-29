@@ -37584,10 +37584,11 @@ function drawCortexModel(vertices) {
 }
 
 function repositionBrainMesh(brainMesh) {
-  //brainMesh.rotateY(Math.PI);
+  brainMesh.rotateY(Math.PI);
   brainMesh.translateY(50);
-  brainMesh.translateX(10); //const scale = .9;
-  //brainMesh.scale.set(scale,scale,scale);
+  brainMesh.translateX(-15);
+  var scale = .8;
+  brainMesh.scale.set(scale, scale, scale);
 }
 
 function updateBrainMeshVisibility() {
@@ -42799,7 +42800,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57725" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50374" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -38,8 +38,6 @@ async function makeVertCoordsList(cortexVert, cortexTri){
     return new Float32Array(positions);
 }
 
-
-
 function drawCortexModel(vertices){
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute( vertices, 3 ));
@@ -53,11 +51,11 @@ function drawCortexModel(vertices){
 }
 
 function repositionBrainMesh(brainMesh){
-    //brainMesh.rotateY(Math.PI);
+    brainMesh.rotateY(Math.PI);
     brainMesh.translateY(50);
-    brainMesh.translateX(10);
-    //const scale = .9;
-    //brainMesh.scale.set(scale,scale,scale);
+    brainMesh.translateX(-15);
+    const scale = .8;
+    brainMesh.scale.set(scale,scale,scale);
 }
 
 function updateBrainMeshVisibility(){
