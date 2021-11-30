@@ -39626,7 +39626,7 @@ function export2DImage() {
   }
 }
 
-var saveFile = function saveFile(strData, filename) {
+function saveFile(strData, filename) {
   var link = document.createElement('a');
 
   if (typeof link.download === 'string') {
@@ -39639,7 +39639,7 @@ var saveFile = function saveFile(strData, filename) {
   } else {
     location.replace(uri);
   }
-};
+}
 },{"../public/main":"main.js","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"../node_modules/three/examples/jsm/exporters/GLTFExporter.js"}],"../data/2d/sensor_labels.csv":[function(require,module,exports) {
 module.exports = "/sensor_labels.c2119944.csv";
 },{}],"../data/2d/sensor_coordinates.csv":[function(require,module,exports) {

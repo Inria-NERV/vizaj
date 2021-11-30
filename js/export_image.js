@@ -38,7 +38,7 @@ function export2DImage(){
 }
 
 
-var saveFile = function (strData, filename) {
+function saveFile(strData, filename) {
     var link = document.createElement('a');
     if (typeof link.download === 'string') {
         document.body.appendChild(link); //Firefox requires the link to be in the body
