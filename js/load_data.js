@@ -20,7 +20,7 @@ export async function loadData(url, dataName, parseRowMethod=(x) => x, onLoadCal
 function defaultOnLoadCallBack(data, parseRowMethod)
 {
     const dataOut = [];
-    for (let row of data.split('\n')){
+    for (let row of data.split('\n').filter(x => x !== null && x !== '')){
         dataOut.push(parseRowMethod(row));
     }
     return dataOut;

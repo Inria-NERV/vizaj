@@ -18,8 +18,7 @@ function setupCamera(){
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function updateRotateCamera()
-{
+function updateRotateCamera(){
     controls.autoRotate = guiParams.rotateCamera;
 }
 

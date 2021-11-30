@@ -6,6 +6,7 @@ import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
 import { clearAllSensors, loadAndDrawSensors, changeMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateAllDegreeLines } from './draw_degree_line';
+import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
     loadFile: () => document.getElementById('fileInput').click(),
@@ -31,6 +32,9 @@ const guiParams = {
 
     getSplinePoints: getSplinePoints,
     montage: 24,
+
+    export2dImage: () => export2DImage(),
+    export3Dgltf: () => export3Dgltf(),
 
     link2dTest: () => { 
         clearAllSensors();
@@ -204,8 +208,15 @@ function setupGui() {
     const degreeLineFolder = gui.addFolder('degree line');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('show');
 
-    gui.add(guiParams, 'montage').options(montages).onChange(changeMontage);
-    gui.add(guiParams, 'loadFile').name('Load CSV file');
+    const montageFolder = gui.addFolder('Change montage');
+    //TODO: add custom montage loader
+    montageFolder.add(guiParams, 'montage').options(montages).onChange(changeMontage).name('Mne montage');
+
+    gui.add(guiParams, 'loadFile').name('Load CSV matrix');
+
+    const exportFileFolder = gui.addFolder('Export as file');
+    exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
+    exportFileFolder.add(guiParams, 'export3Dgltf').name('Export 3D gltf');
 
     gui.add(guiParams, 'link2dTest').name('link2dTest');
 

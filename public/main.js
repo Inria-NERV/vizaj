@@ -12,7 +12,6 @@ import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 
-
 const highlightedLinksPreviousMaterials = [];
 
 const cortexVertUrl = require('../data/cortex_vert.csv');
@@ -20,8 +19,6 @@ const cortexTriUrl = require('../data/cortex_tri.csv');
 const sensorLabelsUrl = require('../data/sensor_labels.csv');
 const sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
-
-
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
@@ -40,7 +37,9 @@ const linkMeshList = [];
 const sensorMeshList = [];
 
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({
+  preserveDrawingBuffer: true
+});
 const camera = new THREE.PerspectiveCamera();
 const controls = new OrbitControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
@@ -70,7 +69,6 @@ function init() {
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
