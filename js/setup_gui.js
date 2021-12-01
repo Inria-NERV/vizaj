@@ -1,15 +1,22 @@
-import { gui, controls } from '../public/main';
+import { gui, controls,
+    csvConnMatrixInput,
+    csvNodePositionsInput,
+    csvNodeLabelsInput } from '../public/main';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks, clearAllLinks, loadAndDrawLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
-import { clearAllSensors, loadAndDrawSensors, changeMontage } from './draw_sensors';
+import { clearAllSensors, loadAndDrawSensors, setCustomMontage, setMneMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateAllDegreeLines } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
-    loadFile: () => document.getElementById('fileInput').click(),
+    loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
+    loadMontageCsvFile: () => {
+        csvNodePositionsInput.click();
+        csvNodeLabelsInput.click();
+    },
 
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
@@ -31,7 +38,8 @@ const guiParams = {
     linkThickness: 1.,
 
     getSplinePoints: getSplinePoints,
-    montage: 24,
+
+    mneMontage: -1,
 
     export2dImage: () => export2DImage(),
     export3Dgltf: () => export3Dgltf(),
@@ -87,8 +95,7 @@ const premadeLinkGeometriesParam = {
         guiParams.linkSensorAngles = 0.;
         guiParams.linkSensorHandleDistances = 1.;
         updateLinkOutline();
-},
-
+    }
 }
 
 function changeLinkMesh(linkGenerator){
@@ -119,8 +126,7 @@ const montages = {'EGI_256': 0,
     'standard_alphabetic': 20,
     'standard_postfixed': 21,
     'standard_prefixed': 22,
-    'standard_primed': 23,
-    'custom': 24 };
+    'standard_primed': 23};
 
 const defaultMontageCoordinates = [
     require('../data/sensor_montages/EGI_256_coordinates.csv'),
@@ -209,10 +215,11 @@ function setupGui() {
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('show');
 
     const montageFolder = gui.addFolder('Change montage');
-    //TODO: add custom montage loader
-    montageFolder.add(guiParams, 'montage').options(montages).onChange(changeMontage).name('Mne montage');
+    montageFolder.add(guiParams, 'loadMontageCsvFile').name('Load CSV');
+    montageFolder.add(guiParams, 'mneMontage').options(montages)
+        .onChange(setMneMontage).name('Mne montage').listen();
 
-    gui.add(guiParams, 'loadFile').name('Load CSV matrix');
+    gui.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Load CSV matrix');
 
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');

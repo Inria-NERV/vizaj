@@ -112,9 +112,15 @@ async function clearAllSensors(){
     } 
 }
 
-function changeMontage(){
-    const newSensorCoordinatesUrl = defaultMontageCoordinates[guiParams.montage];
-    const newSensorLabelsUrl = defaultMontageLabels[guiParams.montage];
+function setCustomMontage(){
+    guiParams.mneMontage == -1;
+
+}
+
+function setMneMontage(){
+    if (guiParams.mneMontage == -1) {return;}
+    const newSensorCoordinatesUrl = defaultMontageCoordinates[guiParams.mneMontage];
+    const newSensorLabelsUrl = defaultMontageLabels[guiParams.mneMontage];
     clearAllSensors();
     clearAllLinks();
     loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
@@ -126,4 +132,5 @@ export {
     sensorMeshList, 
     maxSensorDistance, 
     clearAllSensors,
-    changeMontage};
+    setCustomMontage,
+    setMneMontage};

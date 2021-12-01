@@ -39596,12 +39596,14 @@ var _GLTFExporter = require("../node_modules/three/examples/jsm/exporters/GLTFEx
 var strMime = 'image/bmp';
 
 function export3Dgltf() {
-  exportGLTF(_main.scene);
+  exportSceneToGLTF(_main.scene);
 }
 
-function exportGLTF(scene) {
+function exportSceneToGLTF(scene) {
   var gltfExporter = new _GLTFExporter.GLTFExporter();
-  var options = {};
+  var options = {
+    onlyVisible: true
+  };
   gltfExporter.parse(scene, function (gltf) {
     var output = JSON.stringify(gltf, null, 2);
     var blob = new Blob([output], {
@@ -39628,17 +39630,12 @@ function export2DImage() {
 
 function saveFile(strData, filename) {
   var link = document.createElement('a');
+  document.body.appendChild(link); //Firefox requires the link to be in the body
 
-  if (typeof link.download === 'string') {
-    document.body.appendChild(link); //Firefox requires the link to be in the body
-
-    link.download = filename;
-    link.href = strData;
-    link.click();
-    document.body.removeChild(link); //remove the link when done
-  } else {
-    location.replace(uri);
-  }
+  link.download = filename;
+  link.href = strData;
+  link.click();
+  document.body.removeChild(link);
 }
 },{"../public/main":"main.js","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"../node_modules/three/examples/jsm/exporters/GLTFExporter.js"}],"../data/2d/sensor_labels.csv":[function(require,module,exports) {
 module.exports = "/sensor_labels.c2119944.csv";
@@ -39770,8 +39767,13 @@ var _draw_degree_line = require("./draw_degree_line");
 var _export_image = require("./export_image");
 
 var guiParams = {
-  loadFile: function loadFile() {
-    return document.getElementById('fileInput').click();
+  loadConnectivityMatrixCsvFile: function loadConnectivityMatrixCsvFile() {
+    return _main.csvConnMatrixInput.click();
+  },
+  loadMontageCsvFile: function loadMontageCsvFile() {
+    _main.csvNodePositionsInput.click();
+
+    _main.csvNodeLabelsInput.click();
   },
   autoRotateCamera: false,
   autoRotateSpeed: 2.0,
@@ -39793,7 +39795,7 @@ var guiParams = {
   },
   linkThickness: 1.,
   getSplinePoints: _compute_link_shape.getSplinePoints,
-  montage: 24,
+  mneMontage: -1,
   export2dImage: function export2dImage() {
     return (0, _export_image.export2DImage)();
   },
@@ -39884,8 +39886,7 @@ var montages = {
   'standard_alphabetic': 20,
   'standard_postfixed': 21,
   'standard_prefixed': 22,
-  'standard_primed': 23,
-  'custom': 24
+  'standard_primed': 23
 };
 var defaultMontageCoordinates = [require('../data/sensor_montages/EGI_256_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-128_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-129_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-256_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-257_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-32_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv'), require('../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv'), require('../data/sensor_montages/biosemi128_coordinates.csv'), require('../data/sensor_montages/biosemi16_coordinates.csv'), require('../data/sensor_montages/biosemi160_coordinates.csv'), require('../data/sensor_montages/biosemi256_coordinates.csv'), require('../data/sensor_montages/biosemi32_coordinates.csv'), require('../data/sensor_montages/biosemi64_coordinates.csv'), require('../data/sensor_montages/easycap-M1_coordinates.csv'), require('../data/sensor_montages/easycap-M10_coordinates.csv'), require('../data/sensor_montages/mgh60_coordinates.csv'), require('../data/sensor_montages/mgh70_coordinates.csv'), require('../data/sensor_montages/standard_1005_coordinates.csv'), require('../data/sensor_montages/standard_1020_coordinates.csv'), require('../data/sensor_montages/standard_alphabetic_coordinates.csv'), require('../data/sensor_montages/standard_postfixed_coordinates.csv'), require('../data/sensor_montages/standard_prefixed_coordinates.csv'), require('../data/sensor_montages/standard_primed_coordinates.csv')];
 exports.defaultMontageCoordinates = defaultMontageCoordinates;
@@ -39939,12 +39940,12 @@ function setupGui() {
 
   degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
 
-  var montageFolder = _main.gui.addFolder('Change montage'); //TODO: add custom montage loader
+  var montageFolder = _main.gui.addFolder('Change montage');
 
+  montageFolder.add(guiParams, 'loadMontageCsvFile').name('Load CSV');
+  montageFolder.add(guiParams, 'mneMontage').options(montages).onChange(_draw_sensors.setMneMontage).name('Mne montage').listen();
 
-  montageFolder.add(guiParams, 'montage').options(montages).onChange(_draw_sensors.changeMontage).name('Mne montage');
-
-  _main.gui.add(guiParams, 'loadFile').name('Load CSV matrix');
+  _main.gui.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Load CSV matrix');
 
   var exportFileFolder = _main.gui.addFolder('Export as file');
 
@@ -40400,7 +40401,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadAndDrawSensors = loadAndDrawSensors;
 exports.clearAllSensors = clearAllSensors;
-exports.changeMontage = changeMontage;
+exports.setCustomMontage = setCustomMontage;
+exports.setMneMontage = setMneMontage;
 Object.defineProperty(exports, "sensorMeshList", {
   enumerable: true,
   get: function () {
@@ -40689,9 +40691,17 @@ function _clearAllSensors() {
   return _clearAllSensors.apply(this, arguments);
 }
 
-function changeMontage() {
-  var newSensorCoordinatesUrl = _setup_gui.defaultMontageCoordinates[_setup_gui.guiParams.montage];
-  var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.montage];
+function setCustomMontage() {
+  _setup_gui.guiParams.mneMontage == -1;
+}
+
+function setMneMontage() {
+  if (_setup_gui.guiParams.mneMontage == -1) {
+    return;
+  }
+
+  var newSensorCoordinatesUrl = _setup_gui.defaultMontageCoordinates[_setup_gui.guiParams.mneMontage];
+  var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
   clearAllSensors();
   (0, _draw_links.clearAllLinks)();
   loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
@@ -44460,7 +44470,7 @@ Object.defineProperty(exports, "sensorMaterial", {
     return _draw_sensors.sensorMaterial;
   }
 });
-exports.centerPoint = exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+exports.csvNodeLabelsInput = exports.csvNodePositionsInput = exports.csvConnMatrixInput = exports.centerPoint = exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.linkMeshList = exports.sensorMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -44549,8 +44559,13 @@ var gui = new _datGui.GUI();
 exports.gui = gui;
 document.body.appendChild(renderer.domElement);
 var sensorNameDiv = document.getElementById("sensorName");
-var fileInput = document.getElementById("fileInput"); //INTERSECTED is used to check wether the mouse intersects with a sensor
+var csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
+exports.csvConnMatrixInput = csvConnMatrixInput;
+var csvNodePositionsInput = document.getElementById("csvNodePositions");
+exports.csvNodePositionsInput = csvNodePositionsInput;
+var csvNodeLabelsInput = document.getElementById("csvNodeLabels"); //INTERSECTED is used to check wether the mouse intersects with a sensor
 
+exports.csvNodeLabelsInput = csvNodeLabelsInput;
 var INTERSECTED;
 init();
 animate();
@@ -44561,7 +44576,9 @@ function init() {
   generateSceneElements();
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
-  fileInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
+  csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
+  csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
+  csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
 }
 
 function onWindowResize() {
@@ -44705,6 +44722,20 @@ function handleConnectivityMatrixFileSelect(evt) {
   var fileUrl = getNewFileUrl(evt);
   (0, _draw_links.clearAllLinks)();
   (0, _draw_links.loadAndDrawLinks)(fileUrl);
+}
+
+function handleMontageCoordinatesFileSelect(evt) {
+  sensorCoordinatesUrl = getNewFileUrl(evt);
+  _setup_gui.guiParams.mneMontage = -1;
+} // coordinate is loaded, then labels. Then, we update the new node montage in the labelbutton event handler
+
+
+function handleMontageLabelsFileSelect(evt) {
+  sensorLabelsUrl = getNewFileUrl(evt);
+  _setup_gui.guiParams.mneMontage = -1;
+  (0, _draw_links.clearAllLinks)();
+  (0, _draw_sensors.clearAllSensors)();
+  (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
 }
 },{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];

@@ -6,7 +6,7 @@ import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
-import { loadAndDrawSensors } from '../js/draw_sensors.js';
+import { loadAndDrawSensors, clearAllSensors } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks } from "../js/link_builder/draw_links";
 import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
@@ -14,11 +14,11 @@ import { setupGui, guiParams } from '../js/setup_gui';
 
 const highlightedLinksPreviousMaterials = [];
 
-const cortexVertUrl = require('../data/cortex_vert.csv');
-const cortexTriUrl = require('../data/cortex_tri.csv');
-const sensorLabelsUrl = require('../data/sensor_labels.csv');
-const sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
-const connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
+let cortexVertUrl = require('../data/cortex_vert.csv');
+let cortexTriUrl = require('../data/cortex_tri.csv');
+let sensorLabelsUrl = require('../data/sensor_labels.csv');
+let sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
+let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
@@ -48,7 +48,9 @@ const gui = new GUI();
 
 document.body.appendChild(renderer.domElement);
 const sensorNameDiv = document.getElementById("sensorName");
-const fileInput = document.getElementById("fileInput");
+const csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
+const csvNodePositionsInput = document.getElementById("csvNodePositions");
+const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
 
 //INTERSECTED is used to check wether the mouse intersects with a sensor
 var INTERSECTED;
@@ -63,7 +65,9 @@ function init() {
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
-  fileInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
+  csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
+  csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
+  csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
 }
 
 function onWindowResize() {
@@ -151,7 +155,7 @@ function fillIntersected() {
 function getNewFileUrl(evt){
   if (evt.target.files.length === 0) { return; }
   const file = evt.target.files[0];
-  return window.URL.createObjectURL(file);         
+  return window.URL.createObjectURL(file);
 }
 
 function handleConnectivityMatrixFileSelect(evt) {
@@ -160,6 +164,19 @@ function handleConnectivityMatrixFileSelect(evt) {
   loadAndDrawLinks(fileUrl);
 }
 
+function handleMontageCoordinatesFileSelect(evt) {
+  sensorCoordinatesUrl = getNewFileUrl(evt);
+  guiParams.mneMontage = -1;
+}
+
+// coordinate is loaded, then labels. Then, we update the new node montage in the labelbutton event handler
+function handleMontageLabelsFileSelect(evt) {
+  sensorLabelsUrl = getNewFileUrl(evt);
+  guiParams.mneMontage = -1;
+  clearAllLinks();
+  clearAllSensors();
+  loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+}
 
 export {
     scene,
@@ -175,5 +192,8 @@ export {
     sensorMaterial,
     GLOBAL_LAYER,
     LINK_LAYER,
-    centerPoint
+    centerPoint,
+    csvConnMatrixInput,
+    csvNodePositionsInput,
+    csvNodeLabelsInput
 };
