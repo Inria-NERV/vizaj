@@ -39781,6 +39781,7 @@ var guiParams = {
   maxStrengthToDisplay: .2,
   showBrain: true,
   showDegreeLines: true,
+  averageDegree: 1.,
   linkHeight: 0.75,
   linkTopPointHandleDistances: .5,
   linkSensorAngles: 3 / 8,
@@ -39907,10 +39908,10 @@ function setupGui() {
 
   linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.).onChange(function () {
     return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
-  });
+  }).listen();
   linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.).onChange(function () {
     return (0, _draw_links.updateVisibleLinks)(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
-  });
+  }).listen();
 
   _main.gui.add(guiParams, 'showBrain').onChange(_draw_cortex.updateBrainMeshVisibility);
 
@@ -39938,6 +39939,7 @@ function setupGui() {
 
   var degreeLineFolder = _main.gui.addFolder('degree line');
 
+  degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(_draw_degree_line.updateLinkVisibilityByLinkDegree).listen();
   degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
 
   var montageFolder = _main.gui.addFolder('Change montage');
@@ -39964,12 +39966,15 @@ exports.drawDegreeLine = drawDegreeLine;
 exports.drawAllDegreeLines = drawAllDegreeLines;
 exports.updateAllDegreeLines = updateAllDegreeLines;
 exports.updateDegreeLinesVisibility = updateDegreeLinesVisibility;
+exports.updateLinkVisibilityByLinkDegree = updateLinkVisibilityByLinkDegree;
 
 var THREE = _interopRequireWildcard(require("three"));
 
 var _main = require("../public/main");
 
 var _draw_sensors = require("./draw_sensors");
+
+var _draw_links = require("./link_builder/draw_links");
 
 var _setup_gui = require("./setup_gui");
 
@@ -40070,24 +40075,82 @@ function updateAllDegreeLines() {
   } finally {
     _iterator2.f();
   }
+
+  _setup_gui.guiParams.averageDegree = computeAverageDegree();
 }
 
-function updateDegreeLinesVisibility() {
+function computeAverageDegree() {
+  var nodeDegree = 0.;
+
   var _iterator3 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
       _step3;
 
   try {
     for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
       var sensor = _step3.value;
-      sensor.degreeLine.visible = _setup_gui.guiParams.showDegreeLines;
+      nodeDegree += getNodeDegree(sensor.mesh);
     }
   } catch (err) {
     _iterator3.e(err);
   } finally {
     _iterator3.f();
   }
+
+  return nodeDegree / (_draw_sensors.sensorMeshList.length - 1);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
+
+function updateDegreeLinesVisibility() {
+  var _iterator4 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
+      _step4;
+
+  try {
+    for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+      var sensor = _step4.value;
+      sensor.degreeLine.visible = _setup_gui.guiParams.showDegreeLines;
+    }
+  } catch (err) {
+    _iterator4.e(err);
+  } finally {
+    _iterator4.f();
+  }
+}
+
+function updateLinkVisibilityByLinkDegree() {
+  var avgDegreeTemp = 0.;
+  var i = 0;
+  var sensorDegreeDict = {};
+
+  var _iterator5 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList.map(function (x) {
+    return x.mesh.name;
+  })),
+      _step5;
+
+  try {
+    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
+      var key = _step5.value;
+      sensorDegreeDict[key] = 0.;
+    }
+  } catch (err) {
+    _iterator5.e(err);
+  } finally {
+    _iterator5.f();
+  }
+
+  while (avgDegreeTemp < _setup_gui.guiParams.averageDegree && i < _main.linkMeshList.length) {
+    var link = _main.linkMeshList[i].link;
+    sensorDegreeDict[link.node1.name]++;
+    sensorDegreeDict[link.node2.name]++;
+    avgDegreeTemp = Object.values(sensorDegreeDict).reduce(function (a, b) {
+      return a + b;
+    }, 0.) / (_draw_sensors.sensorMeshList.length - 1);
+    i++;
+  }
+
+  _setup_gui.guiParams.minStrengthToDisplay = 0.;
+  _setup_gui.guiParams.maxStrengthToDisplay = i / _main.linkMeshList.length;
+  (0, _draw_links.updateVisibleLinks)(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
+}
+},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40203,8 +40266,8 @@ function _loadLinks() {
 
 function connectivityMatrixOnLoadCallBack(data) {
   var outList = [];
-  var splittedData = data.split('\n').filter(function (d) {
-    return d !== '';
+  var splittedData = data.split('\n').filter(function (x) {
+    return x !== null && x !== '';
   });
 
   for (var i = 0; i < splittedData.length; i++) {
@@ -40702,8 +40765,6 @@ function setMneMontage() {
 
   var newSensorCoordinatesUrl = _setup_gui.defaultMontageCoordinates[_setup_gui.guiParams.mneMontage];
   var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
-  clearAllSensors();
-  (0, _draw_links.clearAllLinks)();
   loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
 },{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
@@ -44765,7 +44826,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50234" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64220" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

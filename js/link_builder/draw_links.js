@@ -18,7 +18,7 @@ async function loadLinks(linksDataFileUrl){
 
 function connectivityMatrixOnLoadCallBack(data){
     const outList = [];
-    const splittedData = data.split('\n').filter((d) => d !== '');
+    const splittedData = data.split('\n').filter(x => x !== null && x !== '');
     for (let i = 0; i < splittedData.length; i++){
         const row = splittedData[i];
         const splittedRow = row.split(',');

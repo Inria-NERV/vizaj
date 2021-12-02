@@ -1,4 +1,5 @@
 import { gui, controls,
+    linkMeshList,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput } from '../public/main';
@@ -8,7 +9,7 @@ import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
 import { clearAllSensors, loadAndDrawSensors, setCustomMontage, setMneMontage } from './draw_sensors';
-import { updateDegreeLinesVisibility, updateAllDegreeLines } from './draw_degree_line';
+import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -23,7 +24,9 @@ const guiParams = {
     minStrengthToDisplay: 0.,
     maxStrengthToDisplay: .2,
     showBrain: true,
+
     showDegreeLines: true,
+    averageDegree: 1.,
 
     linkHeight: 0.75,
     linkTopPointHandleDistances: .5,
@@ -187,8 +190,12 @@ function setupGui() {
     cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} );
 
     const linksToDisplayFolder = gui.addFolder('LinksToDisplay');
-    linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.).onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay));
-    linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.).onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay));
+    linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
+        .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
+        .listen();
+    linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.)
+        .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
+        .listen();
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
     const linkGeometry = gui.addFolder('linkGeometry');
@@ -212,6 +219,7 @@ function setupGui() {
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     const degreeLineFolder = gui.addFolder('degree line');
+    degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen();
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('show');
 
     const montageFolder = gui.addFolder('Change montage');

@@ -121,8 +121,6 @@ function setMneMontage(){
     if (guiParams.mneMontage == -1) {return;}
     const newSensorCoordinatesUrl = defaultMontageCoordinates[guiParams.mneMontage];
     const newSensorLabelsUrl = defaultMontageLabels[guiParams.mneMontage];
-    clearAllSensors();
-    clearAllLinks();
     loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
 

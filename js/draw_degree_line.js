@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Float32BufferAttribute } from 'three';
 import { scene, linkMeshList, LINK_LAYER } from '../public/main';
 import { sensorMeshList } from './draw_sensors';
+import { updateVisibleLinks } from './link_builder/draw_links';
 import { guiParams } from './setup_gui';
 
 const degreeLineMaterial = new THREE.MeshBasicMaterial( 
@@ -14,7 +15,6 @@ const DEGREE_LINE_UNIT_MAX_SCALE = 200;
 const DEGREE_LINE_TUBULAR_SEGMENTS = 2;
 const DEGREE_LINE_RADIUS = 1.3;
 const DEGREE_LINE_RADIAL_SEGMENTS = 8;
-
 
 function drawDegreeLine(sensor){
     const sensorMesh = sensor.mesh;
@@ -90,6 +90,15 @@ function updateAllDegreeLines(){
             updateNodeDegreeLine(sensor);
         }
     }
+    guiParams.averageDegree = computeAverageDegree();
+}
+
+function computeAverageDegree(){
+    let nodeDegree = 0.;
+    for (let sensor of sensorMeshList){
+        nodeDegree += getNodeDegree(sensor.mesh);
+    }
+    return nodeDegree / (sensorMeshList.length - 1);
 }
 
 function updateDegreeLinesVisibility(){
@@ -98,9 +107,29 @@ function updateDegreeLinesVisibility(){
     }
 }
 
+function updateLinkVisibilityByLinkDegree(){
+    let avgDegreeTemp = 0.;
+    let i = 0;
+    let sensorDegreeDict = {};
+    for (let key of sensorMeshList.map(x => x.mesh.name)){
+        sensorDegreeDict[key] = 0.;
+    }
+    while (avgDegreeTemp < guiParams.averageDegree && i < linkMeshList.length){
+        const link = linkMeshList[i].link;
+        sensorDegreeDict[link.node1.name]++; 
+        sensorDegreeDict[link.node2.name]++; 
+        avgDegreeTemp = Object.values(sensorDegreeDict).reduce((a,b)=>a+b, 0.) / (sensorMeshList.length - 1);
+        i++;
+    }
+    guiParams.minStrengthToDisplay = 0.;
+    guiParams.maxStrengthToDisplay = i/linkMeshList.length;
+    updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
+}
+
 export {
     drawDegreeLine,
     drawAllDegreeLines,
     updateAllDegreeLines,
-    updateDegreeLinesVisibility
+    updateDegreeLinesVisibility,
+    updateLinkVisibilityByLinkDegree
 }
