@@ -115,10 +115,12 @@ function updateLinkVisibilityByLinkDegree(){
         sensorDegreeDict[key] = 0.;
     }
     while (avgDegreeTemp < guiParams.averageDegree && i < linkMeshList.length){
+        //for some reason updating degree line manually using the gui works with computing 
+        // this way rather than just calculating degree = link_count * 2 / sensor_count
         const link = linkMeshList[i].link;
         sensorDegreeDict[link.node1.name]++; 
         sensorDegreeDict[link.node2.name]++; 
-        avgDegreeTemp = Object.values(sensorDegreeDict).reduce((a,b)=>a+b, 0.) / (sensorMeshList.length - 1);
+        avgDegreeTemp = Object.values(sensorDegreeDict).reduce((a,b)=>a+b, 0.) / (sensorMeshList.length);
         i++;
     }
     guiParams.minStrengthToDisplay = 0.;

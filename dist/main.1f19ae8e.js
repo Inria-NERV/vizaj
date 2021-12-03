@@ -40137,12 +40137,14 @@ function updateLinkVisibilityByLinkDegree() {
   }
 
   while (avgDegreeTemp < _setup_gui.guiParams.averageDegree && i < _main.linkMeshList.length) {
+    //for some reason updating degree line manually using the gui works with computing 
+    // this way rather than just calculating degree = link_count * 2 / sensor_count
     var link = _main.linkMeshList[i].link;
     sensorDegreeDict[link.node1.name]++;
     sensorDegreeDict[link.node2.name]++;
     avgDegreeTemp = Object.values(sensorDegreeDict).reduce(function (a, b) {
       return a + b;
-    }, 0.) / (_draw_sensors.sensorMeshList.length - 1);
+    }, 0.) / _draw_sensors.sensorMeshList.length;
     i++;
   }
 
@@ -44826,7 +44828,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64220" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49264" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
