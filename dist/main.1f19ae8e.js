@@ -40059,6 +40059,8 @@ function updateNodeDegreeLine(sensor) {
 }
 
 function updateAllDegreeLines() {
+  var updateAverageDegree = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
   var _iterator2 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList),
       _step2;
 
@@ -40076,7 +40078,9 @@ function updateAllDegreeLines() {
     _iterator2.f();
   }
 
-  _setup_gui.guiParams.averageDegree = computeAverageDegree();
+  if (updateAverageDegree) {
+    _setup_gui.guiParams.averageDegree = computeAverageDegree();
+  }
 }
 
 function computeAverageDegree() {
@@ -40116,41 +40120,14 @@ function updateDegreeLinesVisibility() {
 }
 
 function updateLinkVisibilityByLinkDegree() {
-  var avgDegreeTemp = 0.;
-  var i = 0;
-  var sensorDegreeDict = {};
-
-  var _iterator5 = _createForOfIteratorHelper(_draw_sensors.sensorMeshList.map(function (x) {
-    return x.mesh.name;
-  })),
-      _step5;
-
-  try {
-    for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
-      var key = _step5.value;
-      sensorDegreeDict[key] = 0.;
-    }
-  } catch (err) {
-    _iterator5.e(err);
-  } finally {
-    _iterator5.f();
+  if (_setup_gui.guiParams.averageDegree >= _draw_sensors.sensorMeshList.length - 1) {
+    _setup_gui.guiParams.averageDegree = _draw_sensors.sensorMeshList.length - 1;
   }
 
-  while (avgDegreeTemp < _setup_gui.guiParams.averageDegree && i < _main.linkMeshList.length) {
-    //for some reason updating degree line manually using the gui works with computing 
-    // this way rather than just calculating degree = link_count * 2 / sensor_count
-    var link = _main.linkMeshList[i].link;
-    sensorDegreeDict[link.node1.name]++;
-    sensorDegreeDict[link.node2.name]++;
-    avgDegreeTemp = Object.values(sensorDegreeDict).reduce(function (a, b) {
-      return a + b;
-    }, 0.) / _draw_sensors.sensorMeshList.length;
-    i++;
-  }
-
+  var l = _setup_gui.guiParams.averageDegree * _draw_sensors.sensorMeshList.length / 2;
   _setup_gui.guiParams.minStrengthToDisplay = 0.;
-  _setup_gui.guiParams.maxStrengthToDisplay = i / _main.linkMeshList.length;
-  (0, _draw_links.updateVisibleLinks)(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay);
+  _setup_gui.guiParams.maxStrengthToDisplay = l / _main.linkMeshList.length;
+  (0, _draw_links.updateVisibleLinks)(_setup_gui.guiParams.minStrengthToDisplay, _setup_gui.guiParams.maxStrengthToDisplay, false);
 }
 },{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
 "use strict";
@@ -40411,6 +40388,7 @@ function clearAllLinks() {
 }
 
 function updateVisibleLinks(minStrength, maxStrength) {
+  var updateAverageDegree = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var minVisibleLinkIndice = _main.linkMeshList.length * minStrength;
   var maxVisibleLinkIndice = _main.linkMeshList.length * maxStrength;
 
@@ -40456,7 +40434,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
     _iterator4.f();
   }
 
-  (0, _draw_degree_line.updateAllDegreeLines)();
+  (0, _draw_degree_line.updateAllDegreeLines)(updateAverageDegree);
 }
 },{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js","../mesh_helper":"../js/mesh_helper.js"}],"../js/draw_sensors.js":[function(require,module,exports) {
 "use strict";

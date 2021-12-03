@@ -84,13 +84,16 @@ function updateNodeDegreeLine(sensor){
     sensor.degreeLine.morphTargetInfluences[0] = (1 - nodeDegree / (sensorCount - 1));
 }
 
-function updateAllDegreeLines(){
+function updateAllDegreeLines(updateAverageDegree=true){
     for (let sensor of sensorMeshList){
         if (sensor.mesh && sensor.degreeLine){
             updateNodeDegreeLine(sensor);
         }
     }
-    guiParams.averageDegree = computeAverageDegree();
+    if (updateAverageDegree){
+        guiParams.averageDegree = computeAverageDegree();
+    }
+    
 }
 
 function computeAverageDegree(){
@@ -108,24 +111,13 @@ function updateDegreeLinesVisibility(){
 }
 
 function updateLinkVisibilityByLinkDegree(){
-    let avgDegreeTemp = 0.;
-    let i = 0;
-    let sensorDegreeDict = {};
-    for (let key of sensorMeshList.map(x => x.mesh.name)){
-        sensorDegreeDict[key] = 0.;
+    if (guiParams.averageDegree >= sensorMeshList.length - 1){
+        guiParams.averageDegree = sensorMeshList.length - 1;
     }
-    while (avgDegreeTemp < guiParams.averageDegree && i < linkMeshList.length){
-        //for some reason updating degree line manually using the gui works with computing 
-        // this way rather than just calculating degree = link_count * 2 / sensor_count
-        const link = linkMeshList[i].link;
-        sensorDegreeDict[link.node1.name]++; 
-        sensorDegreeDict[link.node2.name]++; 
-        avgDegreeTemp = Object.values(sensorDegreeDict).reduce((a,b)=>a+b, 0.) / (sensorMeshList.length);
-        i++;
-    }
+    const l = guiParams.averageDegree * sensorMeshList.length / 2;
     guiParams.minStrengthToDisplay = 0.;
-    guiParams.maxStrengthToDisplay = i/linkMeshList.length;
-    updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay);
+    guiParams.maxStrengthToDisplay = l / linkMeshList.length;
+    updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay, false);  
 }
 
 export {

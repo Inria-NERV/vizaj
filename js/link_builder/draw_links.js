@@ -81,7 +81,7 @@ function clearAllLinks() {
     }
 }
 
-function updateVisibleLinks(minStrength, maxStrength) {
+function updateVisibleLinks(minStrength, maxStrength, updateAverageDegree=true) {
     const minVisibleLinkIndice = (linkMeshList.length) * minStrength;
     const maxVisibleLinkIndice = (linkMeshList.length) * maxStrength;
     for (const link of linkMeshList.slice(0, minVisibleLinkIndice)){
@@ -93,7 +93,7 @@ function updateVisibleLinks(minStrength, maxStrength) {
     for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length)){
         link.mesh.visible = false;
     }
-    updateAllDegreeLines();
+    updateAllDegreeLines(updateAverageDegree);
 }
 
  export {
