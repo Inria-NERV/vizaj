@@ -39815,7 +39815,7 @@ var guiParams = {
 
     var connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
 
-    (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+    (0, _draw_sensors.clearLoadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
     (0, _draw_links.loadAndDrawLinks)(connectivityMatrixUrl);
   }
 };
@@ -39937,10 +39937,10 @@ function setupGui() {
   linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
-  var degreeLineFolder = _main.gui.addFolder('degree line');
+  var degreeLineFolder = _main.gui.addFolder('Node degree');
 
-  degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(_draw_degree_line.updateLinkVisibilityByLinkDegree).listen();
-  degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('show');
+  degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(_draw_degree_line.updateLinkVisibilityByLinkDegree).listen().name('Average degree');
+  degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('Show degree line');
 
   var montageFolder = _main.gui.addFolder('Change montage');
 
@@ -40380,11 +40380,29 @@ function redrawLinks() {
 }
 
 function clearAllLinks() {
-  while (_main.linkMeshList.length) {
-    var link = _main.linkMeshList.pop();
+  return _clearAllLinks.apply(this, arguments);
+}
 
-    (0, _mesh_helper.deleteMesh)(link.mesh);
-  }
+function _clearAllLinks() {
+  _clearAllLinks = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+    var link;
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            while (_main.linkMeshList.length) {
+              link = _main.linkMeshList.pop();
+              (0, _mesh_helper.deleteMesh)(link.mesh);
+            }
+
+          case 1:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, _callee5);
+  }));
+  return _clearAllLinks.apply(this, arguments);
 }
 
 function updateVisibleLinks(minStrength, maxStrength) {
@@ -40443,8 +40461,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.loadAndDrawSensors = loadAndDrawSensors;
+exports.clearLoadAndDrawSensors = clearLoadAndDrawSensors;
 exports.clearAllSensors = clearAllSensors;
-exports.setCustomMontage = setCustomMontage;
 exports.setMneMontage = setMneMontage;
 Object.defineProperty(exports, "sensorMeshList", {
   enumerable: true,
@@ -40498,39 +40516,69 @@ var maxSensorDistance = 0.;
 exports.maxSensorDistance = maxSensorDistance;
 var meanSensorDistance = 0.;
 
-function loadAndDrawSensors(_x, _x2) {
-  return _loadAndDrawSensors.apply(this, arguments);
+function clearLoadAndDrawSensors(_x, _x2) {
+  return _clearLoadAndDrawSensors.apply(this, arguments);
 }
 
-function _loadAndDrawSensors() {
-  _loadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl, sensorLabelsUrl) {
-    var data;
+function _clearLoadAndDrawSensors() {
+  _clearLoadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(sensorCoordinatesUrl, sensorLabelsUrl) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.next = 2;
-            return loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
+            return (0, _draw_links.clearAllLinks)();
 
           case 2:
-            data = _context.sent;
-            _context.next = 5;
-            return getCenterPoint(data[1]);
+            _context.next = 4;
+            return clearAllSensors();
+
+          case 4:
+            loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
 
           case 5:
-            _context.next = 7;
-            return getMaxMeanSensorDistance(data[1]);
-
-          case 7:
-            _context.next = 9;
-            return drawAllSensors(data[0], data[1]);
-
-          case 9:
           case "end":
             return _context.stop();
         }
       }
     }, _callee);
+  }));
+  return _clearLoadAndDrawSensors.apply(this, arguments);
+}
+
+function loadAndDrawSensors(_x3, _x4) {
+  return _loadAndDrawSensors.apply(this, arguments);
+}
+
+function _loadAndDrawSensors() {
+  _loadAndDrawSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(sensorCoordinatesUrl, sensorLabelsUrl) {
+    var data;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
+
+          case 2:
+            data = _context2.sent;
+            _context2.next = 5;
+            return getCenterPoint(data[1]);
+
+          case 5:
+            _context2.next = 7;
+            return getMaxMeanSensorDistance(data[1]);
+
+          case 7:
+            _context2.next = 9;
+            return drawAllSensors(data[0], data[1]);
+
+          case 9:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2);
   }));
   return _loadAndDrawSensors.apply(this, arguments);
 }
@@ -40549,53 +40597,53 @@ function loadSensorLabels(sensorLabelsUrl) {
   });
 }
 
-function drawAllSensors(_x3, _x4) {
+function drawAllSensors(_x5, _x6) {
   return _drawAllSensors.apply(this, arguments);
 }
 
 function _drawAllSensors() {
-  _drawAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(labelList, coordinatesList) {
+  _drawAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(labelList, coordinatesList) {
     var i;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context3.prev = _context3.next) {
           case 0:
             i = 0;
 
           case 1:
             if (!(i < labelList.length)) {
-              _context2.next = 7;
+              _context3.next = 7;
               break;
             }
 
-            _context2.next = 4;
+            _context3.next = 4;
             return drawSensor(labelList[i], coordinatesList[i]);
 
           case 4:
             i++;
-            _context2.next = 1;
+            _context3.next = 1;
             break;
 
           case 7:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
-    }, _callee2);
+    }, _callee3);
   }));
   return _drawAllSensors.apply(this, arguments);
 }
 
-function drawSensor(_x5, _x6) {
+function drawSensor(_x7, _x8) {
   return _drawSensor.apply(this, arguments);
 }
 
 function _drawSensor() {
-  _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(label, coordinates) {
+  _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(label, coordinates) {
     var sensorGeometry, sensor;
-    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context4.prev = _context4.next) {
           case 0:
             sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
             sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
@@ -40613,25 +40661,25 @@ function _drawSensor() {
 
           case 9:
           case "end":
-            return _context3.stop();
+            return _context4.stop();
         }
       }
-    }, _callee3);
+    }, _callee4);
   }));
   return _drawSensor.apply(this, arguments);
 }
 
-function getMaxMeanSensorDistance(_x7) {
+function getMaxMeanSensorDistance(_x9) {
   return _getMaxMeanSensorDistance.apply(this, arguments);
 }
 
 function _getMaxMeanSensorDistance() {
-  _getMaxMeanSensorDistance = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(positions) {
+  _getMaxMeanSensorDistance = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(positions) {
     var count, i, j, _dist;
 
-    return regeneratorRuntime.wrap(function _callee4$(_context4) {
+    return regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context4.prev = _context4.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
             exports.maxSensorDistance = maxSensorDistance = 0.;
             meanSensorDistance = 0.;
@@ -40654,25 +40702,25 @@ function _getMaxMeanSensorDistance() {
 
           case 5:
           case "end":
-            return _context4.stop();
+            return _context5.stop();
         }
       }
-    }, _callee4);
+    }, _callee5);
   }));
   return _getMaxMeanSensorDistance.apply(this, arguments);
 }
 
-function getCenterPoint(_x8) {
+function getCenterPoint(_x10) {
   return _getCenterPoint.apply(this, arguments);
 }
 
 function _getCenterPoint() {
-  _getCenterPoint = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(positions) {
+  _getCenterPoint = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(positions) {
     var x, y, z, _iterator, _step, position;
 
-    return regeneratorRuntime.wrap(function _callee5$(_context5) {
+    return regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
-        switch (_context5.prev = _context5.next) {
+        switch (_context6.prev = _context6.next) {
           case 0:
             x = 0;
             y = 0;
@@ -40696,10 +40744,10 @@ function _getCenterPoint() {
 
           case 6:
           case "end":
-            return _context5.stop();
+            return _context6.stop();
         }
       }
-    }, _callee5);
+    }, _callee6);
   }));
   return _getCenterPoint.apply(this, arguments);
 }
@@ -40709,11 +40757,11 @@ function clearAllSensors() {
 }
 
 function _clearAllSensors() {
-  _clearAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+  _clearAllSensors = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
     var sensor;
-    return regeneratorRuntime.wrap(function _callee6$(_context6) {
+    return regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
-        switch (_context6.prev = _context6.next) {
+        switch (_context7.prev = _context7.next) {
           case 0:
             while (_main.sensorMeshList.length) {
               sensor = _main.sensorMeshList.pop();
@@ -40726,26 +40774,22 @@ function _clearAllSensors() {
 
           case 1:
           case "end":
-            return _context6.stop();
+            return _context7.stop();
         }
       }
-    }, _callee6);
+    }, _callee7);
   }));
   return _clearAllSensors.apply(this, arguments);
 }
 
-function setCustomMontage() {
-  _setup_gui.guiParams.mneMontage == -1;
-}
-
 function setMneMontage() {
-  if (_setup_gui.guiParams.mneMontage == -1) {
+  if (_setup_gui.guiParams.mneMontage === -1) {
     return;
   }
 
   var newSensorCoordinatesUrl = _setup_gui.defaultMontageCoordinates[_setup_gui.guiParams.mneMontage];
   var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
-  loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
+  clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
 },{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
 "use strict";
@@ -44774,9 +44818,7 @@ function handleMontageCoordinatesFileSelect(evt) {
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
   _setup_gui.guiParams.mneMontage = -1;
-  (0, _draw_links.clearAllLinks)();
-  (0, _draw_sensors.clearAllSensors)();
-  (0, _draw_sensors.loadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+  (0, _draw_sensors.clearLoadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
 }
 },{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];

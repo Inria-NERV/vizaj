@@ -74,7 +74,7 @@ function redrawLinks(){
     drawLinksAndUpdateVisibility(linkListTemp);
 }
 
-function clearAllLinks() {
+async function clearAllLinks() {
     while (linkMeshList.length){
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);

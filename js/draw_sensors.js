@@ -6,7 +6,6 @@ import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { guiParams, defaultMontageCoordinates, defaultMontageLabels } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
-import { Vector3 } from 'three';
 
 const SENSOR_RADIUS = 3;
 const SENSOR_SEGMENTS = 20;
@@ -27,6 +26,12 @@ const sensorMaterial =  new THREE.MeshPhysicalMaterial({
 
 let maxSensorDistance = 0.;
 let meanSensorDistance = 0.;
+
+async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
+    await clearAllLinks();
+    await clearAllSensors();
+    loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+}
 
 async function loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl) {  
     const data = await loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
@@ -112,23 +117,18 @@ async function clearAllSensors(){
     } 
 }
 
-function setCustomMontage(){
-    guiParams.mneMontage == -1;
-
-}
-
 function setMneMontage(){
-    if (guiParams.mneMontage == -1) {return;}
+    if (guiParams.mneMontage === -1) {return;}
     const newSensorCoordinatesUrl = defaultMontageCoordinates[guiParams.mneMontage];
     const newSensorLabelsUrl = defaultMontageLabels[guiParams.mneMontage];
-    loadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
+    clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
 
 export {
     sensorMaterial,
     loadAndDrawSensors, 
+    clearLoadAndDrawSensors,
     sensorMeshList, 
     maxSensorDistance, 
     clearAllSensors,
-    setCustomMontage,
     setMneMontage};

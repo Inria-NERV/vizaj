@@ -8,7 +8,7 @@ import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_
 import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePoints } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
-import { clearAllSensors, loadAndDrawSensors, setCustomMontage, setMneMontage } from './draw_sensors';
+import { clearAllSensors, clearLoadAndDrawSensors, setMneMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
@@ -57,7 +57,7 @@ const guiParams = {
         const sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
         const connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
 
-        loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+        clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
         loadAndDrawLinks(connectivityMatrixUrl);
     }
     
@@ -218,9 +218,9 @@ function setupGui() {
     linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
-    const degreeLineFolder = gui.addFolder('degree line');
-    degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen();
-    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('show');
+    const degreeLineFolder = gui.addFolder('Node degree');
+    degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
+    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
 
     const montageFolder = gui.addFolder('Change montage');
     montageFolder.add(guiParams, 'loadMontageCsvFile').name('Load CSV');

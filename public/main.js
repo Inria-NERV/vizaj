@@ -6,7 +6,7 @@ import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
-import { loadAndDrawSensors, clearAllSensors } from '../js/draw_sensors.js';
+import { loadAndDrawSensors, clearLoadAndDrawSensors } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks } from "../js/link_builder/draw_links";
 import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
@@ -173,9 +173,7 @@ function handleMontageCoordinatesFileSelect(evt) {
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
   guiParams.mneMontage = -1;
-  clearAllLinks();
-  clearAllSensors();
-  loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+  clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
 }
 
 export {
