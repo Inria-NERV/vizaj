@@ -2,10 +2,9 @@ import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import { updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';
-import { guiParams } from '../setup_gui';
+import { getSplinePoints, guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
-
 
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
@@ -42,7 +41,7 @@ async function drawLinksAndUpdateVisibility(linkList){
 
 async function drawLinks(linkList){
     for (const link of linkList){
-        const splinePoints = guiParams.getSplinePoints(link);
+        const splinePoints = getSplinePoints(link);
         const curveObject = guiParams.linkGenerator.generateLink(splinePoints, link);
         curveObject.layers.set(LINK_LAYER);
         scene.add(curveObject);

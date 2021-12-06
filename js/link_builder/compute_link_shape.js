@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Matrix3, Vector3 } from "three";
 import { guiParams } from '../setup_gui';
 
-function getSplinePoints(link){
+function getSplinePointsScalp(link){
     const linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
     const globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
 
@@ -82,4 +82,4 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l){
     };
 }
 
-export { getSplinePoints }
+export { getSplinePointsScalp }

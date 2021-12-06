@@ -37481,6 +37481,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.loadAndDrawCortexModel = loadAndDrawCortexModel;
 exports.updateBrainMeshVisibility = updateBrainMeshVisibility;
 exports.hideBrain = hideBrain;
+exports.showBrain = showBrain;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -37605,13 +37606,18 @@ function hideBrain() {
   _setup_gui.guiParams.showBrain = false;
   updateBrainMeshVisibility();
 }
+
+function showBrain() {
+  _setup_gui.guiParams.showBrain = true;
+  updateBrainMeshVisibility();
+}
 },{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getSplinePoints = getSplinePoints;
+exports.getSplinePointsScalp = getSplinePointsScalp;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -37621,7 +37627,7 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
-function getSplinePoints(link) {
+function getSplinePointsScalp(link) {
   var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
   var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
   var pointA = {
@@ -39746,7 +39752,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.setupGui = setupGui;
-exports.defaultMontageLabels = exports.defaultMontageCoordinates = exports.guiParams = void 0;
+exports.getSplinePoints = exports.defaultMontageLabels = exports.defaultMontageCoordinates = exports.guiParams = void 0;
 
 var _main = require("../public/main");
 
@@ -39772,7 +39778,8 @@ var guiParams = {
   },
   loadMontageCsvFile: function loadMontageCsvFile() {
     _main.csvNodePositionsInput.click();
-
+  },
+  loadMontageLabelsCsvFile: function loadMontageLabelsCsvFile() {
     _main.csvNodeLabelsInput.click();
   },
   autoRotateCamera: false,
@@ -39795,7 +39802,7 @@ var guiParams = {
     return changeLinkMesh(_link_mesh_generator.linkVolumeGenerator);
   },
   linkThickness: 1.,
-  getSplinePoints: _compute_link_shape.getSplinePoints,
+  splinePointsGeometry: 0,
   mneMontage: -1,
   export2dImage: function export2dImage() {
     return (0, _export_image.export2DImage)();
@@ -39861,6 +39868,26 @@ var premadeLinkGeometriesParam = {
 function changeLinkMesh(linkGenerator) {
   guiParams.linkGenerator = linkGenerator;
   (0, _draw_links.redrawLinks)();
+}
+
+var getSplinePoints = _compute_link_shape.getSplinePointsScalp;
+exports.getSplinePoints = getSplinePoints;
+var splinePointsGeometry = {
+  'scalp': 0,
+  'flat': 1
+};
+
+function toggleMontageShape() {
+  (0, _draw_links.clearAllLinks)();
+  (0, _draw_sensors.clearAllSensors)();
+
+  if (guiParams.splinePointsGeometry != 0) {
+    (0, _draw_cortex.hideBrain)();
+    exports.getSplinePoints = getSplinePoints = _compute_link_shape_2D.getSplinePointsPlane;
+  } else {
+    (0, _draw_cortex.showBrain)();
+    exports.getSplinePoints = getSplinePoints = _compute_link_shape.getSplinePointsScalp;
+  }
 }
 
 var montages = {
@@ -39941,12 +39968,14 @@ function setupGui() {
   degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(_draw_degree_line.updateLinkVisibilityByLinkDegree).listen().name('Average degree');
   degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('Show degree line');
 
-  var montageFolder = _main.gui.addFolder('Change montage');
+  var montageFolder = _main.gui.addFolder('Change nodes');
 
-  montageFolder.add(guiParams, 'loadMontageCsvFile').name('Load CSV');
+  montageFolder.add(guiParams, 'splinePointsGeometry').options(splinePointsGeometry).onChange(toggleMontageShape).name('Geometry');
+  var csvLoadFolder = montageFolder.addFolder('CSV files');
+  csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
+  csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
+  csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
   montageFolder.add(guiParams, 'mneMontage').options(montages).onChange(_draw_sensors.setMneMontage).name('Mne montage').listen();
-
-  _main.gui.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Load CSV matrix');
 
   var exportFileFolder = _main.gui.addFolder('Export as file');
 
@@ -40310,7 +40339,7 @@ function _drawLinks() {
             try {
               for (_iterator5.s(); !(_step5 = _iterator5.n()).done;) {
                 link = _step5.value;
-                splinePoints = _setup_gui.guiParams.getSplinePoints(link);
+                splinePoints = (0, _setup_gui.getSplinePoints)(link);
                 curveObject = _setup_gui.guiParams.linkGenerator.generateLink(splinePoints, link);
                 curveObject.layers.set(_main.LINK_LAYER);
 
@@ -40484,6 +40513,12 @@ var _setup_gui = require("./setup_gui");
 
 var _mesh_helper = require("./mesh_helper");
 
+var _draw_cortex = require("./draw_cortex.js");
+
+var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D.js");
+
+var _compute_link_shape = require("./link_builder/compute_link_shape.js");
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -40538,10 +40573,15 @@ function _clearLoadAndDrawSensors() {
             return loadAndDrawSensors(sensorCoordinatesUrl);
 
           case 6:
-            _context.next = 8;
+            if (!sensorLabelsUrl) {
+              _context.next = 9;
+              break;
+            }
+
+            _context.next = 9;
             return loadAndAssignSensorLabels(sensorLabelsUrl);
 
-          case 8:
+          case 9:
           case "end":
             return _context.stop();
         }
@@ -40590,7 +40630,8 @@ function _loadAndDrawSensors() {
 
 function loadSensorCoordinates(_x4) {
   return _loadSensorCoordinates.apply(this, arguments);
-}
+} //TODO: check if number fo labels correspond to number of nodes
+
 
 function _loadSensorCoordinates() {
   _loadSensorCoordinates = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(sensorCoordinatesUrl) {
@@ -40621,15 +40662,14 @@ function _loadAndAssignSensorLabels() {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
-            console.log('coucou');
-            _context4.next = 3;
+            _context4.next = 2;
             return loadSensorLabels(sensorLabelsUrl);
 
-          case 3:
+          case 2:
             labelList = _context4.sent;
             assignSensorLabels(labelList);
 
-          case 5:
+          case 4:
           case "end":
             return _context4.stop();
         }
@@ -40642,7 +40682,6 @@ function _loadAndAssignSensorLabels() {
 function assignSensorLabels(labelList) {
   for (var i = 0; i < labelList.length; i++) {
     var label = labelList[i];
-    console.log(label);
     _main.sensorMeshList[i].mesh.name = label;
   }
 }
@@ -40717,16 +40756,15 @@ function drawSensor(_x7) {
 
 function _drawSensor() {
   _drawSensor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(coordinates) {
-    var sensorGeometry, sensor, sensorCount;
+    var sensorGeometry, sensor;
     return regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
             sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
             sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
-            sensorCount = Object.keys(_main.sensorMeshList).length;
             sensor.castShadow = false;
-            sensor.name = sensorCount;
+            sensor.name = '';
             sensor.position.x = coordinates[0] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.x;
             sensor.position.y = coordinates[1] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.y;
             sensor.position.z = coordinates[2] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.z;
@@ -40737,7 +40775,7 @@ function _drawSensor() {
               mesh: sensor
             });
 
-          case 10:
+          case 9:
           case "end":
             return _context6.stop();
         }
@@ -40869,7 +40907,7 @@ function setMneMontage() {
   var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
   clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js","./draw_cortex.js":"../js/draw_cortex.js","./link_builder/compute_link_shape_2D.js":"../js/link_builder/compute_link_shape_2D.js","./link_builder/compute_link_shape.js":"../js/link_builder/compute_link_shape.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44894,13 +44932,13 @@ function handleConnectivityMatrixFileSelect(evt) {
 function handleMontageCoordinatesFileSelect(evt) {
   sensorCoordinatesUrl = getNewFileUrl(evt);
   _setup_gui.guiParams.mneMontage = -1;
+  (0, _draw_sensors.clearLoadAndDrawSensors)(sensorCoordinatesUrl);
 } // coordinate is loaded, then labels. Then, we update the new node montage in the labelbutton event handler
 
 
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
-  _setup_gui.guiParams.mneMontage = -1;
-  (0, _draw_sensors.clearLoadAndDrawSensors)(sensorCoordinatesUrl, sensorLabelsUrl);
+  (0, _draw_sensors.loadAndAssignSensorLabels)(sensorLabelsUrl);
 }
 },{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];

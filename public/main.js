@@ -169,13 +169,14 @@ function handleConnectivityMatrixFileSelect(evt) {
 function handleMontageCoordinatesFileSelect(evt) {
   sensorCoordinatesUrl = getNewFileUrl(evt);
   guiParams.mneMontage = -1;
+  clearLoadAndDrawSensors(sensorCoordinatesUrl);
 }
 
 // coordinate is loaded, then labels. Then, we update the new node montage in the labelbutton event handler
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
-  guiParams.mneMontage = -1;
-  clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+  loadAndAssignSensorLabels(sensorLabelsUrl);
+
 }
 
 export {

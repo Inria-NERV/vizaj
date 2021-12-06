@@ -5,8 +5,8 @@ import { gui, controls,
     csvNodeLabelsInput } from '../public/main';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks, clearAllLinks, loadAndDrawLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
-import { hideBrain, updateBrainMeshVisibility } from './draw_cortex';
-import { getSplinePoints } from './link_builder/compute_link_shape';
+import { hideBrain, showBrain, updateBrainMeshVisibility } from './draw_cortex';
+import { getSplinePointsScalp } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
 import { clearAllSensors, clearLoadAndDrawSensors, setMneMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
@@ -14,10 +14,8 @@ import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
-    loadMontageCsvFile: () => {
-        csvNodePositionsInput.click();
-        csvNodeLabelsInput.click();
-    },
+    loadMontageCsvFile: () => {csvNodePositionsInput.click();},
+    loadMontageLabelsCsvFile: () => {csvNodeLabelsInput.click();},
 
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
@@ -40,7 +38,7 @@ const guiParams = {
     makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
     linkThickness: 1.,
 
-    getSplinePoints: getSplinePoints,
+    splinePointsGeometry: 0,
 
     mneMontage: -1,
 
@@ -104,6 +102,25 @@ const premadeLinkGeometriesParam = {
 function changeLinkMesh(linkGenerator){
     guiParams.linkGenerator = linkGenerator;
     redrawLinks();
+}
+
+let getSplinePoints = getSplinePointsScalp;
+
+const splinePointsGeometry = {
+    'scalp': 0, 
+    'flat': 1
+};
+
+function toggleMontageShape(){
+    clearAllLinks();
+    clearAllSensors();
+    if (guiParams.splinePointsGeometry != 0){
+        hideBrain();
+        getSplinePoints = getSplinePointsPlane
+    } else {
+        showBrain();
+        getSplinePoints = getSplinePointsScalp
+    }
 }
 
 const montages = {'EGI_256': 0,
@@ -223,12 +240,16 @@ function setupGui() {
     degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
 
-    const montageFolder = gui.addFolder('Change montage');
-    montageFolder.add(guiParams, 'loadMontageCsvFile').name('Load CSV');
-    montageFolder.add(guiParams, 'mneMontage').options(montages)
-        .onChange(setMneMontage).name('Mne montage').listen();
+    const montageFolder = gui.addFolder('Change nodes');
+    montageFolder.add(guiParams, 'splinePointsGeometry')
+        .options(splinePointsGeometry).onChange(toggleMontageShape)
+        .name('Geometry');
+    const csvLoadFolder = montageFolder.addFolder('CSV files');
+    csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
+    csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
+    csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
+    montageFolder.add(guiParams, 'mneMontage').options(montages).onChange(setMneMontage).name('Mne montage').listen();
 
-    gui.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Load CSV matrix');
 
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
@@ -242,5 +263,6 @@ export {
     guiParams,
     setupGui,
     defaultMontageCoordinates,
-    defaultMontageLabels
+    defaultMontageLabels,
+    getSplinePoints
 }

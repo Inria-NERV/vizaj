@@ -70,8 +70,14 @@ function hideBrain(){
     updateBrainMeshVisibility();
 }
 
+function showBrain(){
+    guiParams.showBrain = true;
+    updateBrainMeshVisibility();
+}
+
 export {
     loadAndDrawCortexModel,
     updateBrainMeshVisibility,
-    hideBrain
+    hideBrain,
+    showBrain
 };

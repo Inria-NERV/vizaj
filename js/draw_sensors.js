@@ -4,8 +4,11 @@ import { scene,
     centerPoint } from "../public/main.js";
 import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
-import { guiParams, defaultMontageCoordinates, defaultMontageLabels } from "./setup_gui";
+import { guiParams, defaultMontageCoordinates, defaultMontageLabels, getSplinePoints } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
+import { hideBrain, showBrain } from './draw_cortex.js';
+import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D.js';
+import { getSplinePointsScalp } from './link_builder/compute_link_shape.js';
 
 const SENSOR_RADIUS = 3;
 const SENSOR_SEGMENTS = 20;
@@ -31,7 +34,9 @@ async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
     await clearAllLinks();
     await clearAllSensors();
     await loadAndDrawSensors(sensorCoordinatesUrl);
-    await loadAndAssignSensorLabels(sensorLabelsUrl);
+    if (sensorLabelsUrl){
+        await loadAndAssignSensorLabels(sensorLabelsUrl);
+    }
 }
 
 async function loadAndDrawSensors(sensorCoordinatesUrl) {  
@@ -45,8 +50,8 @@ async function loadSensorCoordinates(sensorCoordinatesUrl) {
     return loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
 }
 
+//TODO: check if number fo labels correspond to number of nodes
 async function loadAndAssignSensorLabels(sensorLabelsUrl){
-    console.log('coucou');
     const labelList = await loadSensorLabels(sensorLabelsUrl);
     assignSensorLabels(labelList);
 }
@@ -54,7 +59,6 @@ async function loadAndAssignSensorLabels(sensorLabelsUrl){
 function assignSensorLabels(labelList){
     for (let i = 0; i < labelList.length; i++){
         const label = labelList[i];
-        console.log(label);
         sensorMeshList[i].mesh.name = label;
     }
 }
@@ -75,9 +79,8 @@ async function drawSensor(coordinates){
         sensorGeometry,
         sensorMaterial
     );
-    let sensorCount = Object.keys(sensorMeshList).length;
     sensor.castShadow = false;
-    sensor.name = sensorCount;
+    sensor.name = '';
     sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - centerPoint.x;
     sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - centerPoint.y;
     sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - centerPoint.z;
