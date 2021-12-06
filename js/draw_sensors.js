@@ -30,42 +30,54 @@ let meanSensorDistance = 0.;
 async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
     await clearAllLinks();
     await clearAllSensors();
-    loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+    await loadAndDrawSensors(sensorCoordinatesUrl);
+    await loadAndAssignSensorLabels(sensorLabelsUrl);
 }
 
-async function loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl) {  
-    const data = await loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl);
-    await getCenterPoint(data[1]);
-    await getMaxMeanSensorDistance(data[1]);
-    await drawAllSensors(data[0], data[1]);
+async function loadAndDrawSensors(sensorCoordinatesUrl) {  
+    const data = await loadSensorCoordinates(sensorCoordinatesUrl);
+    await getCenterPoint(data);
+    await getMaxMeanSensorDistance(data);
+    await drawAllSensors(data);
 }
 
-function loadAllSensorData(sensorCoordinatesUrl, sensorLabelsUrl) {
-    return Promise.all([loadSensorLabels(sensorLabelsUrl), loadSensorCoordinates(sensorCoordinatesUrl)]);
-}
-
-function loadSensorCoordinates(sensorCoordinatesUrl) {
+async function loadSensorCoordinates(sensorCoordinatesUrl) {
     return loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
+}
+
+async function loadAndAssignSensorLabels(sensorLabelsUrl){
+    console.log('coucou');
+    const labelList = await loadSensorLabels(sensorLabelsUrl);
+    assignSensorLabels(labelList);
+}
+
+function assignSensorLabels(labelList){
+    for (let i = 0; i < labelList.length; i++){
+        const label = labelList[i];
+        console.log(label);
+        sensorMeshList[i].mesh.name = label;
+    }
 }
 
 function loadSensorLabels(sensorLabelsUrl){
     return loadData(sensorLabelsUrl, 'sensor labels', (x) => x);
 }
 
-async function drawAllSensors(labelList, coordinatesList){
-    for (let i = 0; i < labelList.length; i++) {
-        await drawSensor(labelList[i], coordinatesList[i]);
+async function drawAllSensors(coordinatesList){
+    for (let coordinates of coordinatesList) {
+        await drawSensor(coordinates);
       }
 }
 
-async function drawSensor(label, coordinates){
+async function drawSensor(coordinates){
     const sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
     let sensor = new THREE.Mesh(
         sensorGeometry,
         sensorMaterial
     );
+    let sensorCount = Object.keys(sensorMeshList).length;
     sensor.castShadow = false;
-    sensor.name = label;
+    sensor.name = sensorCount;
     sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - centerPoint.x;
     sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - centerPoint.y;
     sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - centerPoint.z;
@@ -127,6 +139,7 @@ function setMneMontage(){
 export {
     sensorMaterial,
     loadAndDrawSensors, 
+    loadAndAssignSensorLabels,
     clearLoadAndDrawSensors,
     sensorMeshList, 
     maxSensorDistance, 

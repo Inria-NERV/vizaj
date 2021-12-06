@@ -6,7 +6,9 @@ import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
-import { loadAndDrawSensors, clearLoadAndDrawSensors } from '../js/draw_sensors.js';
+import { loadAndDrawSensors, 
+  clearLoadAndDrawSensors, 
+  loadAndAssignSensorLabels } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks } from "../js/link_builder/draw_links";
 import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
@@ -74,14 +76,14 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-
 }
 
 async function generateSceneElements(){
   setupCamera();
   addLightAndBackground();
   loadAndDrawCortexModel();
-  await loadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
+  await loadAndDrawSensors(sensorCoordinatesUrl);
+  await loadAndAssignSensorLabels(sensorLabelsUrl);
   await loadAndDrawLinks(connectivityMatrixUrl);
   drawAllDegreeLines();
 }
@@ -181,8 +183,8 @@ export {
     camera,
     controls,
     renderer,
-    sensorMeshList,
     linkMeshList,
+    sensorMeshList,
     gui,
     cortexVertUrl, 
     cortexTriUrl, 

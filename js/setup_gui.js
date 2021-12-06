@@ -189,13 +189,14 @@ function setupGui() {
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
     cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} );
 
-    const linksToDisplayFolder = gui.addFolder('LinksToDisplay');
+    const linksToDisplayFolder = gui.addFolder('Connection density');
     linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
+        .name('Density')
         .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
         .listen();
-    linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.)
-        .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
-        .listen();
+    // linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.)
+    //     .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
+    //     .listen();
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
     const linkGeometry = gui.addFolder('linkGeometry');
