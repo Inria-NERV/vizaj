@@ -37349,6 +37349,8 @@ exports.linkVolumeGenerator = exports.linkLineGenerator = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
+var _draw_sensors = require("../draw_sensors");
+
 var _setup_gui = require("../setup_gui");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -37459,7 +37461,7 @@ var linkVolumeGenerator = /*#__PURE__*/function (_linkMeshGenerator2) {
   }, {
     key: "getGeometry",
     value: function getGeometry(curvePath, link) {
-      var geometry = new THREE.TubeGeometry(curvePath, this.LINK_SEGMENTS, (1 - link.normDist) * _setup_gui.guiParams.linkThickness, this.LINK_RADIAL_SEGMENTS, false);
+      var geometry = new THREE.TubeGeometry(curvePath, this.LINK_SEGMENTS, (1 - link.normDist) * _setup_gui.guiParams.linkThickness * this.LINK_RADIUS_SCALE / Math.sqrt(_draw_sensors.sensorCount), this.LINK_RADIAL_SEGMENTS, false);
       return geometry;
     }
   }]);
@@ -37472,7 +37474,9 @@ exports.linkVolumeGenerator = linkVolumeGenerator;
 _defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
 
 _defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
+
+_defineProperty(linkVolumeGenerator, "LINK_RADIUS_SCALE", 60);
+},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40499,7 +40503,7 @@ Object.defineProperty(exports, "sensorMeshList", {
     return _main.sensorMeshList;
   }
 });
-exports.maxSensorDistance = exports.sensorMaterial = void 0;
+exports.maxSensorDistance = exports.sensorCount = exports.sensorMaterial = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -40512,12 +40516,6 @@ var _draw_links = require("./link_builder/draw_links");
 var _setup_gui = require("./setup_gui");
 
 var _mesh_helper = require("./mesh_helper");
-
-var _draw_cortex = require("./draw_cortex.js");
-
-var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D.js");
-
-var _compute_link_shape = require("./link_builder/compute_link_shape.js");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -40533,7 +40531,10 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var SENSOR_RADIUS = 3;
+var sensorCount = 0; //we multiply by sqrt(60) in order to scale by number of sensor
+
+exports.sensorCount = sensorCount;
+var SENSOR_RADIUS = 3 * 10;
 var SENSOR_SEGMENTS = 20;
 var SENSOR_RINGS = 50;
 var CENTER_POINT_OFFSET_X = 0;
@@ -40635,13 +40636,20 @@ function loadSensorCoordinates(_x4) {
 
 function _loadSensorCoordinates() {
   _loadSensorCoordinates = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(sensorCoordinatesUrl) {
+    var data;
     return regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            return _context3.abrupt("return", (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow));
+            _context3.next = 2;
+            return (0, _load_data.loadData)(sensorCoordinatesUrl, 'sensor coordinates', _load_data.parseCsv3dCoordinatesRow);
 
-          case 1:
+          case 2:
+            data = _context3.sent;
+            exports.sensorCount = sensorCount = data.length;
+            return _context3.abrupt("return", data);
+
+          case 5:
           case "end":
             return _context3.stop();
         }
@@ -40761,7 +40769,7 @@ function _drawSensor() {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
-            sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
+            sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS / Math.sqrt(sensorCount), SENSOR_SEGMENTS, SENSOR_RINGS);
             sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
             sensor.castShadow = false;
             sensor.name = '';
@@ -40907,7 +40915,7 @@ function setMneMontage() {
   var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
   clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js","./draw_cortex.js":"../js/draw_cortex.js","./link_builder/compute_link_shape_2D.js":"../js/link_builder/compute_link_shape_2D.js","./link_builder/compute_link_shape.js":"../js/link_builder/compute_link_shape.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44968,7 +44976,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49264" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54441" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

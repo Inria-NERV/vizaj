@@ -1,16 +1,17 @@
 import * as THREE from 'three';
 import { scene, 
     sensorMeshList,
-    centerPoint } from "../public/main.js";
+    centerPoint
+ } from "../public/main.js";
 import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { guiParams, defaultMontageCoordinates, defaultMontageLabels, getSplinePoints } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
-import { hideBrain, showBrain } from './draw_cortex.js';
-import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D.js';
-import { getSplinePointsScalp } from './link_builder/compute_link_shape.js';
 
-const SENSOR_RADIUS = 3;
+let sensorCount = 0;
+
+//we multiply by sqrt(60) in order to scale by number of sensor
+const SENSOR_RADIUS = 3 * 10;
 const SENSOR_SEGMENTS = 20;
 const SENSOR_RINGS = 50;
 
@@ -47,7 +48,9 @@ async function loadAndDrawSensors(sensorCoordinatesUrl) {
 }
 
 async function loadSensorCoordinates(sensorCoordinatesUrl) {
-    return loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
+    const data = await loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
+    sensorCount = data.length;
+    return data;
 }
 
 //TODO: check if number fo labels correspond to number of nodes
@@ -74,7 +77,10 @@ async function drawAllSensors(coordinatesList){
 }
 
 async function drawSensor(coordinates){
-    const sensorGeometry = new THREE.SphereGeometry(SENSOR_RADIUS, SENSOR_SEGMENTS, SENSOR_RINGS);
+    const sensorGeometry = new THREE.SphereGeometry(
+        SENSOR_RADIUS / Math.sqrt(sensorCount), 
+        SENSOR_SEGMENTS, 
+        SENSOR_RINGS);
     let sensor = new THREE.Mesh(
         sensorGeometry,
         sensorMaterial
@@ -145,6 +151,7 @@ export {
     loadAndAssignSensorLabels,
     clearLoadAndDrawSensors,
     sensorMeshList, 
+    sensorCount,
     maxSensorDistance, 
     clearAllSensors,
     setMneMontage};

@@ -1,5 +1,7 @@
 import * as THREE from "three";
+import { sensorCount } from "../draw_sensors";
 import { guiParams } from '../setup_gui';
+
 
 class linkMeshGenerator{ }
 
@@ -32,6 +34,7 @@ class linkLineGenerator extends linkMeshGenerator{
 class linkVolumeGenerator extends linkMeshGenerator{
     static LINK_SEGMENTS = 64;
     static LINK_RADIAL_SEGMENTS = 10;
+    static LINK_RADIUS_SCALE = 60;
 
     static generateLink(curvePath, link){
         const geometry = this.getGeometry(curvePath, link);
@@ -52,7 +55,7 @@ class linkVolumeGenerator extends linkMeshGenerator{
         const geometry = new THREE.TubeGeometry(
             curvePath,
             this.LINK_SEGMENTS,
-            (1 - link.normDist) * guiParams.linkThickness,
+            (1 - link.normDist) * guiParams.linkThickness * this.LINK_RADIUS_SCALE / Math.sqrt(sensorCount),
             this.LINK_RADIAL_SEGMENTS,
             false
         );
