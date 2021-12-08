@@ -37475,7 +37475,7 @@ _defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
 
 _defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
 
-_defineProperty(linkVolumeGenerator, "LINK_RADIUS_SCALE", 60);
+_defineProperty(linkVolumeGenerator, "LINK_RADIUS_SCALE", 10);
 },{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
 "use strict";
 
@@ -37585,10 +37585,8 @@ function drawCortexModel(vertices) {
   brainMesh.receiveShadow = true;
   brainMesh.castShadow = true;
   repositionBrainMesh(brainMesh);
-  brainMesh.name = 'cortex';
-  var box = new THREE.BoxHelper(brainMesh, 0xffff00);
-
-  _main.scene.add(box);
+  brainMesh.name = 'cortex'; // const box = new THREE.BoxHelper( brainMesh, 0xffff00 );
+  // scene.add( box );
 
   _main.scene.add(brainMesh);
 }
@@ -40377,8 +40375,7 @@ function updateLinkOutline() {
   try {
     for (_iterator.s(); !(_step = _iterator.n()).done;) {
       var linkTuple = _step.value;
-
-      var splinePoints = _setup_gui.guiParams.getSplinePoints(linkTuple.link);
+      var splinePoints = (0, _setup_gui.getSplinePoints)(linkTuple.link);
 
       var curveGeometry = _setup_gui.guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
 
@@ -40503,7 +40500,7 @@ Object.defineProperty(exports, "sensorMeshList", {
     return _main.sensorMeshList;
   }
 });
-exports.maxSensorDistance = exports.sensorCount = exports.sensorMaterial = void 0;
+exports.CENTER_POINT_OFFSET_Z = exports.CENTER_POINT_OFFSET_Y = exports.CENTER_POINT_OFFSET_X = exports.maxSensorDistance = exports.sensorCount = exports.sensorMaterial = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -40538,8 +40535,11 @@ var SENSOR_RADIUS = 3 * 10;
 var SENSOR_SEGMENTS = 20;
 var SENSOR_RINGS = 50;
 var CENTER_POINT_OFFSET_X = 0;
+exports.CENTER_POINT_OFFSET_X = CENTER_POINT_OFFSET_X;
 var CENTER_POINT_OFFSET_Y = 63;
+exports.CENTER_POINT_OFFSET_Y = CENTER_POINT_OFFSET_Y;
 var CENTER_POINT_OFFSET_Z = 0;
+exports.CENTER_POINT_OFFSET_Z = CENTER_POINT_OFFSET_Z;
 var SCALE_FACTOR = 100;
 var sensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xaaaaaa,
@@ -44878,7 +44878,7 @@ function emptyIntersected() {
     var elem = highlightedLinksPreviousMaterials.shift();
 
     var _iterator = _createForOfIteratorHelper(linkMeshList.filter(function (linkMesh) {
-      return linkMesh.link.node1.name === elem.node1Name && linkMesh.link.node2.name === elem.node2Name;
+      return linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2;
     })),
         _step;
 
@@ -44906,13 +44906,12 @@ function fillIntersected() {
   for (var _i = 0, _linkMeshList = linkMeshList; _i < _linkMeshList.length; _i++) {
     var linkMesh = _linkMeshList[_i];
 
-    if (linkMesh.link.node1.name == INTERSECTED.name || linkMesh.link.node2.name == INTERSECTED.name) {
+    if (linkMesh.link.node1 === INTERSECTED || linkMesh.link.node2 === INTERSECTED) {
       highlightedLinksPreviousMaterials.push({
-        node1Name: linkMesh.link.node1.name,
-        node2Name: linkMesh.link.node2.name,
+        node1: linkMesh.link.node1,
+        node2: linkMesh.link.node2,
         material: linkMesh.mesh.material
-      }); //If volume, change to MeshPhysicalMaterial
-
+      });
       linkMesh.mesh.material = new THREE.LineBasicMaterial({
         color: new THREE.Color(1, 1, 1),
         opacity: 1,

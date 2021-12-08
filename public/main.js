@@ -127,7 +127,8 @@ function emptyIntersected() {
   sensorNameDiv.innerHTML = "";
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
-    for (const linkMesh of linkMeshList.filter((linkMesh) => linkMesh.link.node1.name === elem.node1Name && linkMesh.link.node2.name === elem.node2Name))
+    for (const linkMesh of linkMeshList
+      .filter((linkMesh) => linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2))
     {
       linkMesh.mesh.material = elem.material;
     }
@@ -138,13 +139,12 @@ function fillIntersected() {
   INTERSECTED.material = enlightenedSensorMaterial;
   sensorNameDiv.innerHTML = INTERSECTED.name;
   for (const linkMesh of linkMeshList){
-    if (linkMesh.link.node1.name == INTERSECTED.name || linkMesh.link.node2.name == INTERSECTED.name)
+    if (linkMesh.link.node1 === INTERSECTED || linkMesh.link.node2 === INTERSECTED)
     {
       highlightedLinksPreviousMaterials.push({
-        node1Name: linkMesh.link.node1.name,
-        node2Name: linkMesh.link.node2.name,
+        node1: linkMesh.link.node1,
+        node2: linkMesh.link.node2,
         material: linkMesh.mesh.material});
-        //If volume, change to MeshPhysicalMaterial
       linkMesh.mesh.material = new THREE.LineBasicMaterial({
         color : new THREE.Color(1, 1, 1), 
         opacity: 1,

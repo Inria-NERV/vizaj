@@ -47,8 +47,8 @@ function drawCortexModel(vertices){
     brainMesh.castShadow = true;
     repositionBrainMesh( brainMesh );
     brainMesh.name = 'cortex';
-    const box = new THREE.BoxHelper( brainMesh, 0xffff00 );
-    scene.add( box );
+    // const box = new THREE.BoxHelper( brainMesh, 0xffff00 );
+    // scene.add( box );
     scene.add( brainMesh );
 }
 

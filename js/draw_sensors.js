@@ -154,4 +154,7 @@ export {
     sensorCount,
     maxSensorDistance, 
     clearAllSensors,
-    setMneMontage};
+    setMneMontage,
+    CENTER_POINT_OFFSET_X,
+    CENTER_POINT_OFFSET_Y,
+    CENTER_POINT_OFFSET_Z};

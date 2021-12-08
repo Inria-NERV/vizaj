@@ -51,7 +51,7 @@ async function drawLinks(linkList){
 
 function updateLinkOutline(){
     for (let linkTuple of linkMeshList){
-        const splinePoints = guiParams.getSplinePoints(linkTuple.link);
+        const splinePoints = getSplinePoints(linkTuple.link);
         const curveGeometry = guiParams.linkGenerator.getGeometry(splinePoints, linkTuple.link);
 
         const position = linkTuple.mesh.geometry.attributes.position;

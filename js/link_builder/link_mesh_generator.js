@@ -34,7 +34,7 @@ class linkLineGenerator extends linkMeshGenerator{
 class linkVolumeGenerator extends linkMeshGenerator{
     static LINK_SEGMENTS = 64;
     static LINK_RADIAL_SEGMENTS = 10;
-    static LINK_RADIUS_SCALE = 60;
+    static LINK_RADIUS_SCALE = 10;
 
     static generateLink(curvePath, link){
         const geometry = this.getGeometry(curvePath, link);
