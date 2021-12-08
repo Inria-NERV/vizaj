@@ -44,20 +44,6 @@ const guiParams = {
 
     export2dImage: () => export2DImage(),
     export3Dgltf: () => export3Dgltf(),
-
-    link2dTest: () => { 
-        clearAllSensors();
-        clearAllLinks();
-        hideBrain();
-        guiParams.getSplinePoints = getSplinePointsPlane;
-
-        const sensorLabelsUrl = require('../data/2d/sensor_labels.csv');
-        const sensorCoordinatesUrl = require('../data/2d/sensor_coordinates.csv');
-        const connectivityMatrixUrl = require('../data/2d/conn_matrix.csv');
-
-        clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl);
-        loadAndDrawLinks(connectivityMatrixUrl);
-    }
     
   };
 
@@ -112,8 +98,6 @@ const splinePointsGeometry = {
 };
 
 function toggleMontageShape(){
-    clearAllLinks();
-    clearAllSensors();
     if (guiParams.splinePointsGeometry != 0){
         hideBrain();
         getSplinePoints = getSplinePointsPlane
@@ -121,6 +105,8 @@ function toggleMontageShape(){
         showBrain();
         getSplinePoints = getSplinePointsScalp
     }
+    premadeLinkGeometriesParam.defaultLinkGeometry();
+    redrawLinks();
 }
 
 const montages = {'EGI_256': 0,
@@ -254,8 +240,6 @@ function setupGui() {
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
     exportFileFolder.add(guiParams, 'export3Dgltf').name('Export 3D gltf');
-
-    gui.add(guiParams, 'link2dTest').name('link2dTest');
 
 }
 
