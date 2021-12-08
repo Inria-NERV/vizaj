@@ -37701,42 +37701,12 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 function getSplinePointsPlane(link) {
   var pointA = link.node1.position;
   var pointB = link.node2.position;
-  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2);
+  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2).add(new THREE.Vector3(_draw_sensors.CENTER_POINT_OFFSET_X, _draw_sensors.CENTER_POINT_OFFSET_Y, _draw_sensors.CENTER_POINT_OFFSET_Z));
   var curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
   var curvePath = new THREE.CurvePath();
   curvePath.add(curve);
   return curvePath;
-} // function getSplinePointsPlane(link, L){
-//     const pointA = {controlPoint: link.node1.position};
-//     const pointB = {controlPoint: link.node2.position};
-//     const pointC = computePointCPlane(pointA.controlPoint, pointB.controlPoint);
-//     pointA.handleRight = new THREE.Vector3(pointA.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
-//     pointB.handleLeft  = new THREE.Vector3(pointB.controlPoint.x * guiParams.linkSensorHandleDistances,0,0);
-//     const splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
-//     const splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
-//     const curvePath = new THREE.CurvePath();
-//     curvePath.add(splineLeft);
-//     curvePath.add(splineRight);
-//     return curvePath;
-// }
-// function computePointCPlane(pointA, pointB){
-//     const controlPointC = new THREE.Vector3(
-//         (pointA.x + pointB.x)/2,
-//         pointA.distanceTo(pointB) * guiParams.linkHeight,
-//         (pointA.z + pointB.z)/2
-//     );
-//     const leftHandleRotation = new THREE.Quaternion();
-//     leftHandleRotation.setFromAxisAngle(new Vector3(0,+1,0), Math.PI * guiParams.linkTopPointAngle );
-//     const rightHandleRotation = new THREE.Quaternion();
-//     rightHandleRotation.setFromAxisAngle(new Vector3(0,-1,0), Math.PI * guiParams.linkTopPointAngle );
-//     return {controlPoint: controlPointC.clone(),
-//         handleLeft: controlPointC.clone()
-//             .add( new Vector3(pointA.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
-//         handleRight: controlPointC.clone()
-//             .add( new Vector3(pointB.x * guiParams.linkTopPointHandleDistances, 0, 0) ),
-//         controlPointLinkBasis: controlPointC
-//     };
-// }
+}
 },{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../node_modules/three/examples/jsm/exporters/GLTFExporter.js":[function(require,module,exports) {
 "use strict";
 
