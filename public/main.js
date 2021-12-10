@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
-import { sensorMaterial } from "../js/draw_sensors.js";
+import { assignSensorLabels, clearAllSensors, drawSensor, drawSensorsAndUpdateGlobalValues, sensorMaterial } from "../js/draw_sensors.js";
 import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
 
@@ -9,10 +9,11 @@ import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, 
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, clearAllLinks } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
 import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
+import { loadJsonData } from "../js/load_data";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -53,6 +54,7 @@ const sensorNameDiv = document.getElementById("sensorName");
 const csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
 const csvNodePositionsInput = document.getElementById("csvNodePositions");
 const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
+const jsonInput = document.getElementById("jsonInput");
 
 //INTERSECTED is used to check wether the mouse intersects with a sensor
 var INTERSECTED;
@@ -70,6 +72,14 @@ function init() {
   csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
   csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
+  jsonInput.addEventListener("change", handleJsonFileSelect, false);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  hoverDisplayUpdate();
+  renderer.render(scene, camera);
 }
 
 function onWindowResize() {
@@ -78,7 +88,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-async function generateSceneElements(){
+async function generateSceneElements() {
   setupCamera();
   addLightAndBackground();
   loadAndDrawCortexModel();
@@ -95,13 +105,6 @@ function onDocumentMouseMove(event) {
   const padding = 15;
   sensorNameDiv.style.top = event.clientY + padding + "px";
   sensorNameDiv.style.left = event.clientX + padding + "px";
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  hoverDisplayUpdate();
-  renderer.render(scene, camera);
 }
 
 function hoverDisplayUpdate() {
@@ -128,8 +131,7 @@ function emptyIntersected() {
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
     for (const linkMesh of linkMeshList
-      .filter((linkMesh) => linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2))
-    {
+      .filter((linkMesh) => linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2)){
       linkMesh.mesh.material = elem.material;
     }
   }
@@ -172,11 +174,35 @@ function handleMontageCoordinatesFileSelect(evt) {
   clearLoadAndDrawSensors(sensorCoordinatesUrl);
 }
 
-// coordinate is loaded, then labels. Then, we update the new node montage in the labelbutton event handler
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
   loadAndAssignSensorLabels(sensorLabelsUrl);
+}
 
+async function handleJsonFileSelect(evt){
+  const jsonUrl = getNewFileUrl(evt);
+  const jsonData = await loadJsonData(jsonUrl);
+  const graph = jsonData.graph;
+  const coordinatesList  = [];
+  const labelList = [];
+  const linkList = [];
+  for (const [key, value] of Object.entries(graph.nodes)){
+    coordinatesList.push([value.position.x, value.position.y, value.position.z]);
+    let label = '';
+    if (value.label) { label = value.label; }
+    labelList.push(label);
+  }
+  await clearAllLinks();
+  await clearAllSensors();
+  await drawSensorsAndUpdateGlobalValues(coordinatesList);
+  assignSensorLabels(labelList);
+  for (const [key, value] of Object.entries(graph.edges)){
+    linkList.push(generateLinkData(
+      parseInt(value.source - 1), 
+      parseInt(value.target - 1), 
+      value.metadata.corr_mat));
+  }
+  await drawLinksAndUpdateVisibility(linkList);
 }
 
 export {
@@ -196,5 +222,6 @@ export {
     centerPoint,
     csvConnMatrixInput,
     csvNodePositionsInput,
-    csvNodeLabelsInput
+    csvNodeLabelsInput,
+    jsonInput
 };

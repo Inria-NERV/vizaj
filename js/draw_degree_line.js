@@ -10,7 +10,7 @@ const degreeLineMaterial = new THREE.MeshBasicMaterial(
         opacity: .6, 
         transparent: true } );
 
-const DEGREE_LINE_UNIT_MAX_SCALE = 200;
+const DEGREE_LINE_MAX_SCALE = 200;
 
 const DEGREE_LINE_TUBULAR_SEGMENTS = 2;
 const DEGREE_LINE_RADIUS = 1.3;
@@ -20,7 +20,7 @@ function drawDegreeLine(sensor){
     const sensorMesh = sensor.mesh;
 
     const unitVector = sensorMesh.position.clone().normalize();
-    const endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_UNIT_MAX_SCALE );
+    const endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_MAX_SCALE );
     const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
 
     const curve = new THREE.LineCurve(sensorMesh.position, endPoint);
@@ -93,7 +93,6 @@ function updateAllDegreeLines(updateAverageDegree=true){
     if (updateAverageDegree){
         guiParams.averageDegree = computeAverageDegree();
     }
-    
 }
 
 function computeAverageDegree(){
@@ -117,7 +116,7 @@ function updateLinkVisibilityByLinkDegree(){
     const l = guiParams.averageDegree * sensorMeshList.length / 2;
     guiParams.minStrengthToDisplay = 0.;
     guiParams.maxStrengthToDisplay = l / linkMeshList.length;
-    updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay, false);  
+    updateVisibleLinks(false);  
 }
 
 export {

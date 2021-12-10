@@ -3,7 +3,7 @@ import { scene,
     sensorMeshList,
     centerPoint
  } from "../public/main.js";
-import { loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
+import { csv3dCoordinatesOnLoadCallBack, loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { guiParams, defaultMontageCoordinates, defaultMontageLabels, getSplinePoints } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
@@ -42,14 +42,18 @@ async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
 
 async function loadAndDrawSensors(sensorCoordinatesUrl) {  
     const data = await loadSensorCoordinates(sensorCoordinatesUrl);
+    await drawSensorsAndUpdateGlobalValues(data);
+
+}
+async function drawSensorsAndUpdateGlobalValues(data){
     await getCenterPoint(data);
     await getMaxMeanSensorDistance(data);
     await drawAllSensors(data);
 }
 
+
 async function loadSensorCoordinates(sensorCoordinatesUrl) {
-    const data = await loadData(sensorCoordinatesUrl, 'sensor coordinates', parseCsv3dCoordinatesRow);
-    sensorCount = data.length;
+    const data = await loadData(sensorCoordinatesUrl, 'sensor coordinates', csv3dCoordinatesOnLoadCallBack);
     return data;
 }
 
@@ -67,7 +71,7 @@ function assignSensorLabels(labelList){
 }
 
 function loadSensorLabels(sensorLabelsUrl){
-    return loadData(sensorLabelsUrl, 'sensor labels', (x) => x);
+    return loadData(sensorLabelsUrl, 'sensor labels');
 }
 
 async function drawAllSensors(coordinatesList){
@@ -92,6 +96,7 @@ async function drawSensor(coordinates){
     sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - centerPoint.z;
     scene.add(sensor);
     sensorMeshList.push({mesh: sensor});
+    return sensor;
 }
 
 async function getMaxMeanSensorDistance(positions){
@@ -109,6 +114,7 @@ async function getMaxMeanSensorDistance(positions){
             meanSensorDistance += _dist;
         }
     }
+    sensorCount = positions.length;
     meanSensorDistance = meanSensorDistance / count;
 }
 
@@ -147,9 +153,12 @@ function setMneMontage(){
 
 export {
     sensorMaterial,
+    drawSensor,
+    drawSensorsAndUpdateGlobalValues,
     loadAndDrawSensors, 
     loadAndAssignSensorLabels,
     clearLoadAndDrawSensors,
+    assignSensorLabels,
     sensorMeshList, 
     sensorCount,
     maxSensorDistance, 

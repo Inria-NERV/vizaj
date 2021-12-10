@@ -2,13 +2,14 @@ import { gui, controls,
     linkMeshList,
     csvConnMatrixInput,
     csvNodePositionsInput,
-    csvNodeLabelsInput } from '../public/main';
-import { redrawLinks, updateLinkOutline, updateVisibleLinks, clearAllLinks, loadAndDrawLinks } from './link_builder/draw_links';
+    csvNodeLabelsInput,
+    jsonInput } from '../public/main';
+import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { hideBrain, showBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePointsScalp } from './link_builder/compute_link_shape';
 import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
-import { clearAllSensors, clearLoadAndDrawSensors, setMneMontage } from './draw_sensors';
+import { setMneMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
@@ -16,10 +17,10 @@ const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
     loadMontageCsvFile: () => {csvNodePositionsInput.click();},
     loadMontageLabelsCsvFile: () => {csvNodeLabelsInput.click();},
+    loadJson: () => {jsonInput.click()},
 
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
-    minStrengthToDisplay: 0.,
     maxStrengthToDisplay: .2,
     showBrain: true,
 
@@ -195,11 +196,8 @@ function setupGui() {
     const linksToDisplayFolder = gui.addFolder('Connection density');
     linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
         .name('Density')
-        .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
+        .onChange (() => updateVisibleLinks())
         .listen();
-    // linksToDisplayFolder.add(guiParams, 'minStrengthToDisplay', 0., 1.)
-    //     .onChange (() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay))
-    //     .listen();
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
     const linkGeometry = gui.addFolder('linkGeometry');
@@ -223,19 +221,19 @@ function setupGui() {
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     const degreeLineFolder = gui.addFolder('Node degree');
-    degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
+    //degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
 
-    const montageFolder = gui.addFolder('Change nodes');
-    montageFolder.add(guiParams, 'splinePointsGeometry')
+    const fileLoadFolder = gui.addFolder('Load files');
+    fileLoadFolder.add(guiParams, 'splinePointsGeometry')
         .options(splinePointsGeometry).onChange(toggleMontageShape)
         .name('Geometry');
-    const csvLoadFolder = montageFolder.addFolder('CSV files');
+    const csvLoadFolder = fileLoadFolder.addFolder('CSV files');
     csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
     csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
     csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
-    montageFolder.add(guiParams, 'mneMontage').options(montages).onChange(setMneMontage).name('Mne montage').listen();
-
+    fileLoadFolder.add(guiParams, 'loadJson').name('Json files');
+    fileLoadFolder.add(guiParams, 'mneMontage').options(montages).onChange(setMneMontage).name('Mne montage').listen();
 
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');

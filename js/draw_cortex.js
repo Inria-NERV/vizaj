@@ -1,12 +1,11 @@
 import * as THREE from 'three';
-import { loadData, parseCsv3dCoordinatesRow } from './load_data.js';
+import { cortexTriOnLoadCallback, csv3dCoordinatesOnLoadCallBack, loadData } from './load_data.js';
 import { scene, cortexVertUrl, cortexTriUrl, cortexMaterial, GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
 
 let brainMesh;
 
-function loadAndDrawCortexModel()
-{   
+function loadAndDrawCortexModel(){   
     loadCortexModel()
     .then((response) => makeVertCoordsList(response[0], response[1]))
     .then((response) => drawCortexModel(response));
@@ -16,16 +15,11 @@ function loadAndDrawCortexModel()
 function loadCortexModel(){
     return Promise.all([loadCortexVert(), loadCortexTri()]);
 }
-
-function parseRowCortexTri(row) {
-    const splitted_row = row.split(",");
-    return [parseInt(splitted_row[0]), parseInt(splitted_row[1]), parseInt(splitted_row[2])];
-}
 function loadCortexVert(){
-    return loadData(cortexVertUrl, 'cortex vertices', parseCsv3dCoordinatesRow);
+    return loadData(cortexVertUrl, 'cortex vertices', csv3dCoordinatesOnLoadCallBack);
 }
 function loadCortexTri(){
-    return loadData(cortexTriUrl, 'cortex faces', parseRowCortexTri);
+    return loadData(cortexTriUrl, 'cortex faces', cortexTriOnLoadCallback);
 }
 
 async function makeVertCoordsList(cortexVert, cortexTri){

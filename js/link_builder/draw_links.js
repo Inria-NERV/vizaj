@@ -12,7 +12,7 @@ async function loadAndDrawLinks(linksDataFileUrl){
 }
 
 async function loadLinks(linksDataFileUrl){
-    return loadData(linksDataFileUrl, 'connectivity matrix', (x)=>x, connectivityMatrixOnLoadCallBack);
+    return loadData(linksDataFileUrl, 'connectivity matrix', connectivityMatrixOnLoadCallBack);
 }
 
 function connectivityMatrixOnLoadCallBack(data){
@@ -22,24 +22,29 @@ function connectivityMatrixOnLoadCallBack(data){
         const row = splittedData[i];
         const splittedRow = row.split(',');
         for (let j = 0; j < i; j++){
-            outList.push({
-                node1:sensorMeshList[i].mesh,
-                node2:sensorMeshList[j].mesh,
-                strength: parseFloat(splittedRow[j]),
-                normDist: sensorMeshList[i].mesh.position.distanceTo(sensorMeshList[j].mesh.position) / maxSensorDistance
-            });
+            outList.push(generateLinkData(i, j, splittedRow[j]));
         }
     }
     return outList;
 }
 
+function generateLinkData(i_node1, i_node2, strength){
+    return {
+        node1:sensorMeshList[i_node1].mesh,
+        node2:sensorMeshList[i_node2].mesh,
+        strength: parseFloat(strength),
+        normDist: sensorMeshList[i_node1].mesh.position.distanceTo(sensorMeshList[i_node2].mesh.position) / maxSensorDistance
+      }
+}
+
 async function drawLinksAndUpdateVisibility(linkList){
     drawLinks(linkList)
     .then(() => {linkMeshList.sort((x1, x2) => x2.link.strength - x1.link.strength)})
-    .then(() => updateVisibleLinks(guiParams.minStrengthToDisplay, guiParams.maxStrengthToDisplay));
+    .then(() => updateVisibleLinks());
 }
 
 async function drawLinks(linkList){
+
     for (const link of linkList){
         const splinePoints = getSplinePoints(link);
         const curveObject = guiParams.linkGenerator.generateLink(splinePoints, link);
@@ -80,13 +85,13 @@ async function clearAllLinks() {
     }
 }
 
-function updateVisibleLinks(minStrength, maxStrength, updateAverageDegree=true) {
-    const minVisibleLinkIndice = (linkMeshList.length) * minStrength;
-    const maxVisibleLinkIndice = (linkMeshList.length) * maxStrength;
-    for (const link of linkMeshList.slice(0, minVisibleLinkIndice)){
-        link.mesh.visible = false;
+function updateVisibleLinks(updateAverageDegree=true) {
+    const fullyConnectedGraphLinkCount = sensorCount * (sensorCount - 1) / 2;
+    if (guiParams.maxStrengthToDisplay > linkMeshList.length / fullyConnectedGraphLinkCount){
+        guiParams.maxStrengthToDisplay = linkMeshList.length / fullyConnectedGraphLinkCount;
     }
-    for (const link of linkMeshList.slice(minVisibleLinkIndice, maxVisibleLinkIndice)){
+    const maxVisibleLinkIndice = fullyConnectedGraphLinkCount * guiParams.maxStrengthToDisplay;
+    for (const link of linkMeshList.slice(0, maxVisibleLinkIndice)){
         link.mesh.visible = true;
     }
     for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length)){
@@ -97,7 +102,9 @@ function updateVisibleLinks(minStrength, maxStrength, updateAverageDegree=true) 
 
  export {
     clearAllLinks,
+    generateLinkData,
     loadAndDrawLinks,
+    drawLinksAndUpdateVisibility,
     redrawLinks,
     updateLinkOutline,
     updateVisibleLinks}
