@@ -25,8 +25,6 @@ let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
-const centerPoint = new THREE.Vector3();
-
 const cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide
@@ -219,7 +217,6 @@ export {
     sensorMaterial,
     GLOBAL_LAYER,
     LINK_LAYER,
-    centerPoint,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,

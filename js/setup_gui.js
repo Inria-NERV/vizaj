@@ -1,5 +1,4 @@
 import { gui, controls,
-    linkMeshList,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,
@@ -8,7 +7,6 @@ import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_build
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { hideBrain, showBrain, updateBrainMeshVisibility } from './draw_cortex';
 import { getSplinePointsScalp } from './link_builder/compute_link_shape';
-import { getSplinePointsPlane } from './link_builder/compute_link_shape_2D';
 import { setMneMontage } from './draw_sensors';
 import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
@@ -34,6 +32,7 @@ const guiParams = {
     linkTopPointAngle: 0.,
 
     linkGenerator: linkLineGenerator,
+    linkAlignmentTarget: -10,
 
     makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
     makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
@@ -97,18 +96,6 @@ const splinePointsGeometry = {
     'scalp': 0, 
     'flat': 1
 };
-
-function toggleMontageShape(){
-    if (guiParams.splinePointsGeometry != 0){
-        hideBrain();
-        getSplinePoints = getSplinePointsPlane
-    } else {
-        showBrain();
-        getSplinePoints = getSplinePointsScalp
-    }
-    premadeLinkGeometriesParam.defaultLinkGeometry();
-    redrawLinks();
-}
 
 const montages = {'EGI_256': 0,
     'GSN-HydroCel-128': 1,
@@ -225,9 +212,11 @@ function setupGui() {
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
 
     const fileLoadFolder = gui.addFolder('Load files');
-    fileLoadFolder.add(guiParams, 'splinePointsGeometry')
-        .options(splinePointsGeometry).onChange(toggleMontageShape)
-        .name('Geometry');
+    fileLoadFolder.add(guiParams, 'linkAlignmentTarget')
+        .onChange(redrawLinks)
+        .name('Link alignment')
+        .listen();
+
     const csvLoadFolder = fileLoadFolder.addFolder('CSV files');
     csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
     csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');

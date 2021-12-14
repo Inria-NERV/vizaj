@@ -37617,7 +37617,7 @@ function drawCortexModel(vertices) {
 
 function repositionBrainMesh(brainMesh) {
   brainMesh.rotateY(Math.PI);
-  brainMesh.translateY(50);
+  brainMesh.translateY(-13);
   brainMesh.translateX(-15);
   var scale = .8;
   brainMesh.scale.set(scale, scale, scale);
@@ -37653,17 +37653,26 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+//This point is tho translate the origin where the coordinates of the link are computed
+// since all links align with the plan of 0, and the position of the two nodes, we alter the position of the nodes 
+// in order to make the links face where we want
+// This is useful to exploit data from planes or sphere for example
 function getSplinePointsScalp(link) {
-  var linkToGlobalMatrix = getLinkToGlobalMatrix(link.node1.position, link.node2.position);
-  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+  var centerPoint = new THREE.Vector3(0, -_setup_gui.guiParams.linkAlignmentTarget, 0);
   var pointA = {
-    controlPoint: link.node1.position
+    controlPoint: link.node1.position.clone()
   };
   var pointB = {
-    controlPoint: link.node2.position
+    controlPoint: link.node2.position.clone()
   };
-  var linkBasisA = pointA.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
-  var linkBasisB = pointB.controlPoint.clone().applyMatrix3(globalToLinkMatrix);
+  pointA.controlPoint.addScaledVector(centerPoint, -1);
+  pointB.controlPoint.addScaledVector(centerPoint, -1);
+  var linkToGlobalMatrix = getLinkToGlobalMatrix(pointA.controlPoint, pointB.controlPoint);
+  var globalToLinkMatrix = linkToGlobalMatrix.clone().invert();
+  var linkBasisA = pointA.controlPoint.clone();
+  linkBasisA.applyMatrix3(globalToLinkMatrix);
+  var linkBasisB = pointB.controlPoint.clone();
+  linkBasisB.applyMatrix3(globalToLinkMatrix);
   var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).length();
   var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
   var quaternionA = new THREE.Quaternion();
@@ -37672,6 +37681,13 @@ function getSplinePointsScalp(link) {
   quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
   pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
   pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
+  pointA.controlPoint.add(centerPoint);
+  pointA.handleRight.add(centerPoint);
+  pointC.handleLeft.add(centerPoint);
+  pointC.controlPoint.add(centerPoint);
+  pointC.handleRight.add(centerPoint);
+  pointB.handleLeft.add(centerPoint);
+  pointB.controlPoint.add(centerPoint);
   var splineLeft = new THREE.CubicBezierCurve3(pointA.controlPoint, pointA.handleRight, pointC.handleLeft, pointC.controlPoint);
   var splineRight = new THREE.CubicBezierCurve3(pointC.controlPoint, pointC.handleRight, pointB.handleLeft, pointB.controlPoint);
   var curvePath = new THREE.CurvePath();
@@ -37683,8 +37699,8 @@ function getSplinePointsScalp(link) {
 
 
 function getLinkToGlobalMatrix(A, B) {
-  var i = A.clone().addScaledVector(B, -1).normalize();
-  var j = B.clone().add(A).normalize();
+  var i = B.clone().addScaledVector(A, -1).normalize();
+  var j = A.clone().add(B).normalize();
   var k = i.clone().cross(j);
   var m = new THREE.Matrix3();
   m.set(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z);
@@ -37692,46 +37708,18 @@ function getLinkToGlobalMatrix(A, B) {
 }
 
 function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
-  var controlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, 0);
+  var linkBasisControlPointC = new THREE.Vector3(0, linkBasisA.distanceTo(linkBasisB) * _setup_gui.guiParams.linkHeight + l, 0);
   var leftHandleRotation = new THREE.Quaternion();
   leftHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, +1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
   var rightHandleRotation = new THREE.Quaternion();
   rightHandleRotation.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * _setup_gui.guiParams.linkTopPointAngle);
   return {
-    controlPoint: controlPointC.clone().applyMatrix3(linkToGlobalMatrix),
-    handleLeft: controlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    handleRight: controlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix),
-    controlPointLinkBasis: controlPointC
+    controlPoint: linkBasisControlPointC.clone().applyMatrix3(linkToGlobalMatrix),
+    handleLeft: linkBasisControlPointC.clone().add(new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(leftHandleRotation).applyMatrix3(linkToGlobalMatrix),
+    handleRight: linkBasisControlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix)
   };
 }
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape_2D.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getSplinePointsPlane = getSplinePointsPlane;
-
-var THREE = _interopRequireWildcard(require("three"));
-
-var _draw_sensors = require("../draw_sensors");
-
-var _setup_gui = require("../setup_gui");
-
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function getSplinePointsPlane(link) {
-  var pointA = link.node1.position;
-  var pointB = link.node2.position;
-  var pointC = new THREE.Vector3((pointA.x + pointB.x) / 2, pointA.distanceTo(pointB) * _setup_gui.guiParams.linkHeight, (pointA.z + pointB.z) / 2).add(new THREE.Vector3(_draw_sensors.CENTER_POINT_OFFSET_X, _draw_sensors.CENTER_POINT_OFFSET_Y, _draw_sensors.CENTER_POINT_OFFSET_Z));
-  var curve = new THREE.QuadraticBezierCurve3(pointA, pointC, pointB);
-  var curvePath = new THREE.CurvePath();
-  curvePath.add(curve);
-  return curvePath;
-}
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../node_modules/three/examples/jsm/exporters/GLTFExporter.js":[function(require,module,exports) {
+},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../node_modules/three/examples/jsm/exporters/GLTFExporter.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39754,8 +39742,6 @@ var _draw_cortex = require("./draw_cortex");
 
 var _compute_link_shape = require("./link_builder/compute_link_shape");
 
-var _compute_link_shape_2D = require("./link_builder/compute_link_shape_2D");
-
 var _draw_sensors = require("./draw_sensors");
 
 var _draw_degree_line = require("./draw_degree_line");
@@ -39787,6 +39773,7 @@ var guiParams = {
   linkSensorHandleDistances: 0.,
   linkTopPointAngle: 0.,
   linkGenerator: _link_mesh_generator.linkLineGenerator,
+  linkAlignmentTarget: -10,
   makeLinkLineMesh: function makeLinkLineMesh() {
     return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
   },
@@ -39853,20 +39840,6 @@ var splinePointsGeometry = {
   'scalp': 0,
   'flat': 1
 };
-
-function toggleMontageShape() {
-  if (guiParams.splinePointsGeometry != 0) {
-    (0, _draw_cortex.hideBrain)();
-    exports.getSplinePoints = getSplinePoints = _compute_link_shape_2D.getSplinePointsPlane;
-  } else {
-    (0, _draw_cortex.showBrain)();
-    exports.getSplinePoints = getSplinePoints = _compute_link_shape.getSplinePointsScalp;
-  }
-
-  premadeLinkGeometriesParam.defaultLinkGeometry();
-  (0, _draw_links.redrawLinks)();
-}
-
 var montages = {
   'EGI_256': 0,
   'GSN-HydroCel-128': 1,
@@ -39945,7 +39918,7 @@ function setupGui() {
 
   var fileLoadFolder = _main.gui.addFolder('Load files');
 
-  fileLoadFolder.add(guiParams, 'splinePointsGeometry').options(splinePointsGeometry).onChange(toggleMontageShape).name('Geometry');
+  fileLoadFolder.add(guiParams, 'linkAlignmentTarget').onChange(_draw_links.redrawLinks).name('Link alignment').listen();
   var csvLoadFolder = fileLoadFolder.addFolder('CSV files');
   csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
   csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
@@ -39958,7 +39931,7 @@ function setupGui() {
   exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
   exportFileFolder.add(guiParams, 'export3Dgltf').name('Export 3D gltf');
 }
-},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./link_builder/compute_link_shape_2D":"../js/link_builder/compute_link_shape_2D.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","./export_image":"../js/export_image.js","../data/sensor_montages/EGI_256_coordinates.csv":"../data/sensor_montages/EGI_256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv","../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv","../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv","../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv","../data/sensor_montages/biosemi128_coordinates.csv":"../data/sensor_montages/biosemi128_coordinates.csv","../data/sensor_montages/biosemi16_coordinates.csv":"../data/sensor_montages/biosemi16_coordinates.csv","../data/sensor_montages/biosemi160_coordinates.csv":"../data/sensor_montages/biosemi160_coordinates.csv","../data/sensor_montages/biosemi256_coordinates.csv":"../data/sensor_montages/biosemi256_coordinates.csv","../data/sensor_montages/biosemi32_coordinates.csv":"../data/sensor_montages/biosemi32_coordinates.csv","../data/sensor_montages/biosemi64_coordinates.csv":"../data/sensor_montages/biosemi64_coordinates.csv","../data/sensor_montages/easycap-M1_coordinates.csv":"../data/sensor_montages/easycap-M1_coordinates.csv","../data/sensor_montages/easycap-M10_coordinates.csv":"../data/sensor_montages/easycap-M10_coordinates.csv","../data/sensor_montages/mgh60_coordinates.csv":"../data/sensor_montages/mgh60_coordinates.csv","../data/sensor_montages/mgh70_coordinates.csv":"../data/sensor_montages/mgh70_coordinates.csv","../data/sensor_montages/standard_1005_coordinates.csv":"../data/sensor_montages/standard_1005_coordinates.csv","../data/sensor_montages/standard_1020_coordinates.csv":"../data/sensor_montages/standard_1020_coordinates.csv","../data/sensor_montages/standard_alphabetic_coordinates.csv":"../data/sensor_montages/standard_alphabetic_coordinates.csv","../data/sensor_montages/standard_postfixed_coordinates.csv":"../data/sensor_montages/standard_postfixed_coordinates.csv","../data/sensor_montages/standard_prefixed_coordinates.csv":"../data/sensor_montages/standard_prefixed_coordinates.csv","../data/sensor_montages/standard_primed_coordinates.csv":"../data/sensor_montages/standard_primed_coordinates.csv","../data/sensor_montages/EGI_256_labels.csv":"../data/sensor_montages/EGI_256_labels.csv","../data/sensor_montages/GSN-HydroCel-128_labels.csv":"../data/sensor_montages/GSN-HydroCel-128_labels.csv","../data/sensor_montages/GSN-HydroCel-129_labels.csv":"../data/sensor_montages/GSN-HydroCel-129_labels.csv","../data/sensor_montages/GSN-HydroCel-256_labels.csv":"../data/sensor_montages/GSN-HydroCel-256_labels.csv","../data/sensor_montages/GSN-HydroCel-257_labels.csv":"../data/sensor_montages/GSN-HydroCel-257_labels.csv","../data/sensor_montages/GSN-HydroCel-32_labels.csv":"../data/sensor_montages/GSN-HydroCel-32_labels.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv","../data/sensor_montages/biosemi128_labels.csv":"../data/sensor_montages/biosemi128_labels.csv","../data/sensor_montages/biosemi16_labels.csv":"../data/sensor_montages/biosemi16_labels.csv","../data/sensor_montages/biosemi160_labels.csv":"../data/sensor_montages/biosemi160_labels.csv","../data/sensor_montages/biosemi256_labels.csv":"../data/sensor_montages/biosemi256_labels.csv","../data/sensor_montages/biosemi32_labels.csv":"../data/sensor_montages/biosemi32_labels.csv","../data/sensor_montages/biosemi64_labels.csv":"../data/sensor_montages/biosemi64_labels.csv","../data/sensor_montages/easycap-M1_labels.csv":"../data/sensor_montages/easycap-M1_labels.csv","../data/sensor_montages/easycap-M10_labels.csv":"../data/sensor_montages/easycap-M10_labels.csv","../data/sensor_montages/mgh60_labels.csv":"../data/sensor_montages/mgh60_labels.csv","../data/sensor_montages/mgh70_labels.csv":"../data/sensor_montages/mgh70_labels.csv","../data/sensor_montages/standard_1005_labels.csv":"../data/sensor_montages/standard_1005_labels.csv","../data/sensor_montages/standard_1020_labels.csv":"../data/sensor_montages/standard_1020_labels.csv","../data/sensor_montages/standard_alphabetic_labels.csv":"../data/sensor_montages/standard_alphabetic_labels.csv","../data/sensor_montages/standard_postfixed_labels.csv":"../data/sensor_montages/standard_postfixed_labels.csv","../data/sensor_montages/standard_prefixed_labels.csv":"../data/sensor_montages/standard_prefixed_labels.csv","../data/sensor_montages/standard_primed_labels.csv":"../data/sensor_montages/standard_primed_labels.csv"}],"../js/draw_degree_line.js":[function(require,module,exports) {
+},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","./export_image":"../js/export_image.js","../data/sensor_montages/EGI_256_coordinates.csv":"../data/sensor_montages/EGI_256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv","../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv","../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv","../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv","../data/sensor_montages/biosemi128_coordinates.csv":"../data/sensor_montages/biosemi128_coordinates.csv","../data/sensor_montages/biosemi16_coordinates.csv":"../data/sensor_montages/biosemi16_coordinates.csv","../data/sensor_montages/biosemi160_coordinates.csv":"../data/sensor_montages/biosemi160_coordinates.csv","../data/sensor_montages/biosemi256_coordinates.csv":"../data/sensor_montages/biosemi256_coordinates.csv","../data/sensor_montages/biosemi32_coordinates.csv":"../data/sensor_montages/biosemi32_coordinates.csv","../data/sensor_montages/biosemi64_coordinates.csv":"../data/sensor_montages/biosemi64_coordinates.csv","../data/sensor_montages/easycap-M1_coordinates.csv":"../data/sensor_montages/easycap-M1_coordinates.csv","../data/sensor_montages/easycap-M10_coordinates.csv":"../data/sensor_montages/easycap-M10_coordinates.csv","../data/sensor_montages/mgh60_coordinates.csv":"../data/sensor_montages/mgh60_coordinates.csv","../data/sensor_montages/mgh70_coordinates.csv":"../data/sensor_montages/mgh70_coordinates.csv","../data/sensor_montages/standard_1005_coordinates.csv":"../data/sensor_montages/standard_1005_coordinates.csv","../data/sensor_montages/standard_1020_coordinates.csv":"../data/sensor_montages/standard_1020_coordinates.csv","../data/sensor_montages/standard_alphabetic_coordinates.csv":"../data/sensor_montages/standard_alphabetic_coordinates.csv","../data/sensor_montages/standard_postfixed_coordinates.csv":"../data/sensor_montages/standard_postfixed_coordinates.csv","../data/sensor_montages/standard_prefixed_coordinates.csv":"../data/sensor_montages/standard_prefixed_coordinates.csv","../data/sensor_montages/standard_primed_coordinates.csv":"../data/sensor_montages/standard_primed_coordinates.csv","../data/sensor_montages/EGI_256_labels.csv":"../data/sensor_montages/EGI_256_labels.csv","../data/sensor_montages/GSN-HydroCel-128_labels.csv":"../data/sensor_montages/GSN-HydroCel-128_labels.csv","../data/sensor_montages/GSN-HydroCel-129_labels.csv":"../data/sensor_montages/GSN-HydroCel-129_labels.csv","../data/sensor_montages/GSN-HydroCel-256_labels.csv":"../data/sensor_montages/GSN-HydroCel-256_labels.csv","../data/sensor_montages/GSN-HydroCel-257_labels.csv":"../data/sensor_montages/GSN-HydroCel-257_labels.csv","../data/sensor_montages/GSN-HydroCel-32_labels.csv":"../data/sensor_montages/GSN-HydroCel-32_labels.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv","../data/sensor_montages/biosemi128_labels.csv":"../data/sensor_montages/biosemi128_labels.csv","../data/sensor_montages/biosemi16_labels.csv":"../data/sensor_montages/biosemi16_labels.csv","../data/sensor_montages/biosemi160_labels.csv":"../data/sensor_montages/biosemi160_labels.csv","../data/sensor_montages/biosemi256_labels.csv":"../data/sensor_montages/biosemi256_labels.csv","../data/sensor_montages/biosemi32_labels.csv":"../data/sensor_montages/biosemi32_labels.csv","../data/sensor_montages/biosemi64_labels.csv":"../data/sensor_montages/biosemi64_labels.csv","../data/sensor_montages/easycap-M1_labels.csv":"../data/sensor_montages/easycap-M1_labels.csv","../data/sensor_montages/easycap-M10_labels.csv":"../data/sensor_montages/easycap-M10_labels.csv","../data/sensor_montages/mgh60_labels.csv":"../data/sensor_montages/mgh60_labels.csv","../data/sensor_montages/mgh70_labels.csv":"../data/sensor_montages/mgh70_labels.csv","../data/sensor_montages/standard_1005_labels.csv":"../data/sensor_montages/standard_1005_labels.csv","../data/sensor_montages/standard_1020_labels.csv":"../data/sensor_montages/standard_1020_labels.csv","../data/sensor_montages/standard_alphabetic_labels.csv":"../data/sensor_montages/standard_alphabetic_labels.csv","../data/sensor_montages/standard_postfixed_labels.csv":"../data/sensor_montages/standard_postfixed_labels.csv","../data/sensor_montages/standard_prefixed_labels.csv":"../data/sensor_montages/standard_prefixed_labels.csv","../data/sensor_montages/standard_primed_labels.csv":"../data/sensor_montages/standard_primed_labels.csv"}],"../js/draw_degree_line.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40470,7 +40443,7 @@ Object.defineProperty(exports, "sensorMeshList", {
     return _main.sensorMeshList;
   }
 });
-exports.CENTER_POINT_OFFSET_Z = exports.CENTER_POINT_OFFSET_Y = exports.CENTER_POINT_OFFSET_X = exports.maxSensorDistance = exports.sensorCount = exports.sensorMaterial = void 0;
+exports.maxSensorDistance = exports.sensorCount = exports.sensorMaterial = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -40498,18 +40471,12 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var sensorCount = 0; //we multiply by sqrt(60) in order to scale by number of sensor
-
+var sensorCount = 0;
 exports.sensorCount = sensorCount;
+var montageBarycenter = new THREE.Vector3();
 var SENSOR_RADIUS = 3 * 10;
 var SENSOR_SEGMENTS = 20;
 var SENSOR_RINGS = 50;
-var CENTER_POINT_OFFSET_X = 0;
-exports.CENTER_POINT_OFFSET_X = CENTER_POINT_OFFSET_X;
-var CENTER_POINT_OFFSET_Y = 63;
-exports.CENTER_POINT_OFFSET_Y = CENTER_POINT_OFFSET_Y;
-var CENTER_POINT_OFFSET_Z = 0;
-exports.CENTER_POINT_OFFSET_Z = CENTER_POINT_OFFSET_Z;
 var SCALE_FACTOR = 100;
 var sensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xaaaaaa,
@@ -40602,7 +40569,7 @@ function _drawSensorsAndUpdateGlobalValues() {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.next = 2;
-            return getCenterPoint(data);
+            return getMontageBarycenter(data);
 
           case 2:
             _context3.next = 4;
@@ -40763,9 +40730,9 @@ function _drawSensor() {
             sensor = new THREE.Mesh(sensorGeometry, sensorMaterial);
             sensor.castShadow = false;
             sensor.name = '';
-            sensor.position.x = coordinates[0] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.x;
-            sensor.position.y = coordinates[1] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.y;
-            sensor.position.z = coordinates[2] / meanSensorDistance * SCALE_FACTOR - _main.centerPoint.z;
+            sensor.position.x = coordinates[0] / meanSensorDistance * SCALE_FACTOR - montageBarycenter.x;
+            sensor.position.y = coordinates[1] / meanSensorDistance * SCALE_FACTOR - montageBarycenter.y;
+            sensor.position.z = coordinates[2] / meanSensorDistance * SCALE_FACTOR - montageBarycenter.z;
 
             _main.scene.add(sensor);
 
@@ -40827,12 +40794,12 @@ function _getMaxMeanSensorDistance() {
   return _getMaxMeanSensorDistance.apply(this, arguments);
 }
 
-function getCenterPoint(_x10) {
-  return _getCenterPoint.apply(this, arguments);
+function getMontageBarycenter(_x10) {
+  return _getMontageBarycenter.apply(this, arguments);
 }
 
-function _getCenterPoint() {
-  _getCenterPoint = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(positions) {
+function _getMontageBarycenter() {
+  _getMontageBarycenter = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(positions) {
     var x, y, z, _iterator2, _step2, position;
 
     return regeneratorRuntime.wrap(function _callee9$(_context9) {
@@ -40857,7 +40824,7 @@ function _getCenterPoint() {
               _iterator2.f();
             }
 
-            _main.centerPoint.set(x / positions.length - CENTER_POINT_OFFSET_X, y / positions.length - CENTER_POINT_OFFSET_Y, z / positions.length - CENTER_POINT_OFFSET_Z);
+            montageBarycenter.set(x / positions.length, y / positions.length, z / positions.length);
 
           case 6:
           case "end":
@@ -40866,7 +40833,7 @@ function _getCenterPoint() {
       }
     }, _callee9);
   }));
-  return _getCenterPoint.apply(this, arguments);
+  return _getMontageBarycenter.apply(this, arguments);
 }
 
 function clearAllSensors() {
@@ -44633,7 +44600,7 @@ function setupCamera() {
   _main.controls.enableDamping = true;
   _main.controls.dampingFactor = 0.15;
   _main.camera.position.z = 400;
-  _main.camera.position.y = 100;
+  _main.camera.position.y = 20;
 
   _main.camera.layers.enable(_main.LINK_LAYER);
 
@@ -44672,7 +44639,7 @@ Object.defineProperty(exports, "sensorMaterial", {
     return _draw_sensors.sensorMaterial;
   }
 });
-exports.jsonInput = exports.csvNodeLabelsInput = exports.csvNodePositionsInput = exports.csvConnMatrixInput = exports.centerPoint = exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.sensorMeshList = exports.linkMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
+exports.jsonInput = exports.csvNodeLabelsInput = exports.csvNodePositionsInput = exports.csvConnMatrixInput = exports.LINK_LAYER = exports.GLOBAL_LAYER = exports.cortexMaterial = exports.cortexTriUrl = exports.cortexVertUrl = exports.gui = exports.sensorMeshList = exports.linkMeshList = exports.renderer = exports.controls = exports.camera = exports.scene = void 0;
 
 var THREE = _interopRequireWildcard(require("three"));
 
@@ -44740,8 +44707,6 @@ var GLOBAL_LAYER = 0,
     LINK_LAYER = 1;
 exports.LINK_LAYER = LINK_LAYER;
 exports.GLOBAL_LAYER = GLOBAL_LAYER;
-var centerPoint = new THREE.Vector3();
-exports.centerPoint = centerPoint;
 var cortexMaterial = new THREE.MeshStandardMaterial({
   color: 0xffc0cb,
   side: THREE.BackSide
@@ -45047,7 +45012,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54441" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49312" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -1,23 +1,19 @@
 import * as THREE from 'three';
 import { scene, 
-    sensorMeshList,
-    centerPoint
+    sensorMeshList
  } from "../public/main.js";
-import { csv3dCoordinatesOnLoadCallBack, loadData, parseCsv3dCoordinatesRow } from "./load_data.js";
+import { csv3dCoordinatesOnLoadCallBack, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
-import { guiParams, defaultMontageCoordinates, defaultMontageLabels, getSplinePoints } from "./setup_gui";
+import { guiParams, defaultMontageCoordinates, defaultMontageLabels } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
 
 let sensorCount = 0;
 
-//we multiply by sqrt(60) in order to scale by number of sensor
+const montageBarycenter = new THREE.Vector3();
+
 const SENSOR_RADIUS = 3 * 10;
 const SENSOR_SEGMENTS = 20;
 const SENSOR_RINGS = 50;
-
-const CENTER_POINT_OFFSET_X = 0;
-const CENTER_POINT_OFFSET_Y = 63;
-const CENTER_POINT_OFFSET_Z = 0;
 
 const SCALE_FACTOR = 100;
 
@@ -46,7 +42,7 @@ async function loadAndDrawSensors(sensorCoordinatesUrl) {
 
 }
 async function drawSensorsAndUpdateGlobalValues(data){
-    await getCenterPoint(data);
+    await getMontageBarycenter(data);
     await getMaxMeanSensorDistance(data);
     await drawAllSensors(data);
 }
@@ -91,9 +87,9 @@ async function drawSensor(coordinates){
     );
     sensor.castShadow = false;
     sensor.name = '';
-    sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - centerPoint.x;
-    sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - centerPoint.y;
-    sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - centerPoint.z;
+    sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.x;
+    sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.y;
+    sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.z;
     scene.add(sensor);
     sensorMeshList.push({mesh: sensor});
     return sensor;
@@ -118,7 +114,7 @@ async function getMaxMeanSensorDistance(positions){
     meanSensorDistance = meanSensorDistance / count;
 }
 
-async function getCenterPoint(positions){
+async function getMontageBarycenter(positions){
     let x = 0;
     let y = 0;
     let z = 0;
@@ -127,10 +123,10 @@ async function getCenterPoint(positions){
         y += position[1];
         z += position[2];
     }
-    centerPoint.set(
-        x/positions.length - CENTER_POINT_OFFSET_X,
-        y/positions.length - CENTER_POINT_OFFSET_Y,
-        z/positions.length - CENTER_POINT_OFFSET_Z
+    montageBarycenter.set(
+        x/positions.length,
+        y/positions.length,
+        z/positions.length
     );
 }
 
@@ -163,7 +159,4 @@ export {
     sensorCount,
     maxSensorDistance, 
     clearAllSensors,
-    setMneMontage,
-    CENTER_POINT_OFFSET_X,
-    CENTER_POINT_OFFSET_Y,
-    CENTER_POINT_OFFSET_Z};
+    setMneMontage};

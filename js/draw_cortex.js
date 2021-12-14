@@ -48,7 +48,7 @@ function drawCortexModel(vertices){
 
 function repositionBrainMesh(brainMesh){
     brainMesh.rotateY(Math.PI);
-    brainMesh.translateY(50);
+    brainMesh.translateY(-13);
     brainMesh.translateX(-15);
     const scale = .8;
     brainMesh.scale.set(scale,scale,scale);

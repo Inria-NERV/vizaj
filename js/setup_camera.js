@@ -8,7 +8,7 @@ function setupCamera(){
     controls.dampingFactor = 0.15;
 
     camera.position.z = 400;
-    camera.position.y = 100;
+    camera.position.y = 20;
 
     camera.layers.enable(LINK_LAYER);
     controls.target = new THREE.Vector3(0,camera.position.y,0);
