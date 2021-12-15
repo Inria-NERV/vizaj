@@ -39773,7 +39773,7 @@ var guiParams = {
   linkSensorHandleDistances: 0.,
   linkTopPointAngle: 0.,
   linkGenerator: _link_mesh_generator.linkLineGenerator,
-  linkAlignmentTarget: -10,
+  linkAlignmentTarget: 10,
   makeLinkLineMesh: function makeLinkLineMesh() {
     return changeLinkMesh(_link_mesh_generator.linkLineGenerator);
   },
@@ -39782,7 +39782,6 @@ var guiParams = {
   },
   linkThickness: 1.,
   splinePointsGeometry: 0,
-  mneMontage: -1,
   export2dImage: function export2dImage() {
     return (0, _export_image.export2DImage)();
   },

@@ -32,15 +32,13 @@ const guiParams = {
     linkTopPointAngle: 0.,
 
     linkGenerator: linkLineGenerator,
-    linkAlignmentTarget: -10,
+    linkAlignmentTarget: 10,
 
     makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
     makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
     linkThickness: 1.,
 
     splinePointsGeometry: 0,
-
-    mneMontage: -1,
 
     export2dImage: () => export2DImage(),
     export3Dgltf: () => export3Dgltf(),
