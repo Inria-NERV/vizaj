@@ -39923,7 +39923,6 @@ function setupGui() {
   csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
   csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
   fileLoadFolder.add(guiParams, 'loadJson').name('Json files');
-  fileLoadFolder.add(guiParams, 'mneMontage').options(montages).onChange(_draw_sensors.setMneMontage).name('Mne montage').listen();
 
   var exportFileFolder = _main.gui.addFolder('Export as file');
 

@@ -220,7 +220,6 @@ function setupGui() {
     csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
     csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
     fileLoadFolder.add(guiParams, 'loadJson').name('Json files');
-    fileLoadFolder.add(guiParams, 'mneMontage').options(montages).onChange(setMneMontage).name('Mne montage').listen();
 
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
