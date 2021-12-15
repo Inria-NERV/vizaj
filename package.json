@@ -7,7 +7,7 @@
     "test": "mocha --reporter list",
     "start": "parcel public/index.html"
   },
-  "author": "tibo",
+  "author": "Thibault Rolland",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
