@@ -1,0 +1,21 @@
+
+.fileInput {
+  position:fixed;
+  visibility: hidden;
+}
+
+#sensorName {
+    position:fixed;
+    width: 100%;
+    z-index: 100;
+    color: white;
+    display: block;
+    font-family:'Trebuchet MS'; 
+    font-size:23px;
+  }
+  
+  body {
+    margin: 0;
+  }
+
+/*# sourceMappingURL=/main.70edf2ca.css.map */
