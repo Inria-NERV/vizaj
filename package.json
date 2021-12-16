@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --reporter list",
     "start": "parcel public/index.html",
-    "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose"
+    "deploy": "gh-pages -d dist"
   },
   "author": "Thibault Rolland",
   "license": "ISC",
