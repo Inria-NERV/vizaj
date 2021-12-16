@@ -7,9 +7,10 @@ import { guiParams } from '../setup_gui';
 // in order to make the links face where we want
 // This is useful to exploit data from planes or sphere for example
 
+const centerPoint = new Vector3(0,-25,0);
 
 function getSplinePoints(link){
-    const centerPoint = new Vector3(0,-guiParams.linkAlignmentTarget,0);
+    centerPoint.set(0, -guiParams.linkAlignmentTarget, 0);
 
     const pointA = {controlPoint: link.node1.position.clone()};
     const pointB = {controlPoint: link.node2.position.clone()};
@@ -116,4 +117,5 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l){
     };
 }
 
-export { getSplinePoints }
+export { getSplinePoints, 
+    centerPoint }

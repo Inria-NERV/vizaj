@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
-import { assignSensorLabels, clearAllSensors, drawSensor, drawSensorsAndUpdateGlobalValues, sensorMaterial } from "../js/draw_sensors.js";
+import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, sensorMaterial } from "../js/draw_sensors.js";
 import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
 
@@ -93,7 +93,6 @@ async function generateSceneElements() {
   await loadAndDrawSensors(sensorCoordinatesUrl);
   await loadAndAssignSensorLabels(sensorLabelsUrl);
   await loadAndDrawLinks(connectivityMatrixUrl);
-  drawAllDegreeLines();
 }
 
 function onDocumentMouseMove(event) {

@@ -5,6 +5,7 @@ import { scene,
 import { csv3dCoordinatesOnLoadCallBack, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { deleteMesh } from "./mesh_helper";
+import { drawAllDegreeLines } from './draw_degree_line.js';
 
 let sensorCount = 0;
 
@@ -43,6 +44,7 @@ async function drawSensorsAndUpdateGlobalValues(data){
     await getMontageBarycenter(data);
     await drawAllSensors(data);
     await setMaxSensorDistance();
+    await drawAllDegreeLines();
 }
 
 

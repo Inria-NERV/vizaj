@@ -3,7 +3,9 @@ import { Float32BufferAttribute } from 'three';
 import { scene, linkMeshList, LINK_LAYER } from '../public/main';
 import { sensorMeshList } from './draw_sensors';
 import { updateVisibleLinks } from './link_builder/draw_links';
+import { centerPoint } from './link_builder/compute_link_shape';
 import { guiParams } from './setup_gui';
+import { deleteMesh } from './mesh_helper';
 
 const degreeLineMaterial = new THREE.MeshBasicMaterial( 
     { color: 0x9999ff, 
@@ -19,17 +21,22 @@ const DEGREE_LINE_RADIAL_SEGMENTS = 8;
 function drawDegreeLine(sensor){
     const sensorMesh = sensor.mesh;
 
-    const unitVector = sensorMesh.position.clone().normalize();
-    const endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_MAX_SCALE );
+    const unitVector = sensorMesh.position.clone()
+        .addScaledVector(centerPoint, -1).normalize();
+    const endPoint = sensorMesh.position.clone()
+        .addScaledVector(unitVector, 
+            DEGREE_LINE_MAX_SCALE );
     const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
 
     const curve = new THREE.LineCurve(sensorMesh.position, endPoint);
     const flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
 
+    const scaledRadius = DEGREE_LINE_RADIUS * 10 / Math.sqrt(sensorMeshList.length);
+
     const geometry = new THREE.TubeGeometry(
         curve,
         DEGREE_LINE_TUBULAR_SEGMENTS,
-        DEGREE_LINE_RADIUS,
+        scaledRadius,
         DEGREE_LINE_RADIAL_SEGMENTS,
         true
     );
@@ -37,7 +44,7 @@ function drawDegreeLine(sensor){
     const flatGeometry = new THREE.TubeGeometry(
         flatCurve,
         DEGREE_LINE_TUBULAR_SEGMENTS,
-        DEGREE_LINE_RADIUS,
+        scaledRadius,
         DEGREE_LINE_RADIAL_SEGMENTS,
         true
     );
@@ -60,7 +67,7 @@ function drawDegreeLine(sensor){
     return sensor;
 }
 
-function drawAllDegreeLines(){
+async function drawAllDegreeLines(){
     for (let i = 0; i < sensorMeshList.length; i++){
         sensorMeshList[i] = drawDegreeLine(sensorMeshList[i]);
     }
@@ -70,8 +77,8 @@ function getNodeDegree(sensorMesh){
     let nodeDegree = 0;
     for (const linkMesh of linkMeshList.filter(linkMesh=>linkMesh.mesh.visible === true)){
         const link = linkMesh.link;
-        if (link.node1.name == sensorMesh.name 
-            || link.node2.name == sensorMesh.name){
+        if (link.node1 == sensorMesh
+            || link.node2 == sensorMesh){
                 nodeDegree++;
             }
     }
@@ -79,28 +86,16 @@ function getNodeDegree(sensorMesh){
 }
 
 function updateNodeDegreeLine(sensor){
-    const sensorCount = sensorMeshList.length;
     const nodeDegree = getNodeDegree(sensor.mesh);
-    sensor.degreeLine.morphTargetInfluences[0] = (1 - nodeDegree / (sensorCount - 1));
+    sensor.degreeLine.morphTargetInfluences[0] = (1 - nodeDegree / (sensorMeshList.length - 1));
 }
 
-function updateAllDegreeLines(updateAverageDegree=true){
+function updateAllDegreeLines(){
     for (let sensor of sensorMeshList){
         if (sensor.mesh && sensor.degreeLine){
             updateNodeDegreeLine(sensor);
         }
     }
-    if (updateAverageDegree){
-        guiParams.averageDegree = computeAverageDegree();
-    }
-}
-
-function computeAverageDegree(){
-    let nodeDegree = 0.;
-    for (let sensor of sensorMeshList){
-        nodeDegree += getNodeDegree(sensor.mesh);
-    }
-    return nodeDegree / (sensorMeshList.length - 1);
 }
 
 function updateDegreeLinesVisibility(){
@@ -116,7 +111,17 @@ function updateLinkVisibilityByLinkDegree(){
     const l = guiParams.averageDegree * sensorMeshList.length / 2;
     guiParams.minStrengthToDisplay = 0.;
     guiParams.maxStrengthToDisplay = l / linkMeshList.length;
-    updateVisibleLinks(false);  
+    updateVisibleLinks();  
+}
+
+function redrawDegreeLines(){
+    for (let sensor of sensorMeshList){
+        if (sensor.degreeLine){
+            deleteMesh(sensor.degreeLine);
+            sensor.degreeLine = null;
+        }
+    }
+    drawAllDegreeLines();
 }
 
 export {
@@ -124,5 +129,6 @@ export {
     drawAllDegreeLines,
     updateAllDegreeLines,
     updateDegreeLinesVisibility,
-    updateLinkVisibilityByLinkDegree
+    updateLinkVisibilityByLinkDegree,
+    redrawDegreeLines
 }

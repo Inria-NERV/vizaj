@@ -6,7 +6,7 @@ import { gui, controls,
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
-import { updateDegreeLinesVisibility } from './draw_degree_line';
+import { redrawDegreeLines, updateDegreeLinesVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -34,10 +34,12 @@ const guiParams = {
     resetLinkAlignmentTarget: ()=>{
         guiParams.linkAlignmentTarget = 30;
         redrawLinks();
+        redrawDegreeLines();
     },
     maximumLinkAligmnentTarget: ()=> {
         guiParams.linkAlignmentTarget = 1000000;
         redrawLinks();
+        redrawDegreeLines();
     },
 
     makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
@@ -116,7 +118,10 @@ function setupGui() {
 
     const linkAlignmentTarget = gui.addFolder('Link alignment target');
     linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')
-        .onChange(redrawLinks)
+        .onChange(() => {
+            redrawLinks();
+            redrawDegreeLines();
+        })
         .name('Link alignment')
         .listen();
     linkAlignmentTarget.add(guiParams, 'resetLinkAlignmentTarget')

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
-import { updateAllDegreeLines } from "../draw_degree_line";
+import { drawAllDegreeLines, updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance, sensorCount } from '../draw_sensors';
@@ -85,8 +85,8 @@ async function clearAllLinks() {
     }
 }
 
-function updateVisibleLinks(updateAverageDegree=true) {
-    const fullyConnectedGraphLinkCount = sensorCount * (sensorCount - 1) / 2;
+function updateVisibleLinks() {
+    const fullyConnectedGraphLinkCount = sensorMeshList.length * (sensorMeshList.length - 1) / 2;
     if (guiParams.maxStrengthToDisplay > linkMeshList.length / fullyConnectedGraphLinkCount){
         guiParams.maxStrengthToDisplay = linkMeshList.length / fullyConnectedGraphLinkCount;
     }
@@ -97,7 +97,7 @@ function updateVisibleLinks(updateAverageDegree=true) {
     for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length)){
         link.mesh.visible = false;
     }
-    updateAllDegreeLines(updateAverageDegree);
+    updateAllDegreeLines();
 }
 
  export {
