@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "gh-pages": "^3.2.3",
     "node": "^16.6.1",
     "path": "^0.12.7",
     "regenerator-runtime": "^0.13.9",
