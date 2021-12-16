@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/three/build/three.module.js":[function(require,module,exports) {
+})({"dKqR":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36362,7 +36362,7 @@ if (typeof window !== 'undefined') {
     window.__THREE__ = REVISION;
   }
 }
-},{}],"../node_modules/three/examples/jsm/controls/OrbitControls.js":[function(require,module,exports) {
+},{}],"xTGv":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37240,7 +37240,7 @@ class MapControls extends OrbitControls {
 }
 
 exports.MapControls = MapControls;
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/load_data.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"S8od":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37368,7 +37368,7 @@ function parseRowCortexTri(row) {
 function loadJsonData(url) {
   return loadData(url, 'json file', jsonOnloadCallback);
 }
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"ihO1":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37505,7 +37505,7 @@ _defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
 _defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
 
 _defineProperty(linkVolumeGenerator, "LINK_RADIUS_SCALE", 10);
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
+},{"three":"dKqR","../draw_sensors":"OTn2","../setup_gui":"dQ6s"}],"CpRT":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37637,7 +37637,7 @@ function showBrain() {
   _setup_gui.guiParams.showBrain = true;
   updateBrainMeshVisibility();
 }
-},{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
+},{"three":"dKqR","./load_data.js":"S8od","../public/main.js":"epB2","./setup_gui":"dQ6s"}],"XLIo":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37719,7 +37719,7 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
     handleRight: linkBasisControlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix)
   };
 }
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../node_modules/three/examples/jsm/exporters/GLTFExporter.js":[function(require,module,exports) {
+},{"three":"dKqR","../setup_gui":"dQ6s"}],"jZCO":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39570,7 +39570,7 @@ GLTFExporter.Utils = {
     return clip;
   }
 };
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/export_image.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"uhu3":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39627,103 +39627,103 @@ function saveFile(strData, filename) {
   link.click();
   document.body.removeChild(link);
 }
-},{"../public/main":"main.js","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"../node_modules/three/examples/jsm/exporters/GLTFExporter.js"}],"../data/sensor_montages/EGI_256_coordinates.csv":[function(require,module,exports) {
-module.exports = "/EGI_256_coordinates.d12422db.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-128_coordinates.7b562dcb.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-129_coordinates.15f56377.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-256_coordinates.83812c93.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-257_coordinates.9650b385.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-32_coordinates.07fd1f36.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-64_1.0_coordinates.26391a73.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-65_1.0_coordinates.d2db04a5.csv";
-},{}],"../data/sensor_montages/biosemi128_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi128_coordinates.4b8ffb2e.csv";
-},{}],"../data/sensor_montages/biosemi16_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi16_coordinates.09f857db.csv";
-},{}],"../data/sensor_montages/biosemi160_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi160_coordinates.a6c9643f.csv";
-},{}],"../data/sensor_montages/biosemi256_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi256_coordinates.7fee11a1.csv";
-},{}],"../data/sensor_montages/biosemi32_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi32_coordinates.6d5d3121.csv";
-},{}],"../data/sensor_montages/biosemi64_coordinates.csv":[function(require,module,exports) {
-module.exports = "/biosemi64_coordinates.62a0a68e.csv";
-},{}],"../data/sensor_montages/easycap-M1_coordinates.csv":[function(require,module,exports) {
-module.exports = "/easycap-M1_coordinates.26a540c4.csv";
-},{}],"../data/sensor_montages/easycap-M10_coordinates.csv":[function(require,module,exports) {
-module.exports = "/easycap-M10_coordinates.4bbbff7f.csv";
-},{}],"../data/sensor_montages/mgh60_coordinates.csv":[function(require,module,exports) {
-module.exports = "/mgh60_coordinates.1c619c59.csv";
-},{}],"../data/sensor_montages/mgh70_coordinates.csv":[function(require,module,exports) {
-module.exports = "/mgh70_coordinates.04d972c5.csv";
-},{}],"../data/sensor_montages/standard_1005_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_1005_coordinates.6a910b57.csv";
-},{}],"../data/sensor_montages/standard_1020_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_1020_coordinates.1e7e8393.csv";
-},{}],"../data/sensor_montages/standard_alphabetic_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_alphabetic_coordinates.bd41074d.csv";
-},{}],"../data/sensor_montages/standard_postfixed_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_postfixed_coordinates.b4fc7dce.csv";
-},{}],"../data/sensor_montages/standard_prefixed_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_prefixed_coordinates.c4cd2922.csv";
-},{}],"../data/sensor_montages/standard_primed_coordinates.csv":[function(require,module,exports) {
-module.exports = "/standard_primed_coordinates.53e8160c.csv";
-},{}],"../data/sensor_montages/EGI_256_labels.csv":[function(require,module,exports) {
-module.exports = "/EGI_256_labels.b868904e.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-128_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-128_labels.e3cba527.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-129_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-129_labels.35ed28ff.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-256_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-256_labels.368a970f.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-257_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-257_labels.91e94dbc.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-32_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-32_labels.12391cd3.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-64_1.0_labels.cd90872b.csv";
-},{}],"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":[function(require,module,exports) {
-module.exports = "/GSN-HydroCel-65_1.0_labels.0462d280.csv";
-},{}],"../data/sensor_montages/biosemi128_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi128_labels.cd2cf255.csv";
-},{}],"../data/sensor_montages/biosemi16_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi16_labels.03842837.csv";
-},{}],"../data/sensor_montages/biosemi160_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi160_labels.d3678c7b.csv";
-},{}],"../data/sensor_montages/biosemi256_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi256_labels.8ceba71e.csv";
-},{}],"../data/sensor_montages/biosemi32_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi32_labels.5446bfb1.csv";
-},{}],"../data/sensor_montages/biosemi64_labels.csv":[function(require,module,exports) {
-module.exports = "/biosemi64_labels.5601a737.csv";
-},{}],"../data/sensor_montages/easycap-M1_labels.csv":[function(require,module,exports) {
-module.exports = "/easycap-M1_labels.a9773957.csv";
-},{}],"../data/sensor_montages/easycap-M10_labels.csv":[function(require,module,exports) {
-module.exports = "/easycap-M10_labels.0e56f88c.csv";
-},{}],"../data/sensor_montages/mgh60_labels.csv":[function(require,module,exports) {
-module.exports = "/mgh60_labels.366911de.csv";
-},{}],"../data/sensor_montages/mgh70_labels.csv":[function(require,module,exports) {
-module.exports = "/mgh70_labels.67909ea3.csv";
-},{}],"../data/sensor_montages/standard_1005_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_1005_labels.a9d8231d.csv";
-},{}],"../data/sensor_montages/standard_1020_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_1020_labels.e1c73d32.csv";
-},{}],"../data/sensor_montages/standard_alphabetic_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_alphabetic_labels.4ecf41d8.csv";
-},{}],"../data/sensor_montages/standard_postfixed_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_postfixed_labels.067658ee.csv";
-},{}],"../data/sensor_montages/standard_prefixed_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_prefixed_labels.7be38259.csv";
-},{}],"../data/sensor_montages/standard_primed_labels.csv":[function(require,module,exports) {
-module.exports = "/standard_primed_labels.cdf3d1b7.csv";
-},{}],"../js/setup_gui.js":[function(require,module,exports) {
+},{"../public/main":"epB2","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"jZCO"}],"oQg8":[function(require,module,exports) {
+module.exports = "EGI_256_coordinates.9e65f9b5.csv";
+},{}],"tj0D":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-128_coordinates.6c4bd622.csv";
+},{}],"Nkys":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-129_coordinates.ddee6b82.csv";
+},{}],"yqYr":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-256_coordinates.c6d32127.csv";
+},{}],"jUlI":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-257_coordinates.edfc4a67.csv";
+},{}],"uLrk":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-32_coordinates.4190086e.csv";
+},{}],"v4b2":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-64_1.0_coordinates.23db9149.csv";
+},{}],"iwt6":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-65_1.0_coordinates.80074190.csv";
+},{}],"uyQR":[function(require,module,exports) {
+module.exports = "biosemi128_coordinates.e9bf07c6.csv";
+},{}],"u7p1":[function(require,module,exports) {
+module.exports = "biosemi16_coordinates.1c78559a.csv";
+},{}],"XU4S":[function(require,module,exports) {
+module.exports = "biosemi160_coordinates.2c7f8762.csv";
+},{}],"jakb":[function(require,module,exports) {
+module.exports = "biosemi256_coordinates.890930ed.csv";
+},{}],"s91J":[function(require,module,exports) {
+module.exports = "biosemi32_coordinates.751b4f73.csv";
+},{}],"CU5v":[function(require,module,exports) {
+module.exports = "biosemi64_coordinates.09adb9e6.csv";
+},{}],"Lib4":[function(require,module,exports) {
+module.exports = "easycap-M1_coordinates.b5220d20.csv";
+},{}],"q1fE":[function(require,module,exports) {
+module.exports = "easycap-M10_coordinates.7fb1b67b.csv";
+},{}],"nmCJ":[function(require,module,exports) {
+module.exports = "mgh60_coordinates.a11779f9.csv";
+},{}],"uBt9":[function(require,module,exports) {
+module.exports = "mgh70_coordinates.273a9554.csv";
+},{}],"taNR":[function(require,module,exports) {
+module.exports = "standard_1005_coordinates.6f29d291.csv";
+},{}],"hK7S":[function(require,module,exports) {
+module.exports = "standard_1020_coordinates.f42df943.csv";
+},{}],"Z4uM":[function(require,module,exports) {
+module.exports = "standard_alphabetic_coordinates.37f9c7e2.csv";
+},{}],"Mqqw":[function(require,module,exports) {
+module.exports = "standard_postfixed_coordinates.e8633076.csv";
+},{}],"Sb0E":[function(require,module,exports) {
+module.exports = "standard_prefixed_coordinates.7843cff0.csv";
+},{}],"UfLF":[function(require,module,exports) {
+module.exports = "standard_primed_coordinates.e8633076.csv";
+},{}],"r30S":[function(require,module,exports) {
+module.exports = "EGI_256_labels.06244a60.csv";
+},{}],"IlX7":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-128_labels.4329698f.csv";
+},{}],"Q36O":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-129_labels.34ff6ea1.csv";
+},{}],"GwMt":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-256_labels.06244a60.csv";
+},{}],"Jzbq":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-257_labels.6a2bb5be.csv";
+},{}],"rWrU":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-32_labels.5fd153b7.csv";
+},{}],"NAVG":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-64_1.0_labels.3507e4e7.csv";
+},{}],"iJCX":[function(require,module,exports) {
+module.exports = "GSN-HydroCel-65_1.0_labels.552e53ed.csv";
+},{}],"AqAK":[function(require,module,exports) {
+module.exports = "biosemi128_labels.7a837c5a.csv";
+},{}],"ndwD":[function(require,module,exports) {
+module.exports = "biosemi16_labels.a0ccc58d.csv";
+},{}],"T5YO":[function(require,module,exports) {
+module.exports = "biosemi160_labels.b25a780f.csv";
+},{}],"DAwA":[function(require,module,exports) {
+module.exports = "biosemi256_labels.779c47c3.csv";
+},{}],"Bs5g":[function(require,module,exports) {
+module.exports = "biosemi32_labels.35034e66.csv";
+},{}],"XDd2":[function(require,module,exports) {
+module.exports = "biosemi64_labels.21de5bd4.csv";
+},{}],"PUmr":[function(require,module,exports) {
+module.exports = "easycap-M1_labels.5f939cf3.csv";
+},{}],"TG49":[function(require,module,exports) {
+module.exports = "easycap-M10_labels.5e3b0950.csv";
+},{}],"goHK":[function(require,module,exports) {
+module.exports = "mgh60_labels.b1a9ece0.csv";
+},{}],"wrFl":[function(require,module,exports) {
+module.exports = "mgh70_labels.dfc44443.csv";
+},{}],"gn7l":[function(require,module,exports) {
+module.exports = "standard_1005_labels.467e2eb7.csv";
+},{}],"SvYJ":[function(require,module,exports) {
+module.exports = "standard_1020_labels.315d51f1.csv";
+},{}],"PvSZ":[function(require,module,exports) {
+module.exports = "standard_alphabetic_labels.5fca2163.csv";
+},{}],"BOxO":[function(require,module,exports) {
+module.exports = "standard_postfixed_labels.6a57f9df.csv";
+},{}],"YRI9":[function(require,module,exports) {
+module.exports = "standard_prefixed_labels.3ab21eda.csv";
+},{}],"BNjG":[function(require,module,exports) {
+module.exports = "standard_primed_labels.56f84440.csv";
+},{}],"dQ6s":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39929,7 +39929,7 @@ function setupGui() {
   exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
   exportFileFolder.add(guiParams, 'export3Dgltf').name('Export 3D gltf');
 }
-},{"../public/main":"main.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./draw_sensors":"../js/draw_sensors.js","./draw_degree_line":"../js/draw_degree_line.js","./export_image":"../js/export_image.js","../data/sensor_montages/EGI_256_coordinates.csv":"../data/sensor_montages/EGI_256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-128_coordinates.csv","../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-129_coordinates.csv","../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-256_coordinates.csv","../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-257_coordinates.csv","../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-32_coordinates.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv","../data/sensor_montages/biosemi128_coordinates.csv":"../data/sensor_montages/biosemi128_coordinates.csv","../data/sensor_montages/biosemi16_coordinates.csv":"../data/sensor_montages/biosemi16_coordinates.csv","../data/sensor_montages/biosemi160_coordinates.csv":"../data/sensor_montages/biosemi160_coordinates.csv","../data/sensor_montages/biosemi256_coordinates.csv":"../data/sensor_montages/biosemi256_coordinates.csv","../data/sensor_montages/biosemi32_coordinates.csv":"../data/sensor_montages/biosemi32_coordinates.csv","../data/sensor_montages/biosemi64_coordinates.csv":"../data/sensor_montages/biosemi64_coordinates.csv","../data/sensor_montages/easycap-M1_coordinates.csv":"../data/sensor_montages/easycap-M1_coordinates.csv","../data/sensor_montages/easycap-M10_coordinates.csv":"../data/sensor_montages/easycap-M10_coordinates.csv","../data/sensor_montages/mgh60_coordinates.csv":"../data/sensor_montages/mgh60_coordinates.csv","../data/sensor_montages/mgh70_coordinates.csv":"../data/sensor_montages/mgh70_coordinates.csv","../data/sensor_montages/standard_1005_coordinates.csv":"../data/sensor_montages/standard_1005_coordinates.csv","../data/sensor_montages/standard_1020_coordinates.csv":"../data/sensor_montages/standard_1020_coordinates.csv","../data/sensor_montages/standard_alphabetic_coordinates.csv":"../data/sensor_montages/standard_alphabetic_coordinates.csv","../data/sensor_montages/standard_postfixed_coordinates.csv":"../data/sensor_montages/standard_postfixed_coordinates.csv","../data/sensor_montages/standard_prefixed_coordinates.csv":"../data/sensor_montages/standard_prefixed_coordinates.csv","../data/sensor_montages/standard_primed_coordinates.csv":"../data/sensor_montages/standard_primed_coordinates.csv","../data/sensor_montages/EGI_256_labels.csv":"../data/sensor_montages/EGI_256_labels.csv","../data/sensor_montages/GSN-HydroCel-128_labels.csv":"../data/sensor_montages/GSN-HydroCel-128_labels.csv","../data/sensor_montages/GSN-HydroCel-129_labels.csv":"../data/sensor_montages/GSN-HydroCel-129_labels.csv","../data/sensor_montages/GSN-HydroCel-256_labels.csv":"../data/sensor_montages/GSN-HydroCel-256_labels.csv","../data/sensor_montages/GSN-HydroCel-257_labels.csv":"../data/sensor_montages/GSN-HydroCel-257_labels.csv","../data/sensor_montages/GSN-HydroCel-32_labels.csv":"../data/sensor_montages/GSN-HydroCel-32_labels.csv","../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv","../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":"../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv","../data/sensor_montages/biosemi128_labels.csv":"../data/sensor_montages/biosemi128_labels.csv","../data/sensor_montages/biosemi16_labels.csv":"../data/sensor_montages/biosemi16_labels.csv","../data/sensor_montages/biosemi160_labels.csv":"../data/sensor_montages/biosemi160_labels.csv","../data/sensor_montages/biosemi256_labels.csv":"../data/sensor_montages/biosemi256_labels.csv","../data/sensor_montages/biosemi32_labels.csv":"../data/sensor_montages/biosemi32_labels.csv","../data/sensor_montages/biosemi64_labels.csv":"../data/sensor_montages/biosemi64_labels.csv","../data/sensor_montages/easycap-M1_labels.csv":"../data/sensor_montages/easycap-M1_labels.csv","../data/sensor_montages/easycap-M10_labels.csv":"../data/sensor_montages/easycap-M10_labels.csv","../data/sensor_montages/mgh60_labels.csv":"../data/sensor_montages/mgh60_labels.csv","../data/sensor_montages/mgh70_labels.csv":"../data/sensor_montages/mgh70_labels.csv","../data/sensor_montages/standard_1005_labels.csv":"../data/sensor_montages/standard_1005_labels.csv","../data/sensor_montages/standard_1020_labels.csv":"../data/sensor_montages/standard_1020_labels.csv","../data/sensor_montages/standard_alphabetic_labels.csv":"../data/sensor_montages/standard_alphabetic_labels.csv","../data/sensor_montages/standard_postfixed_labels.csv":"../data/sensor_montages/standard_postfixed_labels.csv","../data/sensor_montages/standard_prefixed_labels.csv":"../data/sensor_montages/standard_prefixed_labels.csv","../data/sensor_montages/standard_primed_labels.csv":"../data/sensor_montages/standard_primed_labels.csv"}],"../js/draw_degree_line.js":[function(require,module,exports) {
+},{"../public/main":"epB2","./link_builder/draw_links":"XiGW","./link_builder/link_mesh_generator":"ihO1","./draw_cortex":"CpRT","./link_builder/compute_link_shape":"XLIo","./draw_sensors":"OTn2","./draw_degree_line":"WMMm","./export_image":"uhu3","../data/sensor_montages/EGI_256_coordinates.csv":"oQg8","../data/sensor_montages/GSN-HydroCel-128_coordinates.csv":"tj0D","../data/sensor_montages/GSN-HydroCel-129_coordinates.csv":"Nkys","../data/sensor_montages/GSN-HydroCel-256_coordinates.csv":"yqYr","../data/sensor_montages/GSN-HydroCel-257_coordinates.csv":"jUlI","../data/sensor_montages/GSN-HydroCel-32_coordinates.csv":"uLrk","../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv":"v4b2","../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv":"iwt6","../data/sensor_montages/biosemi128_coordinates.csv":"uyQR","../data/sensor_montages/biosemi16_coordinates.csv":"u7p1","../data/sensor_montages/biosemi160_coordinates.csv":"XU4S","../data/sensor_montages/biosemi256_coordinates.csv":"jakb","../data/sensor_montages/biosemi32_coordinates.csv":"s91J","../data/sensor_montages/biosemi64_coordinates.csv":"CU5v","../data/sensor_montages/easycap-M1_coordinates.csv":"Lib4","../data/sensor_montages/easycap-M10_coordinates.csv":"q1fE","../data/sensor_montages/mgh60_coordinates.csv":"nmCJ","../data/sensor_montages/mgh70_coordinates.csv":"uBt9","../data/sensor_montages/standard_1005_coordinates.csv":"taNR","../data/sensor_montages/standard_1020_coordinates.csv":"hK7S","../data/sensor_montages/standard_alphabetic_coordinates.csv":"Z4uM","../data/sensor_montages/standard_postfixed_coordinates.csv":"Mqqw","../data/sensor_montages/standard_prefixed_coordinates.csv":"Sb0E","../data/sensor_montages/standard_primed_coordinates.csv":"UfLF","../data/sensor_montages/EGI_256_labels.csv":"r30S","../data/sensor_montages/GSN-HydroCel-128_labels.csv":"IlX7","../data/sensor_montages/GSN-HydroCel-129_labels.csv":"Q36O","../data/sensor_montages/GSN-HydroCel-256_labels.csv":"GwMt","../data/sensor_montages/GSN-HydroCel-257_labels.csv":"Jzbq","../data/sensor_montages/GSN-HydroCel-32_labels.csv":"rWrU","../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv":"NAVG","../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv":"iJCX","../data/sensor_montages/biosemi128_labels.csv":"AqAK","../data/sensor_montages/biosemi16_labels.csv":"ndwD","../data/sensor_montages/biosemi160_labels.csv":"T5YO","../data/sensor_montages/biosemi256_labels.csv":"DAwA","../data/sensor_montages/biosemi32_labels.csv":"Bs5g","../data/sensor_montages/biosemi64_labels.csv":"XDd2","../data/sensor_montages/easycap-M1_labels.csv":"PUmr","../data/sensor_montages/easycap-M10_labels.csv":"TG49","../data/sensor_montages/mgh60_labels.csv":"goHK","../data/sensor_montages/mgh70_labels.csv":"wrFl","../data/sensor_montages/standard_1005_labels.csv":"gn7l","../data/sensor_montages/standard_1020_labels.csv":"SvYJ","../data/sensor_montages/standard_alphabetic_labels.csv":"PvSZ","../data/sensor_montages/standard_postfixed_labels.csv":"BOxO","../data/sensor_montages/standard_prefixed_labels.csv":"YRI9","../data/sensor_montages/standard_primed_labels.csv":"BNjG"}],"WMMm":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40102,7 +40102,7 @@ function updateLinkVisibilityByLinkDegree() {
   _setup_gui.guiParams.maxStrengthToDisplay = l / _main.linkMeshList.length;
   (0, _draw_links.updateVisibleLinks)(false);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main":"epB2","./draw_sensors":"OTn2","./link_builder/draw_links":"XiGW","./setup_gui":"dQ6s"}],"w67D":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40123,7 +40123,7 @@ function disposeMesh(mesh) {
   mesh.geometry.dispose();
   mesh.material.dispose();
 }
-},{"../public/main":"main.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
+},{"../public/main":"epB2"}],"XiGW":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40421,7 +40421,7 @@ function updateVisibleLinks() {
 
   (0, _draw_degree_line.updateAllDegreeLines)(updateAverageDegree);
 }
-},{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js","../mesh_helper":"../js/mesh_helper.js"}],"../js/draw_sensors.js":[function(require,module,exports) {
+},{"three":"dKqR","../../public/main":"epB2","../draw_degree_line":"WMMm","../load_data":"S8od","../setup_gui":"dQ6s","../draw_sensors":"OTn2","../mesh_helper":"w67D"}],"OTn2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40873,7 +40873,7 @@ function setMneMontage() {
   var newSensorLabelsUrl = _setup_gui.defaultMontageLabels[_setup_gui.guiParams.mneMontage];
   clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main.js":"epB2","./load_data.js":"S8od","./link_builder/draw_links":"XiGW","./setup_gui":"dQ6s","./mesh_helper":"w67D"}],"irr3":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -43781,7 +43781,7 @@ var index = {
 };
 var _default = index;
 exports.default = _default;
-},{}],"../node_modules/regenerator-runtime/runtime.js":[function(require,module,exports) {
+},{}],"QVnC":[function(require,module,exports) {
 var define;
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
@@ -44538,7 +44538,7 @@ try {
   }
 }
 
-},{}],"../js/add_light_and_background.js":[function(require,module,exports) {
+},{}],"BKG2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44574,7 +44574,7 @@ function addLightAndBackground() {
 
   _main.scene.add(bottomLight);
 }
-},{"../public/main":"main.js","three":"../node_modules/three/build/three.module.js"}],"../js/setup_camera.js":[function(require,module,exports) {
+},{"../public/main":"epB2","three":"dKqR"}],"rmtI":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44615,17 +44615,17 @@ function setupCamera() {
 function updateRotateCamera() {
   _main.controls.autoRotate = _setup_gui.guiParams.rotateCamera;
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../data/cortex_vert.csv":[function(require,module,exports) {
-module.exports = "/cortex_vert.963f0d70.csv";
-},{}],"../data/cortex_tri.csv":[function(require,module,exports) {
-module.exports = "/cortex_tri.54eda097.csv";
-},{}],"../data/sensor_labels.csv":[function(require,module,exports) {
-module.exports = "/sensor_labels.87a1706e.csv";
-},{}],"../data/sensor_coordinates.csv":[function(require,module,exports) {
-module.exports = "/sensor_coordinates.7c286084.csv";
-},{}],"../data/conn_matrix_0.csv":[function(require,module,exports) {
-module.exports = "/conn_matrix_0.5c498bf8.csv";
-},{}],"main.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main.js":"epB2","./setup_gui":"dQ6s"}],"W2Gw":[function(require,module,exports) {
+module.exports = "cortex_vert.6b91c19c.csv";
+},{}],"Kq1E":[function(require,module,exports) {
+module.exports = "cortex_tri.f028cefc.csv";
+},{}],"yqIO":[function(require,module,exports) {
+module.exports = "sensor_labels.1d7346b6.csv";
+},{}],"Dkox":[function(require,module,exports) {
+module.exports = "sensor_coordinates.011ddb17.csv";
+},{}],"GRyb":[function(require,module,exports) {
+module.exports = "conn_matrix_0.7fd9ba48.csv";
+},{}],"epB2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -44982,209 +44982,5 @@ function _handleJsonFileSelect() {
   }));
   return _handleJsonFileSelect.apply(this, arguments);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/draw_degree_line":"../js/draw_degree_line.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../js/load_data":"../js/load_data.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
-var global = arguments[3];
-var OVERLAY_ID = '__parcel__error__overlay__';
-var OldModule = module.bundle.Module;
-
-function Module(moduleName) {
-  OldModule.call(this, moduleName);
-  this.hot = {
-    data: module.bundle.hotData,
-    _acceptCallbacks: [],
-    _disposeCallbacks: [],
-    accept: function (fn) {
-      this._acceptCallbacks.push(fn || function () {});
-    },
-    dispose: function (fn) {
-      this._disposeCallbacks.push(fn);
-    }
-  };
-  module.bundle.hotData = null;
-}
-
-module.bundle.Module = Module;
-var checkedAssets, assetsToAccept;
-var parent = module.bundle.parent;
-
-if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = "" || location.hostname;
-  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50695" + '/');
-
-  ws.onmessage = function (event) {
-    checkedAssets = {};
-    assetsToAccept = [];
-    var data = JSON.parse(event.data);
-
-    if (data.type === 'update') {
-      var handled = false;
-      data.assets.forEach(function (asset) {
-        if (!asset.isNew) {
-          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
-
-          if (didAccept) {
-            handled = true;
-          }
-        }
-      }); // Enable HMR for CSS by default.
-
-      handled = handled || data.assets.every(function (asset) {
-        return asset.type === 'css' && asset.generated.js;
-      });
-
-      if (handled) {
-        console.clear();
-        data.assets.forEach(function (asset) {
-          hmrApply(global.parcelRequire, asset);
-        });
-        assetsToAccept.forEach(function (v) {
-          hmrAcceptRun(v[0], v[1]);
-        });
-      } else if (location.reload) {
-        // `location` global exists in a web worker context but lacks `.reload()` function.
-        location.reload();
-      }
-    }
-
-    if (data.type === 'reload') {
-      ws.close();
-
-      ws.onclose = function () {
-        location.reload();
-      };
-    }
-
-    if (data.type === 'error-resolved') {
-      console.log('[parcel] ✨ Error resolved');
-      removeErrorOverlay();
-    }
-
-    if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
-      removeErrorOverlay();
-      var overlay = createErrorOverlay(data);
-      document.body.appendChild(overlay);
-    }
-  };
-}
-
-function removeErrorOverlay() {
-  var overlay = document.getElementById(OVERLAY_ID);
-
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function createErrorOverlay(data) {
-  var overlay = document.createElement('div');
-  overlay.id = OVERLAY_ID; // html encode message and stack trace
-
-  var message = document.createElement('div');
-  var stackTrace = document.createElement('pre');
-  message.innerText = data.error.message;
-  stackTrace.innerText = data.error.stack;
-  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
-  return overlay;
-}
-
-function getParents(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return [];
-  }
-
-  var parents = [];
-  var k, d, dep;
-
-  for (k in modules) {
-    for (d in modules[k][1]) {
-      dep = modules[k][1][d];
-
-      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
-        parents.push(k);
-      }
-    }
-  }
-
-  if (bundle.parent) {
-    parents = parents.concat(getParents(bundle.parent, id));
-  }
-
-  return parents;
-}
-
-function hmrApply(bundle, asset) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (modules[asset.id] || !bundle.parent) {
-    var fn = new Function('require', 'module', 'exports', asset.generated.js);
-    asset.isNew = !modules[asset.id];
-    modules[asset.id] = [fn, asset.deps];
-  } else if (bundle.parent) {
-    hmrApply(bundle.parent, asset);
-  }
-}
-
-function hmrAcceptCheck(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (!modules[id] && bundle.parent) {
-    return hmrAcceptCheck(bundle.parent, id);
-  }
-
-  if (checkedAssets[id]) {
-    return;
-  }
-
-  checkedAssets[id] = true;
-  var cached = bundle.cache[id];
-  assetsToAccept.push([bundle, id]);
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    return true;
-  }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAcceptCheck(global.parcelRequire, id);
-  });
-}
-
-function hmrAcceptRun(bundle, id) {
-  var cached = bundle.cache[id];
-  bundle.hotData = {};
-
-  if (cached) {
-    cached.hot.data = bundle.hotData;
-  }
-
-  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
-    cached.hot._disposeCallbacks.forEach(function (cb) {
-      cb(bundle.hotData);
-    });
-  }
-
-  delete bundle.cache[id];
-  bundle(id);
-  cached = bundle.cache[id];
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    cached.hot._acceptCallbacks.forEach(function (cb) {
-      cb();
-    });
-
-    return true;
-  }
-}
-},{}]},{},["../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.js"], null)
-//# sourceMappingURL=/main.1f19ae8e.js.map
+},{"three":"dKqR","../node_modules/three/examples/jsm/controls/OrbitControls":"xTGv","../js/draw_sensors.js":"OTn2","../node_modules/three/examples/jsm/libs/dat.gui.module":"irr3","regenerator-runtime/runtime.js":"QVnC","../js/add_light_and_background":"BKG2","../js/draw_cortex.js":"CpRT","../js/link_builder/draw_links":"XiGW","../js/draw_degree_line":"WMMm","../js/setup_camera":"rmtI","../js/setup_gui":"dQ6s","../js/load_data":"S8od","../data/cortex_vert.csv":"W2Gw","../data/cortex_tri.csv":"Kq1E","../data/sensor_labels.csv":"yqIO","../data/sensor_coordinates.csv":"Dkox","../data/conn_matrix_0.csv":"GRyb"}]},{},["epB2"], null)
+//# sourceMappingURL=main.c8388811.js.map

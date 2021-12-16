@@ -6,6 +6,7 @@
   "scripts": {
     "test": "mocha --reporter list",
     "start": "parcel public/index.html",
+    "build": "parcel build public/index.html --no-minify --public-url ./",
     "deploy": "gh-pages -d dist"
   },
   "author": "Thibault Rolland",
@@ -23,6 +24,8 @@
     "webpack": "^5.51.1"
   },
   "devDependencies": {
+    "cssnano": "^5.0.13",
+    "postcss": "^8.4.5",
     "webpack-cli": "^4.8.0"
   }
 }
