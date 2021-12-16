@@ -5,7 +5,8 @@
   "main": "./js/main.js",
   "scripts": {
     "test": "mocha --reporter list",
-    "start": "parcel public/index.html"
+    "start": "parcel public/index.html",
+    "push-gh-pages": "push-dir --dir=dist --branch=gh-pages --cleanup --verbose"
   },
   "author": "Thibault Rolland",
   "license": "ISC",
