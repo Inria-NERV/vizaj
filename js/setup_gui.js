@@ -5,10 +5,8 @@ import { gui, controls,
     jsonInput } from '../public/main';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
-import { hideBrain, showBrain, updateBrainMeshVisibility } from './draw_cortex';
-import { getSplinePointsScalp } from './link_builder/compute_link_shape';
-import { setMneMontage } from './draw_sensors';
-import { updateDegreeLinesVisibility, updateLinkVisibilityByLinkDegree } from './draw_degree_line';
+import { updateBrainMeshVisibility } from './draw_cortex';
+import { updateDegreeLinesVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -32,7 +30,15 @@ const guiParams = {
     linkTopPointAngle: 0.,
 
     linkGenerator: linkLineGenerator,
-    linkAlignmentTarget: 10,
+    linkAlignmentTarget: 30,
+    resetLinkAlignmentTarget: ()=>{
+        guiParams.linkAlignmentTarget = 30;
+        redrawLinks();
+    },
+    maximumLinkAligmnentTarget: ()=> {
+        guiParams.linkAlignmentTarget = 1000000;
+        redrawLinks();
+    },
 
     makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
     makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
@@ -88,91 +94,6 @@ function changeLinkMesh(linkGenerator){
     redrawLinks();
 }
 
-let getSplinePoints = getSplinePointsScalp;
-
-const splinePointsGeometry = {
-    'scalp': 0, 
-    'flat': 1
-};
-
-const montages = {'EGI_256': 0,
-    'GSN-HydroCel-128': 1,
-    'GSN-HydroCel-129': 2,
-    'GSN-HydroCel-256': 3,
-    'GSN-HydroCel-257': 4,
-    'GSN-HydroCel-32': 5,
-    'GSN-HydroCel-64_1.0': 6,
-    'GSN-HydroCel-65_1.0': 7,
-    'biosemi128': 8,
-    'biosemi16': 9,
-    'biosemi160': 10,
-    'biosemi256': 11,
-    'biosemi32': 12,
-    'biosemi64': 13,
-    'easycap-M1': 14,
-    'easycap-M10': 15,
-    'mgh60': 16,
-    'mgh70': 17,
-    'standard_1005': 18,
-    'standard_1020': 19,
-    'standard_alphabetic': 20,
-    'standard_postfixed': 21,
-    'standard_prefixed': 22,
-    'standard_primed': 23};
-
-const defaultMontageCoordinates = [
-    require('../data/sensor_montages/EGI_256_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-128_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-129_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-256_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-257_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-32_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-64_1.0_coordinates.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-65_1.0_coordinates.csv'),
-    require('../data/sensor_montages/biosemi128_coordinates.csv'),
-    require('../data/sensor_montages/biosemi16_coordinates.csv'),
-    require('../data/sensor_montages/biosemi160_coordinates.csv'),
-    require('../data/sensor_montages/biosemi256_coordinates.csv'),
-    require('../data/sensor_montages/biosemi32_coordinates.csv'),
-    require('../data/sensor_montages/biosemi64_coordinates.csv'),
-    require('../data/sensor_montages/easycap-M1_coordinates.csv'),
-    require('../data/sensor_montages/easycap-M10_coordinates.csv'),
-    require('../data/sensor_montages/mgh60_coordinates.csv'),
-    require('../data/sensor_montages/mgh70_coordinates.csv'),
-    require('../data/sensor_montages/standard_1005_coordinates.csv'),
-    require('../data/sensor_montages/standard_1020_coordinates.csv'),
-    require('../data/sensor_montages/standard_alphabetic_coordinates.csv'),
-    require('../data/sensor_montages/standard_postfixed_coordinates.csv'),
-    require('../data/sensor_montages/standard_prefixed_coordinates.csv'),
-    require('../data/sensor_montages/standard_primed_coordinates.csv')];
-
-const defaultMontageLabels = [
-    require('../data/sensor_montages/EGI_256_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-128_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-129_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-256_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-257_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-32_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-64_1.0_labels.csv'),
-    require('../data/sensor_montages/GSN-HydroCel-65_1.0_labels.csv'),
-    require('../data/sensor_montages/biosemi128_labels.csv'),
-    require('../data/sensor_montages/biosemi16_labels.csv'),
-    require('../data/sensor_montages/biosemi160_labels.csv'),
-    require('../data/sensor_montages/biosemi256_labels.csv'),
-    require('../data/sensor_montages/biosemi32_labels.csv'),
-    require('../data/sensor_montages/biosemi64_labels.csv'),
-    require('../data/sensor_montages/easycap-M1_labels.csv'),
-    require('../data/sensor_montages/easycap-M10_labels.csv'),
-    require('../data/sensor_montages/mgh60_labels.csv'),
-    require('../data/sensor_montages/mgh70_labels.csv'),
-    require('../data/sensor_montages/standard_1005_labels.csv'),
-    require('../data/sensor_montages/standard_1020_labels.csv'),
-    require('../data/sensor_montages/standard_alphabetic_labels.csv'),
-    require('../data/sensor_montages/standard_postfixed_labels.csv'),
-    require('../data/sensor_montages/standard_prefixed_labels.csv'),
-    require('../data/sensor_montages/standard_primed_labels.csv')];
-
-
 function setupGui() {
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
@@ -193,6 +114,16 @@ function setupGui() {
     //This one below is messy
     //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
+    const linkAlignmentTarget = gui.addFolder('Link alignment target');
+    linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')
+        .onChange(redrawLinks)
+        .name('Link alignment')
+        .listen();
+    linkAlignmentTarget.add(guiParams, 'resetLinkAlignmentTarget')
+        .name('Reset');
+    linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget')
+        .name('Maximum');  
+
     const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
     premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
     premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
@@ -210,11 +141,6 @@ function setupGui() {
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
 
     const fileLoadFolder = gui.addFolder('Load files');
-    fileLoadFolder.add(guiParams, 'linkAlignmentTarget')
-        .onChange(redrawLinks)
-        .name('Link alignment')
-        .listen();
-
     const csvLoadFolder = fileLoadFolder.addFolder('CSV files');
     csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
     csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
@@ -229,8 +155,5 @@ function setupGui() {
 
 export {
     guiParams,
-    setupGui,
-    defaultMontageCoordinates,
-    defaultMontageLabels,
-    getSplinePoints
+    setupGui
 }

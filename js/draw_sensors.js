@@ -4,7 +4,6 @@ import { scene,
  } from "../public/main.js";
 import { csv3dCoordinatesOnLoadCallBack, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
-import { guiParams, defaultMontageCoordinates, defaultMontageLabels } from "./setup_gui";
 import { deleteMesh } from "./mesh_helper";
 
 let sensorCount = 0;
@@ -25,7 +24,6 @@ const sensorMaterial =  new THREE.MeshPhysicalMaterial({
   });
 
 let maxSensorDistance = 0.;
-let meanSensorDistance = 0.;
 
 async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
     await clearAllLinks();
@@ -43,8 +41,8 @@ async function loadAndDrawSensors(sensorCoordinatesUrl) {
 }
 async function drawSensorsAndUpdateGlobalValues(data){
     await getMontageBarycenter(data);
-    await getMaxMeanSensorDistance(data);
     await drawAllSensors(data);
+    await setMaxSensorDistance();
 }
 
 
@@ -71,12 +69,14 @@ function loadSensorLabels(sensorLabelsUrl){
 }
 
 async function drawAllSensors(coordinatesList){
+    const meanSensorDistance = await getMeanSensorDistance(coordinatesList);
+    sensorCount = coordinatesList.length;
     for (let coordinates of coordinatesList) {
-        await drawSensor(coordinates);
+        await drawSensor(coordinates, meanSensorDistance);
       }
 }
 
-async function drawSensor(coordinates){
+async function drawSensor(coordinates, meanSensorDistance){
     const sensorGeometry = new THREE.SphereGeometry(
         SENSOR_RADIUS / Math.sqrt(sensorCount), 
         SENSOR_SEGMENTS, 
@@ -95,23 +95,31 @@ async function drawSensor(coordinates){
     return sensor;
 }
 
-async function getMaxMeanSensorDistance(positions){
+async function setMaxSensorDistance(){
     maxSensorDistance = 0.;
-    meanSensorDistance = 0.;
+    for (var i = 0; i < sensorMeshList.length; i++) {
+        for (var j = 0; j < i; j++) {
+            const _dist = sensorMeshList[i].mesh.position
+                .distanceTo(sensorMeshList[j].mesh.position);
+            if (maxSensorDistance <= _dist) {
+                maxSensorDistance = _dist;
+            }
+        }
+    }
+}
+
+async function getMeanSensorDistance(positions){
+    let meanSensorDistance = 0.;
     let count = 0;
     for (var i = 0; i < positions.length; i++) {
         for (var j = 0; j < i; j++) {
             const _dist = new THREE.Vector3(positions[i][0], positions[i][1], positions[i][2])
                 .distanceTo(new THREE.Vector3(positions[j][0], positions[j][1], positions[j][2]))
-            if (maxSensorDistance <= _dist) {
-                maxSensorDistance = _dist;
-            }
             count++;
             meanSensorDistance += _dist;
         }
     }
-    sensorCount = positions.length;
-    meanSensorDistance = meanSensorDistance / count;
+    return meanSensorDistance / count;
 }
 
 async function getMontageBarycenter(positions){
@@ -140,13 +148,6 @@ async function clearAllSensors(){
     } 
 }
 
-function setMneMontage(){
-    if (guiParams.mneMontage === -1) {return;}
-    const newSensorCoordinatesUrl = defaultMontageCoordinates[guiParams.mneMontage];
-    const newSensorLabelsUrl = defaultMontageLabels[guiParams.mneMontage];
-    clearLoadAndDrawSensors(newSensorCoordinatesUrl, newSensorLabelsUrl);
-}
-
 export {
     sensorMaterial,
     drawSensor,
@@ -158,5 +159,4 @@ export {
     sensorMeshList, 
     sensorCount,
     maxSensorDistance, 
-    clearAllSensors,
-    setMneMontage};
+    clearAllSensors};

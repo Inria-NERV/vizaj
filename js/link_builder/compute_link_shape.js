@@ -8,7 +8,7 @@ import { guiParams } from '../setup_gui';
 // This is useful to exploit data from planes or sphere for example
 
 
-function getSplinePointsScalp(link){
+function getSplinePoints(link){
     const centerPoint = new Vector3(0,-guiParams.linkAlignmentTarget,0);
 
     const pointA = {controlPoint: link.node1.position.clone()};
@@ -116,4 +116,4 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l){
     };
 }
 
-export { getSplinePointsScalp }
+export { getSplinePoints }
