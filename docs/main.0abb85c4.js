@@ -39687,6 +39687,14 @@ function setupGui() {
   linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(_draw_links.updateLinkOutline).listen(); //This one below is messy
   //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
+  var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
+
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
+
   var linkAlignmentTarget = _main.gui.addFolder('Link alignment target');
 
   linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget').onChange(function () {
@@ -39695,14 +39703,6 @@ function setupGui() {
   }).name('Link alignment').listen();
   linkAlignmentTarget.add(guiParams, 'resetLinkAlignmentTarget').name('Reset');
   linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget').name('Maximum');
-
-  var premadeLinkGeometries = _main.gui.addFolder('premadeLinkGeometries');
-
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
-  premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
   var linkVolume = _main.gui.addFolder('linkVolume');
 
@@ -39771,9 +39771,9 @@ function getSplinePoints(link) {
   var l = new THREE.Vector3((linkBasisA.x + linkBasisB.x) / 2, (linkBasisA.y + linkBasisB.y) / 2, (linkBasisA.z + linkBasisB.z) / 2).length();
   var pointC = computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l);
   var quaternionA = new THREE.Quaternion();
-  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  quaternionA.setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI + Math.PI * _setup_gui.guiParams.linkSensorAngles);
   var quaternionB = new THREE.Quaternion();
-  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI * (1 - _setup_gui.guiParams.linkSensorAngles));
+  quaternionB.setFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI + Math.PI * _setup_gui.guiParams.linkSensorAngles);
   pointA.handleRight = new THREE.Vector3(linkBasisA.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionA).add(linkBasisA).applyMatrix3(linkToGlobalMatrix);
   pointB.handleLeft = new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkSensorHandleDistances, 0, 0).applyQuaternion(quaternionB).add(linkBasisB).applyMatrix3(linkToGlobalMatrix);
   pointA.controlPoint.add(centerPoint);
@@ -44915,4 +44915,4 @@ function _handleJsonFileSelect() {
   return _handleJsonFileSelect.apply(this, arguments);
 }
 },{"three":"dKqR","../node_modules/three/examples/jsm/controls/OrbitControls":"xTGv","../js/draw_sensors.js":"OTn2","../node_modules/three/examples/jsm/libs/dat.gui.module":"irr3","regenerator-runtime/runtime.js":"QVnC","../js/add_light_and_background":"BKG2","../js/draw_cortex.js":"CpRT","../js/link_builder/draw_links":"XiGW","../js/draw_degree_line":"WMMm","../js/setup_camera":"rmtI","../js/setup_gui":"dQ6s","../js/load_data":"S8od","../data/cortex_vert.csv":"W2Gw","../data/cortex_tri.csv":"Kq1E","../data/sensor_labels.csv":"yqIO","../data/sensor_coordinates.csv":"Dkox","../data/conn_matrix_0.csv":"GRyb"}]},{},["epB2"], null)
-//# sourceMappingURL=main.c0c3fcad.js.map
+//# sourceMappingURL=main.0abb85c4.js.map

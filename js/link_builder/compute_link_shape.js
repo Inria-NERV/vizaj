@@ -37,12 +37,14 @@ function getSplinePoints(link){
     const quaternionA = new THREE.Quaternion();
     quaternionA.setFromAxisAngle( 
         new Vector3(0,0,1), 
-        Math.PI * (1 - guiParams.linkSensorAngles ) );
+        Math.PI + Math.PI * ( guiParams.linkSensorAngles )
+    );
 
     const quaternionB = new THREE.Quaternion();
     quaternionB.setFromAxisAngle( 
         new Vector3(0,0,-1), 
-        Math.PI  * ( 1 - guiParams.linkSensorAngles ) );
+        Math.PI + Math.PI  * ( guiParams.linkSensorAngles ) 
+    );
 
     pointA.handleRight = new THREE.Vector3(linkBasisA.x * guiParams.linkSensorHandleDistances,0,0)
         .applyQuaternion( quaternionA )

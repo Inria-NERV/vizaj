@@ -116,6 +116,13 @@ function setupGui() {
     //This one below is messy
     //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
 
+    const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
+
     const linkAlignmentTarget = gui.addFolder('Link alignment target');
     linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')
         .onChange(() => {
@@ -128,13 +135,6 @@ function setupGui() {
         .name('Reset');
     linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget')
         .name('Maximum');  
-
-    const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
     const linkVolume = gui.addFolder('linkVolume');
     linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
