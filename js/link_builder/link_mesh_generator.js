@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { sensorCount } from "../draw_sensors";
+import { sensorCount, sensorMeshList } from "../draw_sensors";
 import { guiParams } from '../setup_gui';
 
 
