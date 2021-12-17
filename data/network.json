@@ -1,0 +1,56 @@
+{
+    "graph":{
+        "directed":        false,
+        "type":"graph type",
+        "label":"some name",
+        "metadata":{
+            "somekey":"somevalue"
+        },
+        "nodes":{
+            "0":{
+                "type":"node type",
+                "label":"label1",
+                "position":{
+                    "x": 4,
+                    "y": 4,
+                    "z": 0 
+                }
+            },
+            "1":{
+                "type":"node type",
+                "label":"label2",
+                "position":{
+                    "x": 8,
+                    "y": 3,
+                    "z": 2 
+                }
+            },
+            "2":{
+                "type":"node type",
+                "position":{
+                    "x": -4,
+                    "y": -3,
+                    "z": 2 
+                }
+            }
+        },
+        "edges":[
+            {
+                "source":"0",
+                "target":"1",
+                "directed":                false,
+                "metadata":{
+                    "corr_mat":                    0.8849602908
+                }
+            },
+            {
+                "source":"0",
+                "target":"2",
+                "directed":                false,
+                "metadata":{
+                    "corr_mat":                    0.8027855757
+                }
+            }
+        ]
+    }
+}

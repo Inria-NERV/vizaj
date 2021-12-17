@@ -195,8 +195,8 @@ async function handleJsonFileSelect(evt){
   assignSensorLabels(labelList);
   for (const [key, value] of Object.entries(graph.edges)){
     linkList.push(generateLinkData(
-      parseInt(value.source - 1), 
-      parseInt(value.target - 1), 
+      parseInt(value.source), 
+      parseInt(value.target), 
       value.metadata.corr_mat));
   }
   await drawLinksAndUpdateVisibility(linkList);
