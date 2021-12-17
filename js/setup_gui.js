@@ -2,7 +2,9 @@ import { gui, controls,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,
-    jsonInput } from '../public/main';
+    jsonInput, 
+    linkMeshList,
+    sensorMeshList} from '../public/main';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
@@ -31,6 +33,14 @@ const guiParams = {
 
     linkGenerator: linkLineGenerator,
     linkAlignmentTarget: 30,
+
+    ecoFiltering: () =>{
+    // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
+    // in other words : number of links = number of nodes * 3 / 2
+        guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
+        updateVisibleLinks();
+    },
+
     resetLinkAlignmentTarget: ()=>{
         guiParams.linkAlignmentTarget = 30;
         redrawLinks();
@@ -106,6 +116,7 @@ function setupGui() {
         .name('Density')
         .onChange (() => updateVisibleLinks())
         .listen();
+    linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
     const linkGeometry = gui.addFolder('linkGeometry');

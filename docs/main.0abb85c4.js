@@ -37518,7 +37518,7 @@ exports.showBrain = showBrain;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _load_data = require("./load_data.js");
+var _load_data = require("./load_data.js.js");
 
 var _main = require("../public/main.js");
 
@@ -39499,7 +39499,7 @@ exports.export3Dgltf = export3Dgltf;
 
 var _main = require("../public/main");
 
-var _GLTFExporter = require("../node_modules/three/examples/jsm/exporters/GLTFExporter.js");
+var _GLTFExporter = require("three/examples/jsm/exporters/GLTFExporter");
 
 var strMime = 'image/bmp';
 
@@ -40356,13 +40356,13 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _main = require("../public/main.js");
 
-var _load_data = require("./load_data.js");
+var _load_data = require("./load_data.js.js");
 
 var _draw_links = require("./link_builder/draw_links");
 
 var _mesh_helper = require("./mesh_helper");
 
-var _draw_degree_line = require("./draw_degree_line.js");
+var _draw_degree_line = require("./draw_degree_line.js.js");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -44576,11 +44576,11 @@ exports.jsonInput = exports.csvNodeLabelsInput = exports.csvNodePositionsInput =
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _OrbitControls = require("../node_modules/three/examples/jsm/controls/OrbitControls");
+var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
 
 var _draw_sensors = require("../js/draw_sensors.js");
 
-var _datGui = require("../node_modules/three/examples/jsm/libs/dat.gui.module");
+var _datGui = require("three/examples/jsm/libs/dat.gui.module");
 
 require("regenerator-runtime/runtime.js");
 
