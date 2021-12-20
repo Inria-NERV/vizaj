@@ -10,7 +10,6 @@ import { loadAndDrawSensors,
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
-import { drawAllDegreeLines } from "../js/draw_degree_line";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData } from "../js/load_data";
