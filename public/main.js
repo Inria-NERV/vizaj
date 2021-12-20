@@ -183,11 +183,13 @@ async function handleJsonFileSelect(evt){
   const coordinatesList  = [];
   const labelList = [];
   const linkList = [];
+  const sensorIdDict = {};
   for (const [key, value] of Object.entries(graph.nodes)){
     coordinatesList.push([value.position.x, value.position.y, value.position.z]);
     let label = '';
     if (value.label) { label = value.label; }
     labelList.push(label);
+    sensorIdDict[key] = labelList.length - 1;
   }
   await clearAllLinks();
   await clearAllSensors();
@@ -195,8 +197,8 @@ async function handleJsonFileSelect(evt){
   assignSensorLabels(labelList);
   for (const [key, value] of Object.entries(graph.edges)){
     linkList.push(generateLinkData(
-      parseInt(value.source), 
-      parseInt(value.target), 
+      sensorIdDict[value.source], 
+      sensorIdDict[value.target], 
       value.metadata.corr_mat));
   }
   await drawLinksAndUpdateVisibility(linkList);
