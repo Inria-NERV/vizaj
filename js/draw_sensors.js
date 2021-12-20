@@ -79,8 +79,9 @@ async function drawAllSensors(coordinatesList){
 }
 
 async function drawSensor(coordinates, meanSensorDistance){
+    const radiusScale = 1 / Math.max(Math.sqrt(sensorCount), Math.sqrt(8));
     const sensorGeometry = new THREE.SphereGeometry(
-        SENSOR_RADIUS / Math.sqrt(sensorCount), 
+        SENSOR_RADIUS * radiusScale, 
         SENSOR_SEGMENTS, 
         SENSOR_RINGS);
     let sensor = new THREE.Mesh(
