@@ -3,7 +3,7 @@ import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/mai
 import { drawAllDegreeLines, updateAllDegreeLines } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
-import { maxSensorDistance, sensorCount } from '../draw_sensors';
+import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
 

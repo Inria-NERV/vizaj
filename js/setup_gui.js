@@ -8,7 +8,7 @@ import { gui, controls,
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
-import { redrawDegreeLines, updateDegreeLinesVisibility } from './draw_degree_line';
+import { redrawDegreeLines, updateAllDegreeLines, updateDegreeLinesVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -23,7 +23,8 @@ const guiParams = {
     showBrain: true,
 
     showDegreeLines: true,
-    averageDegree: 1.,
+    degreeLineRadius: 1,
+    degreeLineLength: 1,
 
     linkHeight: 0.75,
     linkTopPointHandleDistances: .5,
@@ -153,8 +154,9 @@ function setupGui() {
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     const degreeLineFolder = gui.addFolder('Node degree');
-    //degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
+    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 2.).onChange(redrawDegreeLines).name('Radius');
+    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 4.).onChange(updateAllDegreeLines).name('Length');
 
     const fileLoadFolder = gui.addFolder('Load files');
     const csvLoadFolder = fileLoadFolder.addFolder('CSV files');

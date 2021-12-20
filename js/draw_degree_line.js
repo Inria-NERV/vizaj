@@ -26,12 +26,15 @@ function drawDegreeLine(sensor){
     const endPoint = sensorMesh.position.clone()
         .addScaledVector(unitVector, 
             DEGREE_LINE_MAX_SCALE );
-    const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
+    const flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .001);
 
     const curve = new THREE.LineCurve(sensorMesh.position, endPoint);
     const flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
 
-    const scaledRadius = DEGREE_LINE_RADIUS * 10 / Math.sqrt(sensorMeshList.length);
+    const scaledRadius = 
+        DEGREE_LINE_RADIUS 
+        * 10 / Math.sqrt(sensorMeshList.length)
+        * guiParams.degreeLineRadius;
 
     const geometry = new THREE.TubeGeometry(
         curve,
@@ -87,7 +90,10 @@ function getNodeDegree(sensorMesh){
 
 function updateNodeDegreeLine(sensor){
     const nodeDegree = getNodeDegree(sensor.mesh);
-    sensor.degreeLine.morphTargetInfluences[0] = (1 - nodeDegree / (sensorMeshList.length - 1));
+    sensor.degreeLine.morphTargetInfluences[0] = 
+        (1 - 
+            nodeDegree / (sensorMeshList.length - 1)
+            * guiParams.degreeLineLength);
 }
 
 function updateAllDegreeLines(){
@@ -102,16 +108,6 @@ function updateDegreeLinesVisibility(){
     for (let sensor of sensorMeshList){
         sensor.degreeLine.visible = guiParams.showDegreeLines;
     }
-}
-
-function updateLinkVisibilityByLinkDegree(){
-    if (guiParams.averageDegree >= sensorMeshList.length - 1){
-        guiParams.averageDegree = sensorMeshList.length - 1;
-    }
-    const l = guiParams.averageDegree * sensorMeshList.length / 2;
-    guiParams.minStrengthToDisplay = 0.;
-    guiParams.maxStrengthToDisplay = l / linkMeshList.length;
-    updateVisibleLinks();  
 }
 
 function redrawDegreeLines(){
@@ -129,6 +125,5 @@ export {
     drawAllDegreeLines,
     updateAllDegreeLines,
     updateDegreeLinesVisibility,
-    updateLinkVisibilityByLinkDegree,
     redrawDegreeLines
 }
