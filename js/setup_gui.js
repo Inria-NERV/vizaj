@@ -159,11 +159,11 @@ function setupGui() {
     degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 4.).onChange(updateAllDegreeLines).name('Length');
 
     const fileLoadFolder = gui.addFolder('Load files');
-    const csvLoadFolder = fileLoadFolder.addFolder('CSV files');
+    const csvLoadFolder = fileLoadFolder.addFolder('CSV file');
     csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
     csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
     csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
-    fileLoadFolder.add(guiParams, 'loadJson').name('Json files');
+    fileLoadFolder.add(guiParams, 'loadJson').name('Json file');
 
     const exportFileFolder = gui.addFolder('Export as file');
     exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
