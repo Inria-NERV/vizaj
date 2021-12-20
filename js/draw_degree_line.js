@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Float32BufferAttribute } from 'three';
 import { scene, linkMeshList, LINK_LAYER } from '../public/main';
 import { sensorMeshList } from './draw_sensors';
-import { updateVisibleLinks } from './link_builder/draw_links';
 import { centerPoint } from './link_builder/compute_link_shape';
 import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper';
