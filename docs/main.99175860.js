@@ -37518,7 +37518,7 @@ exports.showBrain = showBrain;
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _load_data = require("./load_data.js.js");
+var _load_data = require("./load_data.js");
 
 var _main = require("../public/main.js");
 
@@ -39499,7 +39499,7 @@ exports.export3Dgltf = export3Dgltf;
 
 var _main = require("../public/main");
 
-var _GLTFExporter = require("three/examples/jsm/exporters/GLTFExporter");
+var _GLTFExporter = require("../node_modules/three/examples/jsm/exporters/GLTFExporter.js");
 
 var strMime = 'image/bmp';
 
@@ -39584,7 +39584,8 @@ var guiParams = {
   maxStrengthToDisplay: .2,
   showBrain: true,
   showDegreeLines: true,
-  averageDegree: 1.,
+  degreeLineRadius: 1,
+  degreeLineLength: 1,
   linkHeight: 0.75,
   linkTopPointHandleDistances: .5,
   linkSensorAngles: 3 / 8,
@@ -39592,6 +39593,12 @@ var guiParams = {
   linkTopPointAngle: 0.,
   linkGenerator: _link_mesh_generator.linkLineGenerator,
   linkAlignmentTarget: 30,
+  ecoFiltering: function ecoFiltering() {
+    // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
+    // in other words : number of links = number of nodes * 3 / 2
+    guiParams.maxStrengthToDisplay = 3 / 2 * _main.sensorMeshList.length / _main.linkMeshList.length;
+    (0, _draw_links.updateVisibleLinks)();
+  },
   resetLinkAlignmentTarget: function resetLinkAlignmentTarget() {
     guiParams.linkAlignmentTarget = 30;
     (0, _draw_links.redrawLinks)();
@@ -39676,6 +39683,7 @@ function setupGui() {
   linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.).name('Density').onChange(function () {
     return (0, _draw_links.updateVisibleLinks)();
   }).listen();
+  linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
 
   _main.gui.add(guiParams, 'showBrain').onChange(_draw_cortex.updateBrainMeshVisibility);
 
@@ -39710,18 +39718,19 @@ function setupGui() {
   linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
   linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(_draw_links.redrawLinks);
 
-  var degreeLineFolder = _main.gui.addFolder('Node degree'); //degreeLineFolder.add(guiParams, 'averageDegree', 0).onChange(updateLinkVisibilityByLinkDegree).listen().name('Average degree');
-
+  var degreeLineFolder = _main.gui.addFolder('Node degree');
 
   degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(_draw_degree_line.updateDegreeLinesVisibility).name('Show degree line');
+  degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 2.).onChange(_draw_degree_line.redrawDegreeLines).name('Radius');
+  degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 4.).onChange(_draw_degree_line.updateAllDegreeLines).name('Length');
 
   var fileLoadFolder = _main.gui.addFolder('Load files');
 
-  var csvLoadFolder = fileLoadFolder.addFolder('CSV files');
+  var csvLoadFolder = fileLoadFolder.addFolder('CSV file');
   csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
   csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
   csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
-  fileLoadFolder.add(guiParams, 'loadJson').name('Json files');
+  fileLoadFolder.add(guiParams, 'loadJson').name('Json file');
 
   var exportFileFolder = _main.gui.addFolder('Export as file');
 
@@ -39845,7 +39854,6 @@ exports.drawDegreeLine = drawDegreeLine;
 exports.drawAllDegreeLines = drawAllDegreeLines;
 exports.updateAllDegreeLines = updateAllDegreeLines;
 exports.updateDegreeLinesVisibility = updateDegreeLinesVisibility;
-exports.updateLinkVisibilityByLinkDegree = updateLinkVisibilityByLinkDegree;
 exports.redrawDegreeLines = redrawDegreeLines;
 
 var THREE = _interopRequireWildcard(require("three"));
@@ -39890,10 +39898,12 @@ function drawDegreeLine(sensor) {
   var sensorMesh = sensor.mesh;
   var unitVector = sensorMesh.position.clone().addScaledVector(_compute_link_shape.centerPoint, -1).normalize();
   var endPoint = sensorMesh.position.clone().addScaledVector(unitVector, DEGREE_LINE_MAX_SCALE);
-  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .01);
+  var flatEndPoint = sensorMesh.position.clone().addScaledVector(unitVector, .001);
   var curve = new THREE.LineCurve(sensorMesh.position, endPoint);
   var flatCurve = new THREE.LineCurve(sensorMesh.position, flatEndPoint);
-  var scaledRadius = DEGREE_LINE_RADIUS * 10 / Math.sqrt(_draw_sensors.sensorMeshList.length);
+
+  var scaledRadius = DEGREE_LINE_RADIUS * 10 / Math.sqrt(_draw_sensors.sensorMeshList.length) * _setup_gui.guiParams.degreeLineRadius;
+
   var geometry = new THREE.TubeGeometry(curve, DEGREE_LINE_TUBULAR_SEGMENTS, scaledRadius, DEGREE_LINE_RADIAL_SEGMENTS, true);
   var flatGeometry = new THREE.TubeGeometry(flatCurve, DEGREE_LINE_TUBULAR_SEGMENTS, scaledRadius, DEGREE_LINE_RADIAL_SEGMENTS, true);
   geometry.morphAttributes.position = [];
@@ -39962,7 +39972,7 @@ function getNodeDegree(sensorMesh) {
 
 function updateNodeDegreeLine(sensor) {
   var nodeDegree = getNodeDegree(sensor.mesh);
-  sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (_draw_sensors.sensorMeshList.length - 1);
+  sensor.degreeLine.morphTargetInfluences[0] = 1 - nodeDegree / (_draw_sensors.sensorMeshList.length - 1) * _setup_gui.guiParams.degreeLineLength;
 }
 
 function updateAllDegreeLines() {
@@ -39998,17 +40008,6 @@ function updateDegreeLinesVisibility() {
   } finally {
     _iterator3.f();
   }
-}
-
-function updateLinkVisibilityByLinkDegree() {
-  if (_setup_gui.guiParams.averageDegree >= _draw_sensors.sensorMeshList.length - 1) {
-    _setup_gui.guiParams.averageDegree = _draw_sensors.sensorMeshList.length - 1;
-  }
-
-  var l = _setup_gui.guiParams.averageDegree * _draw_sensors.sensorMeshList.length / 2;
-  _setup_gui.guiParams.minStrengthToDisplay = 0.;
-  _setup_gui.guiParams.maxStrengthToDisplay = l / _main.linkMeshList.length;
-  (0, _draw_links.updateVisibleLinks)();
 }
 
 function redrawDegreeLines() {
@@ -40356,13 +40355,13 @@ var THREE = _interopRequireWildcard(require("three"));
 
 var _main = require("../public/main.js");
 
-var _load_data = require("./load_data.js.js");
+var _load_data = require("./load_data.js");
 
 var _draw_links = require("./link_builder/draw_links");
 
 var _mesh_helper = require("./mesh_helper");
 
-var _draw_degree_line = require("./draw_degree_line.js.js");
+var _draw_degree_line = require("./draw_degree_line.js");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -44576,11 +44575,11 @@ exports.jsonInput = exports.csvNodeLabelsInput = exports.csvNodePositionsInput =
 
 var THREE = _interopRequireWildcard(require("three"));
 
-var _OrbitControls = require("three/examples/jsm/controls/OrbitControls");
+var _OrbitControls = require("../node_modules/three/examples/jsm/controls/OrbitControls");
 
 var _draw_sensors = require("../js/draw_sensors.js");
 
-var _datGui = require("three/examples/jsm/libs/dat.gui.module");
+var _datGui = require("../node_modules/three/examples/jsm/libs/dat.gui.module");
 
 require("regenerator-runtime/runtime.js");
 
@@ -44854,7 +44853,7 @@ function handleJsonFileSelect(_x) {
 
 function _handleJsonFileSelect() {
   _handleJsonFileSelect = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(evt) {
-    var jsonUrl, jsonData, graph, coordinatesList, labelList, linkList, _i2, _Object$entries, _Object$entries$_i, key, value, label, _i3, _Object$entries2, _Object$entries2$_i, _key, _value;
+    var jsonUrl, jsonData, graph, coordinatesList, labelList, linkList, sensorIdDict, _i2, _Object$entries, _Object$entries$_i, key, value, label, _i3, _Object$entries2, _Object$entries2$_i, _key, _value;
 
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
@@ -44870,6 +44869,7 @@ function _handleJsonFileSelect() {
             coordinatesList = [];
             labelList = [];
             linkList = [];
+            sensorIdDict = {};
 
             for (_i2 = 0, _Object$entries = Object.entries(graph.nodes); _i2 < _Object$entries.length; _i2++) {
               _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2), key = _Object$entries$_i[0], value = _Object$entries$_i[1];
@@ -44881,31 +44881,32 @@ function _handleJsonFileSelect() {
               }
 
               labelList.push(label);
+              sensorIdDict[key] = labelList.length - 1;
             }
 
-            _context2.next = 11;
+            _context2.next = 12;
             return (0, _draw_links.clearAllLinks)();
 
-          case 11:
-            _context2.next = 13;
+          case 12:
+            _context2.next = 14;
             return (0, _draw_sensors.clearAllSensors)();
 
-          case 13:
-            _context2.next = 15;
+          case 14:
+            _context2.next = 16;
             return (0, _draw_sensors.drawSensorsAndUpdateGlobalValues)(coordinatesList);
 
-          case 15:
+          case 16:
             (0, _draw_sensors.assignSensorLabels)(labelList);
 
             for (_i3 = 0, _Object$entries2 = Object.entries(graph.edges); _i3 < _Object$entries2.length; _i3++) {
               _Object$entries2$_i = _slicedToArray(_Object$entries2[_i3], 2), _key = _Object$entries2$_i[0], _value = _Object$entries2$_i[1];
-              linkList.push((0, _draw_links.generateLinkData)(parseInt(_value.source - 1), parseInt(_value.target - 1), _value.metadata.corr_mat));
+              linkList.push((0, _draw_links.generateLinkData)(sensorIdDict[_value.source], sensorIdDict[_value.target], _value.metadata.corr_mat));
             }
 
-            _context2.next = 19;
+            _context2.next = 20;
             return (0, _draw_links.drawLinksAndUpdateVisibility)(linkList);
 
-          case 19:
+          case 20:
           case "end":
             return _context2.stop();
         }
@@ -44915,4 +44916,4 @@ function _handleJsonFileSelect() {
   return _handleJsonFileSelect.apply(this, arguments);
 }
 },{"three":"dKqR","../node_modules/three/examples/jsm/controls/OrbitControls":"xTGv","../js/draw_sensors.js":"OTn2","../node_modules/three/examples/jsm/libs/dat.gui.module":"irr3","regenerator-runtime/runtime.js":"QVnC","../js/add_light_and_background":"BKG2","../js/draw_cortex.js":"CpRT","../js/link_builder/draw_links":"XiGW","../js/draw_degree_line":"WMMm","../js/setup_camera":"rmtI","../js/setup_gui":"dQ6s","../js/load_data":"S8od","../data/cortex_vert.csv":"W2Gw","../data/cortex_tri.csv":"Kq1E","../data/sensor_labels.csv":"yqIO","../data/sensor_coordinates.csv":"Dkox","../data/conn_matrix_0.csv":"GRyb"}]},{},["epB2"], null)
-//# sourceMappingURL=main.0abb85c4.js.map
+//# sourceMappingURL=main.99175860.js.map
