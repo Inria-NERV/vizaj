@@ -31,7 +31,7 @@ function exportSceneToGLTF( scene ) {
 function export2DImage(){
     try {
         const imgData = renderer.domElement.toDataURL(strMime);
-        saveFile(imgData, "scene.bmp");
+        saveFile(imgData, "scene.tif");
     } catch (e){
         console.log(e);
         return;

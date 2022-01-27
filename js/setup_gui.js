@@ -112,7 +112,7 @@ function setupGui() {
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
     cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} );
 
-    const linksToDisplayFolder = gui.addFolder('Connection density');
+    const linksToDisplayFolder = gui.addFolder('Filtering');
     linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
         .name('Density')
         .onChange (() => updateVisibleLinks())
@@ -153,21 +153,21 @@ function setupGui() {
     linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
-    const degreeLineFolder = gui.addFolder('Node degree');
+    const degreeLineFolder = gui.addFolder('Degree lines');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
-    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 2.).onChange(redrawDegreeLines).name('Radius');
-    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 4.).onChange(updateAllDegreeLines).name('Length');
+    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius');
+    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLines).name('Length');
 
     const fileLoadFolder = gui.addFolder('Load files');
-    const csvLoadFolder = fileLoadFolder.addFolder('CSV file');
-    csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Load coords');
-    csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Load labels');
-    csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Conn matrix');
-    fileLoadFolder.add(guiParams, 'loadJson').name('Json file');
+    const csvLoadFolder = fileLoadFolder.addFolder('CSV');
+    csvLoadFolder.add(guiParams, 'loadMontageCsvFile').name('Coordinates');
+    csvLoadFolder.add(guiParams, 'loadMontageLabelsCsvFile').name('Labels');
+    csvLoadFolder.add(guiParams, 'loadConnectivityMatrixCsvFile').name('Matrix');
+    fileLoadFolder.add(guiParams, 'loadJson').name('Json');
 
-    const exportFileFolder = gui.addFolder('Export as file');
-    exportFileFolder.add(guiParams, 'export2dImage').name('Export 2D bmp');
-    exportFileFolder.add(guiParams, 'export3Dgltf').name('Export 3D gltf');
+    const exportFileFolder = gui.addFolder('Export');
+    exportFileFolder.add(guiParams, 'export2dImage').name('Picture (.tif)');
+    exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');
 
 }
 
