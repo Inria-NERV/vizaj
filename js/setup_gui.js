@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { gui, controls,
     csvConnMatrixInput,
     csvNodePositionsInput,
@@ -5,6 +6,8 @@ import { gui, controls,
     jsonInput, 
     linkMeshList,
     sensorMeshList} from '../public/main';
+import { updateAllSensorRadius,
+    updateAllSensorMaterial } from './draw_sensors';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
@@ -32,10 +35,21 @@ const guiParams = {
     linkSensorHandleDistances: 0.,
     linkTopPointAngle: 0.,
 
+    sensorRadiusFactor: 1.,
+    sensorOpacity: 1.,
+    sensorColor: "#aaaaaa",
+    resetSensors: () => {
+        guiParams.sensorRadiusFactor = 1;
+        guiParams.sensorOpacity = 1;
+        guiParams.sensorColor = "#aaaaaa";
+        updateAllSensorRadius();
+        updateAllSensorMaterial();
+    },
+
     linkGenerator: linkLineGenerator,
     linkAlignmentTarget: 30,
 
-    ecoFiltering: () =>{
+    ecoFiltering: () => {
     // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
     // in other words : number of links = number of nodes * 3 / 2
         guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
@@ -120,13 +134,18 @@ function setupGui() {
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
     gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
 
-    const linkGeometry = gui.addFolder('linkGeometry');
-    linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen();
-    linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen();
-    linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen();
-    linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen();
-    //This one below is messy
-    //linkGeometry.add(guiParams, 'linkTopPointAngle', -2, 2).onChange(redrawLinks).listen();
+    const sensorFolder = gui.addFolder('Nodes');
+    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
+    sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).listen().name('Opacity');
+    sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
+    sensorFolder.add(guiParams, 'resetSensors').name('Reset');
+
+    const linkGeometry = gui.addFolder('Link');
+    linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
+    linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Top point handle distance');
+    linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen().name('Sensor angle');
+    linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
+    //we purposedly don't allow change of top point angle
 
     const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
     premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
@@ -135,7 +154,7 @@ function setupGui() {
     premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
     premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
-    const linkAlignmentTarget = gui.addFolder('Link alignment target');
+    const linkAlignmentTarget = linkGeometry.addFolder('Link alignment target');
     linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')
         .onChange(() => {
             redrawLinks();
@@ -148,7 +167,7 @@ function setupGui() {
     linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget')
         .name('Maximum');  
 
-    const linkVolume = gui.addFolder('linkVolume');
+    const linkVolume = linkGeometry.addFolder('Volume');
     linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
     linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);

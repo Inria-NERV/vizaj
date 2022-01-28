@@ -53,8 +53,8 @@ const csvNodePositionsInput = document.getElementById("csvNodePositions");
 const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
 const jsonInput = document.getElementById("jsonInput");
 
-//INTERSECTED is used to check wether the mouse intersects with a sensor
-var INTERSECTED;
+//intersectedNodeList is used to check wether the mouse intersects with a sensor
+var intersectedNodeList;
 
 init();
 animate();
@@ -107,9 +107,9 @@ function hoverDisplayUpdate() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(scene.children);
   if (intersects.length !== 0 && sensorMeshList.map(x=>x.mesh).includes(intersects[0].object)) {
-    if (INTERSECTED != intersects[0].object) {
+    if (intersectedNodeList != intersects[0].object) {
       emptyIntersected();
-      INTERSECTED = intersects[0].object;
+      intersectedNodeList = intersects[0].object;
       fillIntersected();
     }
   }
@@ -119,10 +119,10 @@ function hoverDisplayUpdate() {
 }
 
 function emptyIntersected() {
-  if (INTERSECTED) {
-    INTERSECTED.material = sensorMaterial;
+  if (intersectedNodeList) {
+    intersectedNodeList.material = sensorMaterial;
   }
-  INTERSECTED = null;
+  intersectedNodeList = null;
   sensorNameDiv.innerHTML = "";
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
@@ -134,10 +134,10 @@ function emptyIntersected() {
 }
 
 function fillIntersected() {
-  INTERSECTED.material = enlightenedSensorMaterial;
-  sensorNameDiv.innerHTML = INTERSECTED.name;
+  intersectedNodeList.material = enlightenedSensorMaterial;
+  sensorNameDiv.innerHTML = intersectedNodeList.name;
   for (const linkMesh of linkMeshList){
-    if (linkMesh.link.node1 === INTERSECTED || linkMesh.link.node2 === INTERSECTED)
+    if (linkMesh.link.node1 === intersectedNodeList || linkMesh.link.node2 === intersectedNodeList)
     {
       highlightedLinksPreviousMaterials.push({
         node1: linkMesh.link.node1,
@@ -220,5 +220,7 @@ export {
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,
-    jsonInput
+    jsonInput,
+    emptyIntersected,
+    intersectedNodeList
 };

@@ -46,7 +46,7 @@ class linkVolumeGenerator extends linkMeshGenerator{
     static getMaterial(strength){
         return new THREE.MeshPhysicalMaterial({
             color : new THREE.Color(strength, 0, 1-strength), 
-            opacity: strength,
+            opacity: 1,
             transparent: false
         });
     }

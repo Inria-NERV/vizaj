@@ -1,25 +1,30 @@
 import * as THREE from 'three';
 import { scene, 
-    sensorMeshList
+    sensorMeshList,
+    intersectedNodeList,
+    emptyIntersected
  } from "../public/main.js";
 import { csv3dCoordinatesOnLoadCallBack, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { deleteMesh } from "./mesh_helper";
 import { drawAllDegreeLines } from './draw_degree_line.js';
+import { guiParams } from './setup_gui.js';
 
 let sensorCount = 0;
 
 const montageBarycenter = new THREE.Vector3();
 
-const SENSOR_RADIUS = 3 * 10;
+const SENSOR_RADIUS = 3 * 10 ;
 const SENSOR_SEGMENTS = 20;
 const SENSOR_RINGS = 50;
+
+const RADIUS_SCALE = Math.sqrt(8);
 
 const SCALE_FACTOR = 100;
 
 const sensorMaterial =  new THREE.MeshPhysicalMaterial({
-    color: 0xaaaaaa,
-    opacity: 1.,
+    color: guiParams.sensorColor,
+    opacity: guiParams.sensorOpacity,
     transparent: true,
     reflectivity: 1
   });
@@ -79,20 +84,33 @@ async function drawAllSensors(coordinatesList){
 }
 
 async function drawSensor(coordinates, meanSensorDistance){
-    const radiusScale = 1 / Math.max(Math.sqrt(sensorCount), Math.sqrt(8));
+    const radiusScale = 1 / Math.max(Math.sqrt(sensorCount), RADIUS_SCALE);
+
+    const dotGeometry = new THREE.SphereGeometry(
+        0,
+        SENSOR_SEGMENTS,
+        SENSOR_RINGS
+    );
     const sensorGeometry = new THREE.SphereGeometry(
         SENSOR_RADIUS * radiusScale, 
         SENSOR_SEGMENTS, 
         SENSOR_RINGS);
+    dotGeometry.position = sensorGeometry.position;
+
+    sensorGeometry.morphAttributes.position = [];
+    sensorGeometry.morphAttributes.position[0] = new THREE.Float32BufferAttribute(
+        dotGeometry.attributes.position.array,
+        3);
+
     let sensor = new THREE.Mesh(
         sensorGeometry,
         sensorMaterial
     );
-    sensor.castShadow = false;
-    sensor.name = '';
     sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.x;
     sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.y;
     sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.z;
+    sensor.castShadow = false;
+    sensor.name = '';
     scene.add(sensor);
     sensorMeshList.push({mesh: sensor});
     return sensor;
@@ -123,6 +141,34 @@ async function getMeanSensorDistance(positions){
         }
     }
     return meanSensorDistance / count;
+}
+
+function updateAllSensorMaterial(){
+    if(intersectedNodeList){
+        emptyIntersected();
+    }
+    for (let sensor of sensorMeshList){
+        if (sensor.mesh){
+            updateSensorMaterial(sensor.mesh);
+        }
+    }
+}
+
+function updateSensorMaterial(mesh){
+    mesh.material.opacity = guiParams.sensorOpacity;
+    mesh.material.color = new THREE.Color(guiParams.sensorColor);
+}
+
+function updateAllSensorRadius(){
+    for (let sensor of sensorMeshList){
+        if (sensor.mesh){
+            updateSensorRadius(sensor.mesh);
+        }
+    }
+}
+
+function updateSensorRadius(mesh){
+    mesh.morphTargetInfluences[0] = 1 - guiParams.sensorRadiusFactor;
 }
 
 async function getMontageBarycenter(positions){
@@ -162,4 +208,6 @@ export {
     sensorMeshList, 
     sensorCount,
     maxSensorDistance, 
-    clearAllSensors};
+    clearAllSensors,
+    updateAllSensorRadius,
+    updateAllSensorMaterial };
