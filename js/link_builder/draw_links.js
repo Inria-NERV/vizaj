@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
-import { drawAllDegreeLines, updateAllDegreeLines } from "../draw_degree_line";
+import {updateAllDegreeLineLength } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
@@ -97,7 +97,7 @@ function updateVisibleLinks() {
     for (const link of linkMeshList.slice(maxVisibleLinkIndice, linkMeshList.length)){
         link.mesh.visible = false;
     }
-    updateAllDegreeLines();
+    updateAllDegreeLineLength();
 }
 
  export {

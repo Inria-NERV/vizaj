@@ -6,10 +6,7 @@ import { centerPoint } from './link_builder/compute_link_shape';
 import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper';
 
-const degreeLineMaterial = new THREE.MeshBasicMaterial( 
-    { color: 0x9999ff, 
-        opacity: .6, 
-        transparent: true } );
+let degreeLineMaterial;
 
 const DEGREE_LINE_MAX_SCALE = 200;
 
@@ -64,12 +61,16 @@ function drawDegreeLine(sensor){
     scene.add(line);
 
     sensor.degreeLine = line;
-    updateNodeDegreeLine(sensor);
+    updateDegreeLineLength(sensor);
 
     return sensor;
 }
 
 async function drawAllDegreeLines(){
+    degreeLineMaterial = new THREE.MeshBasicMaterial( 
+        { color: guiParams.degreeLineColor, 
+            opacity: guiParams.degreeLineOpacity, 
+            transparent: true } );
     for (let i = 0; i < sensorMeshList.length; i++){
         sensorMeshList[i] = drawDegreeLine(sensorMeshList[i]);
     }
@@ -87,7 +88,7 @@ function getNodeDegree(sensorMesh){
     return nodeDegree;
 }
 
-function updateNodeDegreeLine(sensor){
+function updateDegreeLineLength(sensor){
     const nodeDegree = getNodeDegree(sensor.mesh);
     sensor.degreeLine.morphTargetInfluences[0] = 
         (1 - 
@@ -95,10 +96,21 @@ function updateNodeDegreeLine(sensor){
             * guiParams.degreeLineLength);
 }
 
-function updateAllDegreeLines(){
+function updateAllDegreeLineMaterial(){
+    for (let sensor of sensorMeshList){
+        updatDegreeLineMaterial(sensor.degreeLine);
+    }
+}
+
+function updatDegreeLineMaterial(mesh){
+    mesh.material.opacity = guiParams.degreeLineOpacity;
+    mesh.material.color = new THREE.Color(guiParams.degreeLineColor);
+}
+
+function updateAllDegreeLineLength(){
     for (let sensor of sensorMeshList){
         if (sensor.mesh && sensor.degreeLine){
-            updateNodeDegreeLine(sensor);
+            updateDegreeLineLength(sensor);
         }
     }
 }
@@ -122,7 +134,8 @@ function redrawDegreeLines(){
 export {
     drawDegreeLine,
     drawAllDegreeLines,
-    updateAllDegreeLines,
+    updateAllDegreeLineLength,
     updateDegreeLinesVisibility,
-    redrawDegreeLines
+    redrawDegreeLines,
+    updateAllDegreeLineMaterial
 }

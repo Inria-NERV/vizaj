@@ -11,7 +11,7 @@ import { updateAllSensorRadius,
 import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
-import { redrawDegreeLines, updateAllDegreeLines, updateDegreeLinesVisibility } from './draw_degree_line';
+import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateDegreeLinesVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -28,6 +28,16 @@ const guiParams = {
     showDegreeLines: true,
     degreeLineRadius: 1,
     degreeLineLength: 1,
+    degreeLineColor: '#9999ff',
+    degreeLineOpacity: .6,
+    degreeLineReset: () => {
+        guiParams.showDegreeLines = true;
+        guiParams.degreeLineRadius = 1;
+        guiParams.degreeLineLength = 1;
+        guiParams.degreeLineColor = '#9999ff';
+        guiParams.degreeLineOpacity = .6;
+        redrawDegreeLines();
+    },
 
     linkHeight: 0.75,
     linkTopPointHandleDistances: .5,
@@ -38,7 +48,7 @@ const guiParams = {
     sensorRadiusFactor: 1.,
     sensorOpacity: 1.,
     sensorColor: "#aaaaaa",
-    resetSensors: () => {
+    sensorReset: () => {
         guiParams.sensorRadiusFactor = 1;
         guiParams.sensorOpacity = 1;
         guiParams.sensorColor = "#aaaaaa";
@@ -138,7 +148,7 @@ function setupGui() {
     sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
     sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).listen().name('Opacity');
     sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
-    sensorFolder.add(guiParams, 'resetSensors').name('Reset');
+    sensorFolder.add(guiParams, 'sensorReset').name('Reset');
 
     const linkGeometry = gui.addFolder('Link');
     linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
@@ -173,9 +183,12 @@ function setupGui() {
     linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
 
     const degreeLineFolder = gui.addFolder('Degree lines');
-    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line');
-    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius');
-    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLines).name('Length');
+    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line').listen();
+    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius').listen();
+    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLineLength).name('Length').listen();
+    degreeLineFolder.add(guiParams, 'degreeLineOpacity', 0., 1.).onChange(updateAllDegreeLineMaterial).listen().name('Opacity');
+    degreeLineFolder.addColor(guiParams, 'degreeLineColor').onChange(updateAllDegreeLineMaterial).listen().name('Color');
+    degreeLineFolder.add(guiParams, 'degreeLineReset').name('Reset');
 
     const fileLoadFolder = gui.addFolder('Load files');
     const csvLoadFolder = fileLoadFolder.addFolder('CSV');
