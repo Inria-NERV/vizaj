@@ -37,10 +37,12 @@ const linkMeshList = [];
 const sensorMeshList = [];
 
 const scene = new THREE.Scene();
+const uiScene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
   preserveDrawingBuffer: true
 });
-const camera = new THREE.PerspectiveCamera();
+let camera = new THREE.PerspectiveCamera();
+let uiCamera = new THREE.OrthographicCamera();
 const controls = new OrbitControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
@@ -61,6 +63,7 @@ animate();
 
 function init() {
   THREE.Cache.enabled = true;
+  renderer.autoClear = false;
   setupGui();
   generateSceneElements();
   
@@ -76,7 +79,10 @@ function animate() {
   requestAnimationFrame(animate);
   controls.update();
   hoverDisplayUpdate();
+  renderer.clear();
   renderer.render(scene, camera);
+  renderer.clearDepth();
+  renderer.render(uiScene, uiCamera);
 }
 
 function onWindowResize() {
@@ -206,6 +212,8 @@ async function handleJsonFileSelect(evt){
 export {
     scene,
     camera,
+    uiScene,
+    uiCamera,
     controls,
     renderer,
     linkMeshList,

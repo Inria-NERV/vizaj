@@ -3,7 +3,8 @@ import { sensorMeshList } from "../draw_sensors";
 import { guiParams } from '../setup_gui';
 
 
-class linkMeshGenerator{ }
+class linkMeshGenerator{ 
+}
 
 class linkLineGenerator extends linkMeshGenerator{
     static ARC_SEGMENTS = 48;
@@ -16,12 +17,11 @@ class linkLineGenerator extends linkMeshGenerator{
     }
 
     static getMaterial(strength){
-        return new THREE.LineBasicMaterial( { 
-            color : new THREE.Color(strength, 0, 1-strength),
+        const material = new THREE.LineBasicMaterial( { 
             linewidth: 0.001,
-            opacity: guiParams.linkOpacity,
             transparent: true 
         } );
+        return material;
     }
 
     static getGeometry(curvePath, link){
@@ -44,11 +44,10 @@ class linkVolumeGenerator extends linkMeshGenerator{
     }
 
     static getMaterial(strength){
-        return new THREE.MeshPhysicalMaterial({
-            color : new THREE.Color(strength, 0, 1-strength), 
-            opacity: guiParams.linkOpacity,
+        const material = new THREE.MeshPhysicalMaterial({
             transparent: true
         });
+        return material;
     }
 
     static getGeometry(curvePath, link){

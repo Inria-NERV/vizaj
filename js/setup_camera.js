@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { camera, controls, scene, renderer, LINK_LAYER} from '../public/main.js';
+import { scene, camera,
+    uiScene, uiCamera,
+    controls, renderer, LINK_LAYER} from '../public/main.js';
 import { guiParams } from './setup_gui';
 
 function setupCamera(){
@@ -14,8 +16,9 @@ function setupCamera(){
     controls.target = new THREE.Vector3(0,camera.position.y,0);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    scene.add(camera);
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    uiCamera.position.set(0.85, 0, 1);
 }
 
 function updateRotateCamera(){

@@ -1,11 +1,17 @@
 import * as THREE from "three";
-import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
+import { sensorMeshList, scene, uiScene, linkMeshList, LINK_LAYER} from '../../public/main';
 import {updateAllDegreeLineLength } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
+import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
+
+const lut = new Lut();
+let colorMapSprite;
+let maxLinkStrength;
+let minLinkStrength;
 
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
@@ -52,6 +58,13 @@ async function drawLinks(linkList){
         scene.add(curveObject);
         linkMeshList.push({link: link, mesh: curveObject});
     }
+    maxLinkStrength = Math.max.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
+    minLinkStrength = Math.min.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
+    lut.setColorMap( guiParams.linkColorMap );
+    lut.setMax(maxLinkStrength);
+    lut.setMin(minLinkStrength);
+    generateLinkColorMapSprite();
+    updateAllLinkMaterial();
 }
 
 function updateLinkOutline(){
@@ -83,6 +96,7 @@ async function clearAllLinks() {
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);
     }
+    deleteMesh(colorMapSprite);
 }
 
 function updateVisibleLinks() {
@@ -101,13 +115,38 @@ function updateVisibleLinks() {
 }
 
 function updateAllLinkMaterial(){
-    for (let link of linkMeshList){
-        lupdateLinkMaterial(link.mesh);
+    lut.setColorMap( guiParams.linkColorMap );
+    updateColorMapSprite();
+    for (let linkTuple of linkMeshList){
+        updateLinkMaterial(linkTuple);
     }
 }
 
-function updateLinkMaterial(mesh){
+function updateLinkMaterial(linkTuple){
+    const mesh = linkTuple.mesh;
     mesh.material.opacity = guiParams.linkOpacity;
+    updateLinkColor(linkTuple);
+}
+
+function updateLinkColor(linkTuple){
+    const color = lut.getColor(linkTuple.link.strength);
+    linkTuple.mesh.material.color = color;
+}
+
+function generateLinkColorMapSprite(){
+    const spriteMaterial = new THREE.SpriteMaterial( {
+        map: new THREE.CanvasTexture(lut.createCanvas()),
+        visible: true
+    });
+    colorMapSprite = new THREE.Sprite(spriteMaterial);
+    colorMapSprite.scale.x = 0.075;
+    uiScene.add(colorMapSprite);
+}
+
+function updateColorMapSprite(){
+    const map = colorMapSprite.material.map;
+    lut.updateCanvas( map.image );
+    map.needsUpdate = true;
 }
 
  export {

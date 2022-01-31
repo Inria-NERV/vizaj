@@ -46,6 +46,7 @@ const guiParams = {
     linkTopPointAngle: 0.,
     linkThickness: 0.,
     linkOpacity: 1.,
+    linkColorMap: 'rainbow',
 
     sensorRadiusFactor: 1.,
     sensorOpacity: 1.,
@@ -175,6 +176,8 @@ function setupGui() {
     linkGeometryFolder.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen().name('Sensor angle');
     linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
     //we purposedly don't allow change of top point angle
+
+    linkFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial);
 
     const defaultLinkGeometryFolder = linkGeometryFolder.addFolder('Default geometries');
     defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
