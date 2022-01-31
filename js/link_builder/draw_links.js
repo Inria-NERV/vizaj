@@ -100,6 +100,16 @@ function updateVisibleLinks() {
     updateAllDegreeLineLength();
 }
 
+function updateAllLinkMaterial(){
+    for (let link of linkMeshList){
+        lupdateLinkMaterial(link.mesh);
+    }
+}
+
+function updateLinkMaterial(mesh){
+    mesh.material.opacity = guiParams.linkOpacity;
+}
+
  export {
     clearAllLinks,
     generateLinkData,
@@ -107,5 +117,6 @@ function updateVisibleLinks() {
     drawLinksAndUpdateVisibility,
     redrawLinks,
     updateLinkOutline,
-    updateVisibleLinks}
+    updateVisibleLinks,
+    updateAllLinkMaterial}
      

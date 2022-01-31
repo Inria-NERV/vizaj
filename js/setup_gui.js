@@ -8,7 +8,7 @@ import { gui, controls,
     sensorMeshList} from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
-import { redrawLinks, updateLinkOutline, updateVisibleLinks } from './link_builder/draw_links';
+import { redrawLinks, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateDegreeLinesVisibility } from './draw_degree_line';
@@ -44,6 +44,8 @@ const guiParams = {
     linkSensorAngles: 3 / 8,
     linkSensorHandleDistances: 0.,
     linkTopPointAngle: 0.,
+    linkThickness: 0.,
+    linkOpacity: 1.,
 
     sensorRadiusFactor: 1.,
     sensorOpacity: 1.,
@@ -77,9 +79,15 @@ const guiParams = {
         redrawDegreeLines();
     },
 
-    makeLinkLineMesh: () => changeLinkMesh(linkLineGenerator),
-    makeLinkVolumeMesh: () => changeLinkMesh(linkVolumeGenerator),
-    linkThickness: 1.,
+    makeLinkLineMesh: () => {
+        guiParams.linkThickness = 0;
+        changeLinkMesh(linkLineGenerator)},
+
+    makeLinkVolumeMesh: () => {
+        if (guiParams.linkThickness == 0){
+            guiParams.linkThickness = 1;
+        }
+        changeLinkMesh(linkVolumeGenerator)},
 
     splinePointsGeometry: 0,
 
@@ -131,6 +139,16 @@ function changeLinkMesh(linkGenerator){
     redrawLinks();
 }
 
+function linkThicknessUpdate() {
+    if (guiParams.linkThickness > 0. && guiParams.linkGenerator != linkVolumeGenerator){
+        changeLinkMesh(linkVolumeGenerator);
+    }
+    else if (guiParams.linkThickness == 0.){
+        changeLinkMesh(linkLineGenerator);
+    }
+    redrawLinks();
+}
+
 function setupGui() {
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
@@ -150,21 +168,22 @@ function setupGui() {
     sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
     sensorFolder.add(guiParams, 'sensorReset').name('Reset');
 
-    const linkGeometry = gui.addFolder('Link');
-    linkGeometry.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
-    linkGeometry.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Top point handle distance');
-    linkGeometry.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen().name('Sensor angle');
-    linkGeometry.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
+    const linkFolder = gui.addFolder('Link');
+    const linkGeometryFolder = linkFolder.addFolder('Geometry');
+    linkGeometryFolder.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
+    linkGeometryFolder.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Top point handle distance');
+    linkGeometryFolder.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen().name('Sensor angle');
+    linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
     //we purposedly don't allow change of top point angle
 
-    const premadeLinkGeometries = gui.addFolder('premadeLinkGeometries');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
-    premadeLinkGeometries.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
+    const defaultLinkGeometryFolder = linkGeometryFolder.addFolder('Default geometries');
+    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
+    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
+    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
+    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
+    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
 
-    const linkAlignmentTarget = linkGeometry.addFolder('Link alignment target');
+    const linkAlignmentTarget = linkFolder.addFolder('Link alignment target');
     linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')
         .onChange(() => {
             redrawLinks();
@@ -177,10 +196,12 @@ function setupGui() {
     linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget')
         .name('Maximum');  
 
-    const linkVolume = linkGeometry.addFolder('Volume');
-    linkVolume.add(guiParams, 'makeLinkLineMesh').name('Line');
-    linkVolume.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
-    linkVolume.add(guiParams, 'linkThickness', 0, 4).onChange(redrawLinks);
+    const linkVolumeFolder = linkFolder.addFolder('Link radius');
+    linkVolumeFolder.add(guiParams, 'makeLinkLineMesh').name('Line');
+    linkVolumeFolder.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
+    linkVolumeFolder.add(guiParams, 'linkThickness', 0, 4).onChange(linkThicknessUpdate).listen().name('Link radius');
+
+    linkFolder.add(guiParams, 'linkOpacity', 0., 1.).onChange(updateAllLinkMaterial).listen().name('Opacity');
 
     const degreeLineFolder = gui.addFolder('Degree lines');
     degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line').listen();

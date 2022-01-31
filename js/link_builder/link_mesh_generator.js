@@ -19,8 +19,8 @@ class linkLineGenerator extends linkMeshGenerator{
         return new THREE.LineBasicMaterial( { 
             color : new THREE.Color(strength, 0, 1-strength),
             linewidth: 0.001,
-            opacity: strength,
-            transparent: false 
+            opacity: guiParams.linkOpacity,
+            transparent: true 
         } );
     }
 
@@ -46,8 +46,8 @@ class linkVolumeGenerator extends linkMeshGenerator{
     static getMaterial(strength){
         return new THREE.MeshPhysicalMaterial({
             color : new THREE.Color(strength, 0, 1-strength), 
-            opacity: 1,
-            transparent: false
+            opacity: guiParams.linkOpacity,
+            transparent: true
         });
     }
 
