@@ -88,10 +88,10 @@ class spriteLut extends Lut {
 
     updateColorMapSprites(){
         if (this.topValueSprite){
-            spriteLut.setSpriteScale(topValueSprite);
+            spriteLut.setSpriteScale(this.topValueSprite);
         }
         if (this.bottomValueSprite){
-            spriteLut.setSpriteScale(bottomValueSprite);
+            spriteLut.setSpriteScale(this.bottomValueSprite);
         }
     }
 
@@ -99,7 +99,5 @@ class spriteLut extends Lut {
         sprite.scale.set(.09 * window.innerHeight/789,.15 * window.innerWidth / 1440,1);
     }
 }
-
-
 
 export { spriteLut }
