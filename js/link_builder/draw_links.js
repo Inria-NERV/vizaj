@@ -138,6 +138,7 @@ function generateLinkColorMapSprite(){
     clearAllLinks,
     generateLinkData,
     loadAndDrawLinks,
+    lut,
     drawLinksAndUpdateVisibility,
     redrawLinks,
     updateLinkOutline,

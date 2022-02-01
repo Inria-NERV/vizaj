@@ -9,7 +9,7 @@ import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, 
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, lut, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData } from "../js/load_data";
@@ -64,6 +64,7 @@ animate();
 function init() {
   THREE.Cache.enabled = true;
   renderer.autoClear = false;
+  renderer.setPixelRatio( window.devicePixelRatio );
   setupGui();
   generateSceneElements();
   
@@ -89,6 +90,10 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  if(lut){
+    lut.updateColorMapSprites();
+  }
+  
 }
 
 async function generateSceneElements() {

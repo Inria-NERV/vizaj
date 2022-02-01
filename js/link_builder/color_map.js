@@ -51,7 +51,7 @@ class spriteLut extends Lut {
 
     static generateValueSprite(number, canvas){
         const sprite = spriteLut.createTextSprite(parseFloat(number).toFixed(2), canvas);
-        sprite.scale.set(.6 * .15,1 * .15,1);
+        spriteLut.setSpriteScale(sprite);
         return sprite;
     }
 
@@ -85,6 +85,21 @@ class spriteLut extends Lut {
         ctx.fillStyle = "white";
         ctx.fillText(message,10,500);
     }
+
+    updateColorMapSprites(){
+        if (this.topValueSprite){
+            spriteLut.setSpriteScale(topValueSprite);
+        }
+        if (this.bottomValueSprite){
+            spriteLut.setSpriteScale(bottomValueSprite);
+        }
+    }
+
+    static setSpriteScale(sprite){
+        sprite.scale.set(.09 * window.innerHeight/789,.15 * window.innerWidth / 1440,1);
+    }
 }
+
+
 
 export { spriteLut }
