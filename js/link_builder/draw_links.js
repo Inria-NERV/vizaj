@@ -6,12 +6,9 @@ import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
-import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
+import { spriteLut } from './color_map.js';
 
-const lut = new Lut();
-let colorMapSprite;
-let maxLinkStrength;
-let minLinkStrength;
+const lut = new spriteLut();
 
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
@@ -58,8 +55,8 @@ async function drawLinks(linkList){
         scene.add(curveObject);
         linkMeshList.push({link: link, mesh: curveObject});
     }
-    maxLinkStrength = Math.max.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
-    minLinkStrength = Math.min.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
+    const maxLinkStrength = Math.max.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
+    const minLinkStrength = Math.min.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
     lut.setColorMap( guiParams.linkColorMap );
     lut.setMax(maxLinkStrength);
     lut.setMin(minLinkStrength);
@@ -96,7 +93,7 @@ async function clearAllLinks() {
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);
     }
-    deleteMesh(colorMapSprite);
+    lut.clear();
 }
 
 function updateVisibleLinks() {
@@ -116,7 +113,7 @@ function updateVisibleLinks() {
 
 function updateAllLinkMaterial(){
     lut.setColorMap( guiParams.linkColorMap );
-    updateColorMapSprite();
+    lut.updateColorMapSprite();
     for (let linkTuple of linkMeshList){
         updateLinkMaterial(linkTuple);
     }
@@ -134,19 +131,7 @@ function updateLinkColor(linkTuple){
 }
 
 function generateLinkColorMapSprite(){
-    const spriteMaterial = new THREE.SpriteMaterial( {
-        map: new THREE.CanvasTexture(lut.createCanvas()),
-        visible: true
-    });
-    colorMapSprite = new THREE.Sprite(spriteMaterial);
-    colorMapSprite.scale.x = 0.075;
-    uiScene.add(colorMapSprite);
-}
-
-function updateColorMapSprite(){
-    const map = colorMapSprite.material.map;
-    lut.updateCanvas( map.image );
-    map.needsUpdate = true;
+    lut.drawColorMapSprite(uiScene);
 }
 
  export {

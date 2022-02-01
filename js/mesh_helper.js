@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import { scene } from '../public/main';
 
-function deleteMesh(mesh){
+function deleteMesh(mesh, _scene=scene){
     disposeMesh(mesh);
-    scene.remove(mesh);
+    _scene.remove(mesh);
 }
 
 function disposeMesh(mesh){
