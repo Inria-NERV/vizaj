@@ -96,7 +96,7 @@ class spriteLut extends Lut {
     }
 
     static setSpriteScale(sprite){
-        sprite.scale.set(.09 * window.innerHeight/789,.15 * window.innerWidth / 1440,1);
+        sprite.scale.set(.085 * window.innerHeight / 789, .15 * window.innerWidth / 1440,1);
     }
 }
 
