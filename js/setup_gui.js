@@ -8,7 +8,7 @@ import { gui, controls,
     sensorMeshList} from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
-import { redrawLinks, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
+import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateDegreeLinesVisibility } from './draw_degree_line';
@@ -47,6 +47,8 @@ const guiParams = {
     linkThickness: 0.,
     linkOpacity: 1.,
     linkColorMap: 'rainbow',
+
+    showColorMap: true,
 
     sensorRadiusFactor: 1.,
     sensorOpacity: 1.,
@@ -177,7 +179,9 @@ function setupGui() {
     linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
     //we purposedly don't allow change of top point angle
 
-    linkFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial);
+    const colorMapFolder = linkFolder.addFolder('Color map');
+    colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial).name('Color map');
+    colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {colorMapSprite.show(guiParams.showColorMap)}).name('Show color bar');
 
     const defaultLinkGeometryFolder = linkGeometryFolder.addFolder('Default geometries');
     defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');

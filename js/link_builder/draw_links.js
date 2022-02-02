@@ -6,9 +6,9 @@ import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
-import { spriteLut } from './color_map.js';
+import { ColorMapSprite } from './color_map_sprite.js';
 
-const lut = new spriteLut();
+let colorMapSprite;
 
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
@@ -57,9 +57,7 @@ async function drawLinks(linkList){
     }
     const maxLinkStrength = Math.max.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
     const minLinkStrength = Math.min.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
-    lut.setColorMap( guiParams.linkColorMap );
-    lut.setMax(maxLinkStrength);
-    lut.setMin(minLinkStrength);
+    colorMapSprite = new ColorMapSprite(guiParams.linkColorMap, maxLinkStrength, minLinkStrength);
     generateLinkColorMapSprite();
     updateAllLinkMaterial();
 }
@@ -93,7 +91,7 @@ async function clearAllLinks() {
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);
     }
-    lut.clear();
+    colorMapSprite.clear();
 }
 
 function updateVisibleLinks() {
@@ -112,8 +110,7 @@ function updateVisibleLinks() {
 }
 
 function updateAllLinkMaterial(){
-    lut.setColorMap( guiParams.linkColorMap );
-    lut.updateColorMapSprite();
+    colorMapSprite.setColorMap(guiParams.linkColorMap );
     for (let linkTuple of linkMeshList){
         updateLinkMaterial(linkTuple);
     }
@@ -126,19 +123,19 @@ function updateLinkMaterial(linkTuple){
 }
 
 function updateLinkColor(linkTuple){
-    const color = lut.getColor(linkTuple.link.strength);
+    const color = colorMapSprite.getColor(linkTuple.link.strength);
     linkTuple.mesh.material.color = color;
 }
 
 function generateLinkColorMapSprite(){
-    lut.drawColorMapSprite(uiScene);
+    colorMapSprite.drawColorMapSprite(uiScene);
 }
 
  export {
     clearAllLinks,
+    colorMapSprite,
     generateLinkData,
     loadAndDrawLinks,
-    lut,
     drawLinksAndUpdateVisibility,
     redrawLinks,
     updateLinkOutline,
