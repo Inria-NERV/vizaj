@@ -55,14 +55,17 @@ function drawDegreeLine(sensor){
 
     const line = new THREE.Mesh(geometry, degreeLineMaterial);
     line.morphTargetInfluences = [];
+
+    line.visible = guiParams.de
     
     line.layers.set(LINK_LAYER);
 
-    scene.add(line);
-
     sensor.degreeLine = line;
     updateDegreeLineLength(sensor);
+    updatDegreeLineMaterial(line);
+    updateDegreeLineVisibility(line);
 
+    scene.add(line);
     return sensor;
 }
 
@@ -115,10 +118,14 @@ function updateAllDegreeLineLength(){
     }
 }
 
-function updateDegreeLinesVisibility(){
+function updateAllDegreeLineVisibility(){
     for (let sensor of sensorMeshList){
-        sensor.degreeLine.visible = guiParams.showDegreeLines;
+        updateDegreeLineVisibility(sensor.degreeLine);
     }
+}
+
+function updateDegreeLineVisibility(mesh){
+    mesh.visible = guiParams.showDegreeLines;
 }
 
 function redrawDegreeLines(){
@@ -135,7 +142,7 @@ export {
     drawDegreeLine,
     drawAllDegreeLines,
     updateAllDegreeLineLength,
-    updateDegreeLinesVisibility,
+    updateAllDegreeLineVisibility,
     redrawDegreeLines,
     updateAllDegreeLineMaterial
 }

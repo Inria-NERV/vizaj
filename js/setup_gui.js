@@ -11,7 +11,7 @@ import { updateAllSensorRadius,
 import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
-import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateDegreeLinesVisibility } from './draw_degree_line';
+import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
 
 const guiParams = {
@@ -211,7 +211,7 @@ function setupGui() {
     linkFolder.add(guiParams, 'linkOpacity', 0., 1.).onChange(updateAllLinkMaterial).listen().name('Opacity');
 
     const degreeLineFolder = gui.addFolder('Degree lines');
-    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateDegreeLinesVisibility).name('Show degree line').listen();
+    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateAllDegreeLineVisibility).name('Show degree line').listen();
     degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius').listen();
     degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLineLength).name('Length').listen();
     degreeLineFolder.add(guiParams, 'degreeLineOpacity', 0., 1.).onChange(updateAllDegreeLineMaterial).listen().name('Opacity');
