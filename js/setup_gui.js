@@ -81,6 +81,11 @@ const guiParams = {
         redrawLinks();
         redrawDegreeLines();
     },
+    minimumLinkAligmnentTarget: ()=> {
+        guiParams.linkAlignmentTarget = -1000000;
+        redrawLinks();
+        redrawDegreeLines();
+    },
 
     makeLinkLineMesh: () => {
         guiParams.linkThickness = 0;
@@ -202,6 +207,8 @@ function setupGui() {
         .name('Reset');
     linkAlignmentTarget.add(guiParams, 'maximumLinkAligmnentTarget')
         .name('Maximum');  
+    linkAlignmentTarget.add(guiParams, 'minimumLinkAligmnentTarget')
+        .name('Minimum');  
 
     const linkVolumeFolder = linkFolder.addFolder('Link radius');
     linkVolumeFolder.add(guiParams, 'makeLinkLineMesh').name('Line');
