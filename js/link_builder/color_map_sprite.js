@@ -3,10 +3,8 @@ import { deleteMesh } from "../mesh_helper";
 import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
 import { uiScene } from "../../public/main";
 
-
-const canvasLen = 1000;
 class ColorMapSprite {
-    constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0 ){
+    constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0, canvasLen=1000 ){
         this.lut = new Lut();
         this.lut.setColorMap( colorMapName );
         this.lut.setMax(maxLinkStrength);
