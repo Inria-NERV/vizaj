@@ -13,7 +13,6 @@ import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_
 import { updateBrainMeshVisibility } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf } from './export_image';
-
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
     loadMontageCsvFile: () => {csvNodePositionsInput.click();},
@@ -25,7 +24,7 @@ const guiParams = {
     maxStrengthToDisplay: .2,
     showBrain: true,
 
-    showDegreeLines: true,
+    showDegreeLines: false,
     degreeLineRadius: 1,
     degreeLineLength: 1,
     degreeLineColor: '#9999ff',
@@ -41,8 +40,8 @@ const guiParams = {
 
     linkHeight: 0.75,
     linkTopPointHandleDistances: .5,
-    linkSensorAngles: 3 / 8,
-    linkSensorHandleDistances: 0.,
+    linkSensorAngles: .375,
+    linkSensorHandleDistances: 0.1,
     linkTopPointAngle: 0.,
     linkThickness: 0.,
     linkOpacity: 1.,
@@ -70,6 +69,8 @@ const guiParams = {
         guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
         updateVisibleLinks();
     },
+
+    linkGeometry: 'Default',
 
     resetLinkAlignmentTarget: ()=>{
         guiParams.linkAlignmentTarget = 30;
@@ -104,42 +105,60 @@ const guiParams = {
     
   };
 
-const premadeLinkGeometriesParam = {
-    defaultLinkGeometry: () => {
-        guiParams.linkHeight = 0.75;
-        guiParams.linkTopPointHandleDistances = 0.5;
-        guiParams.linkSensorAngles = 3 / 8;
-        guiParams.linkSensorHandleDistances = 0.;
-        updateLinkOutline();
-    },
-    bellLinkGeometry: () => {
-        guiParams.linkHeight = 0.75;
-        guiParams.linkTopPointHandleDistances = 0.5;
-        guiParams.linkSensorAngles = 0.;
-        guiParams.linkSensorHandleDistances = .5;
-        updateLinkOutline();
-    },
-    triangleLinkGeometry: () => {
-        guiParams.linkHeight = 0.75;
-        guiParams.linkTopPointHandleDistances = 0;
-        guiParams.linkSensorAngles = 0.;
-        guiParams.linkSensorHandleDistances = 0.;
-        updateLinkOutline();
-    },
-    roundedSquareLinkGeometry: () => {
-        guiParams.linkHeight = 0.5;
-        guiParams.linkTopPointHandleDistances = 1.;
-        guiParams.linkSensorAngles = 0.5;
-        guiParams.linkSensorHandleDistances = 1.;
-        updateLinkOutline();
-    },
-    peakLinkGeometry: () => {
-        guiParams.linkHeight = 0.75;
-        guiParams.linkTopPointHandleDistances = 0;
-        guiParams.linkSensorAngles = 0.;
-        guiParams.linkSensorHandleDistances = 1.;
-        updateLinkOutline();
+const premadeLinkGeometriesList = ['Default', 'Bell', 'Triangle', 'Circle', 'Circle2', 'Rounded square', 'Peak', 'Flat'];
+function updateDefaultLinkGeometry(){
+    switch (guiParams.linkGeometry){
+        case 'Default':
+            guiParams.linkHeight = 0.75;
+            guiParams.linkTopPointHandleDistances = 0.5;
+            guiParams.linkSensorAngles = 0.375;
+            guiParams.linkSensorHandleDistances = 0.;
+            break;
+        case 'Bell':
+            guiParams.linkHeight = 0.75;
+            guiParams.linkTopPointHandleDistances = 0.5;
+            guiParams.linkSensorAngles = 0.;
+            guiParams.linkSensorHandleDistances = .5;
+            break;
+        case 'Triangle':
+            guiParams.linkHeight = 0.75;
+            guiParams.linkTopPointHandleDistances = 0;
+            guiParams.linkSensorAngles = 0.;
+            guiParams.linkSensorHandleDistances = 0.;
+            break;
+        case 'Circle':
+            guiParams.linkHeight = 0.5;
+            guiParams.linkTopPointHandleDistances = 0.5;
+            guiParams.linkSensorAngles = 0.5;
+            guiParams.linkSensorHandleDistances = .5;
+            break;
+        case 'Circle2':
+            guiParams.linkHeight = 0.9;
+            guiParams.linkTopPointHandleDistances = 1.;
+            guiParams.linkSensorAngles = 0.8;
+            guiParams.linkSensorHandleDistances = 1.;
+            break;
+        case 'Rounded square':
+            guiParams.linkHeight = 0.5;
+            guiParams.linkTopPointHandleDistances = 1.;
+            guiParams.linkSensorAngles = 0.5;
+            guiParams.linkSensorHandleDistances = 1.;
+            break;
+        case 'Peak':
+            guiParams.linkHeight = 0.75;
+            guiParams.linkTopPointHandleDistances = 0;
+            guiParams.linkSensorAngles = 0.;
+            guiParams.linkSensorHandleDistances = 1.;
+            break;
+        case 'Flat':
+            guiParams.linkHeight = 0;
+            guiParams.linkTopPointHandleDistances = 0;
+            guiParams.linkSensorAngles = 0.;
+            guiParams.linkSensorHandleDistances = 0.;
+            break;
     }
+    updateLinkOutline();
+
 }
 
 function changeLinkMesh(linkGenerator){
@@ -188,12 +207,7 @@ function setupGui() {
     colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial).name('Color map');
     colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {colorMapSprite.show(guiParams.showColorMap)}).name('Show color bar');
 
-    const defaultLinkGeometryFolder = linkGeometryFolder.addFolder('Default geometries');
-    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'defaultLinkGeometry').name('Default');
-    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'bellLinkGeometry').name('Bell');
-    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'triangleLinkGeometry').name('Triangle');
-    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'roundedSquareLinkGeometry').name('Rounded square');
-    defaultLinkGeometryFolder.add(premadeLinkGeometriesParam, 'peakLinkGeometry').name('Peak');
+    linkGeometryFolder.add(guiParams, 'linkGeometry', premadeLinkGeometriesList).onChange(updateDefaultLinkGeometry).name('Geometry');
 
     const linkAlignmentTarget = linkFolder.addFolder('Link alignment target');
     linkAlignmentTarget.add(guiParams, 'linkAlignmentTarget')

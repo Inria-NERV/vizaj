@@ -3,9 +3,8 @@ import { Matrix3, Vector3 } from "three";
 import { guiParams } from '../setup_gui';
 
 //This point is tho translate the origin where the coordinates of the link are computed
-// since all links align with the plan of 0, and the position of the two nodes, we alter the position of the nodes 
+// since all links align with the plan of (0,0,0) and the position of the two nodes, we alter the position of the nodes 
 // in order to make the links face where we want
-// This is useful to exploit data from planes or sphere for example
 
 const centerPoint = new Vector3(0,-25,0);
 
