@@ -39,7 +39,7 @@ async function export2DImage(){
             setTimeout(()=>{resolve()}, 1);
         });
         const imgData = renderer.domElement.toDataURL(strMime);
-        saveFile(imgData, "scene.tif");
+        saveFile(imgData, "network.tif");
         renderer.setSize(window.innerWidth, window.innerHeight, false);
         window.addEventListener("resize", onWindowResize);
         isExporting2DImage = false;
