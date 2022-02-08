@@ -39,8 +39,9 @@ const sensorMeshList = [];
 const scene = new THREE.Scene();
 const uiScene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
-  preserveDrawingBuffer: true
+  preserveDrawingBuffer: true,
 });
+renderer.domElement.id = 'renderer';
 let camera = new THREE.PerspectiveCamera();
 let uiCamera = new THREE.OrthographicCamera();
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -93,7 +94,6 @@ function onWindowResize() {
   if(colorMapSprite){
     colorMapSprite.updateSpriteValueScale();
   }
-  
 }
 
 async function generateSceneElements() {
@@ -235,5 +235,6 @@ export {
     csvNodeLabelsInput,
     jsonInput,
     emptyIntersected,
-    intersectedNodeList
+    intersectedNodeList,
+    onWindowResize
 };

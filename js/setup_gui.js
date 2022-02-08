@@ -12,7 +12,8 @@ import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, upd
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
-import { export2DImage, export3Dgltf } from './export_image';
+import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
+
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
     loadMontageCsvFile: () => {csvNodePositionsInput.click();},
@@ -100,7 +101,11 @@ const guiParams = {
 
     splinePointsGeometry: 0,
 
-    export2dImage: () => export2DImage(),
+    export2dImage: () => {
+        if (!isExporting2DImage){
+            export2DImage();
+        }
+    },
     export3Dgltf: () => export3Dgltf(),
     
   };

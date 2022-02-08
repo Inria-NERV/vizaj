@@ -1,13 +1,15 @@
-import { renderer, scene } from "../public/main";
+import { renderer, scene, onWindowResize } from "../public/main";
 import { GLTFExporter } from '../node_modules/three/examples/jsm/exporters/GLTFExporter.js';
 
 const strMime = 'image/bmp';
+
+let isExporting2DImage = false;
 
 function export3Dgltf(){
     exportSceneToGLTF(scene);
 }
 
-function exportSceneToGLTF( scene ) {
+async function exportSceneToGLTF( scene ) {
     const gltfExporter = new GLTFExporter();
     const options = {
         onlyVisible: true,
@@ -28,10 +30,19 @@ function exportSceneToGLTF( scene ) {
     );
 }
 
-function export2DImage(){
+async function export2DImage(){
     try {
+        isExporting2DImage = true;
+        window.removeEventListener("resize", onWindowResize);
+        await new Promise((resolve, reject)=> {
+            renderer.setSize(window.innerWidth * 3, window.innerHeight * 3, false);
+            setTimeout(()=>{resolve()}, 1);
+        });
         const imgData = renderer.domElement.toDataURL(strMime);
         saveFile(imgData, "scene.tif");
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+        window.addEventListener("resize", onWindowResize);
+        isExporting2DImage = false;
     } catch (e){
         console.log(e);
         return;
@@ -49,5 +60,6 @@ function saveFile(strData, filename) {
 
 export {
     export2DImage,
-    export3Dgltf
+    export3Dgltf,
+    isExporting2DImage
 }
