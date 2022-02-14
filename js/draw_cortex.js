@@ -1,9 +1,15 @@
 import * as THREE from 'three';
 import { cortexTriOnLoadCallback, csv3dCoordinatesOnLoadCallBack, loadData } from './load_data.js';
-import { scene, cortexVertUrl, cortexTriUrl, cortexMaterial, GLOBAL_LAYER } from "../public/main.js";
+import { scene, transformControls, cortexVertUrl, cortexTriUrl, GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
 
 let brainMesh;
+let orbitControlsEnabled = false;
+
+const cortexMaterial = new THREE.MeshStandardMaterial({
+    color: '#ffc0cb',
+    side: THREE.BackSide
+  });
 
 function loadAndDrawCortexModel(){   
     loadCortexModel()
@@ -41,15 +47,12 @@ function drawCortexModel(vertices){
     brainMesh.castShadow = true;
     repositionBrainMesh( brainMesh );
     brainMesh.name = 'cortex';
-    // const box = new THREE.BoxHelper( brainMesh, 0xffff00 );
-    // scene.add( box );
     scene.add( brainMesh );
 }
 
-function repositionBrainMesh(brainMesh){
-    brainMesh.rotateY(Math.PI);
-    brainMesh.translateY(-13);
-    brainMesh.translateX(-15);
+function repositionBrainMesh(){
+    brainMesh.rotation.set(0,Math.PI,0);
+    brainMesh.position.set(2,-13,0);
     const scale = .8;
     brainMesh.scale.set(scale,scale,scale);
 }
@@ -69,9 +72,43 @@ function showBrain(){
     updateBrainMeshVisibility();
 }
 
+function updateExtraItemMaterial(){
+    if (brainMesh){
+        brainMesh.material.color = new THREE.Color(guiParams.colorExtraItem);
+    }
+}
+
+function toggleTransformControls(mode){
+    if (!brainMesh){return;}
+    if (!orbitControlsEnabled){
+        transformControls.attach( brainMesh );
+        orbitControlsEnabled = true;
+    }
+    else if (orbitControlsEnabled && transformControls.mode == mode){
+        transformControls.detach( brainMesh );
+        orbitControlsEnabled = false;
+    }
+    transformControls.setMode(mode);
+}
+
+function translateModeTransformControls(){
+    toggleTransformControls('translate');
+}
+function rotateModeTransformControls(){
+    toggleTransformControls('rotate');
+}
+function scaleModeTransformControls(){
+    toggleTransformControls('scale');
+}
+
 export {
     loadAndDrawCortexModel,
     updateBrainMeshVisibility,
     hideBrain,
-    showBrain
+    showBrain,
+    updateExtraItemMaterial,
+    translateModeTransformControls,
+    rotateModeTransformControls,
+    scaleModeTransformControls,
+    repositionBrainMesh
 };

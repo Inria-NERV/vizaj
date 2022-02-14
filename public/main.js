@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
+import { TransformControls } from '../node_modules/three/examples/jsm/controls/TransformControls.js';
 import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, sensorMaterial } from "../js/draw_sensors.js";
 import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
@@ -24,10 +25,6 @@ let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
-const cortexMaterial = new THREE.MeshStandardMaterial({
-  color: 0xffc0cb,
-  side: THREE.BackSide
-});
 const enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
   reflectivity: 1
@@ -44,7 +41,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.domElement.id = 'renderer';
 let camera = new THREE.PerspectiveCamera();
 let uiCamera = new THREE.OrthographicCamera();
-const controls = new OrbitControls(camera, renderer.domElement);
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+const transformControls = new TransformControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 const gui = new GUI();
@@ -71,6 +69,9 @@ function init() {
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
+  transformControls.addEventListener('dragging-changed', (event)=>{
+    orbitControls.enabled = !event.value
+  });
   csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
   csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
@@ -79,7 +80,6 @@ function init() {
 
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
   hoverDisplayUpdate();
   renderer.clear();
   renderer.render(scene, camera);
@@ -99,6 +99,7 @@ function onWindowResize() {
 async function generateSceneElements() {
   setupCamera();
   addLightAndBackground();
+  scene.add( transformControls );
   loadAndDrawCortexModel();
   await loadAndDrawSensors(sensorCoordinatesUrl);
   await loadAndAssignSensorLabels(sensorLabelsUrl);
@@ -219,14 +220,14 @@ export {
     camera,
     uiScene,
     uiCamera,
-    controls,
+    transformControls,
+    orbitControls as controls,
     renderer,
     linkMeshList,
     sensorMeshList,
     gui,
     cortexVertUrl, 
     cortexTriUrl, 
-    cortexMaterial,
     sensorMaterial,
     GLOBAL_LAYER,
     LINK_LAYER,

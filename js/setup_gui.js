@@ -10,7 +10,12 @@ import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
 import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
-import { updateBrainMeshVisibility } from './draw_cortex';
+import { updateBrainMeshVisibility, 
+    updateExtraItemMaterial,
+    translateModeTransformControls,
+    rotateModeTransformControls,
+    scaleModeTransformControls,
+    repositionBrainMesh } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
 
@@ -23,7 +28,17 @@ const guiParams = {
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
     maxStrengthToDisplay: .2,
-    showBrain: true,
+
+    showExtraItem: true,
+    colorExtraItem: '#ffc0cb',
+    resetExtraItemColor: () =>{
+        guiParams.colorExtraItem = '#ffc0cb';
+        updateExtraItemMaterial();
+    },
+    translateModeTransformControls: translateModeTransformControls,
+    rotateModeTransformControls: rotateModeTransformControls,
+    scaleModeTransformControls: scaleModeTransformControls,
+    repositionExtraItem: repositionBrainMesh,
 
     showDegreeLines: false,
     degreeLineRadius: 1,
@@ -192,7 +207,16 @@ function setupGui() {
         .onChange (() => updateVisibleLinks())
         .listen();
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
-    gui.add(guiParams, 'showBrain').onChange(updateBrainMeshVisibility);
+
+    const extraItemFolder = gui.addFolder('Extra item');
+    extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show');
+    extraItemFolder.addColor(guiParams, 'colorExtraItem').name('Color').onChange(updateExtraItemMaterial).listen();
+    extraItemFolder.add(guiParams, 'resetExtraItemColor').name('Reset color');
+    const moveExtraItemFolder = extraItemFolder.addFolder('Move extra item');
+    moveExtraItemFolder.add(guiParams, 'translateModeTransformControls').name('Translate');
+    moveExtraItemFolder.add(guiParams, 'rotateModeTransformControls').name('Rotate');
+    moveExtraItemFolder.add(guiParams, 'scaleModeTransformControls').name('Scale');
+    moveExtraItemFolder.add(guiParams, 'repositionExtraItem').name('Reset');
 
     const sensorFolder = gui.addFolder('Nodes');
     sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
