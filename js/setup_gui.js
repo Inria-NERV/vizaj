@@ -19,6 +19,7 @@ import { updateBrainMeshVisibility,
     resetPositionExtraItemMesh } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
+import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_background';
 
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
@@ -29,6 +30,9 @@ const guiParams = {
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
     maxStrengthToDisplay: .2,
+
+    backgroundColor: '#111133',
+    resetBackgroundColor: resetBackgroundColor,
 
     showExtraItem: true,
     colorExtraItem: '#ffc0cb',
@@ -202,6 +206,10 @@ function setupGui() {
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
     cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} );
+
+    const backgroundFolder = gui.addFolder('Background');
+    backgroundFolder.addColor(guiParams, 'backgroundColor').onChange(updateBackgroundColor).name('color').listen();
+    backgroundFolder.add(guiParams, 'resetBackgroundColor').name('reset color');
 
     const linksToDisplayFolder = gui.addFolder('Filtering');
     linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
