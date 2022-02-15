@@ -8,7 +8,7 @@ import { gui, controls,
     sensorMeshList} from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
-import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial } from './link_builder/draw_links';
+import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial, ecoFiltering } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility, 
     updateExtraItemMaterial,
@@ -85,12 +85,7 @@ const guiParams = {
     linkGenerator: linkLineGenerator,
     linkAlignmentTarget: 30,
 
-    ecoFiltering: () => {
-    // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
-    // in other words : number of links = number of nodes * 3 / 2
-        guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
-        updateVisibleLinks();
-    },
+    ecoFiltering: ecoFiltering,
 
     linkGeometry: 'Default',
 
@@ -204,8 +199,10 @@ function linkThicknessUpdate() {
 
 function setupGui() {
     const cameraFolder = gui.addFolder('Camera');
-    cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} );
-    cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} );
+    cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} )
+        .name('Rotate');
+    cameraFolder.add(guiParams, 'autoRotateSpeed', 0, 35 ).onChange( (value) => {controls.autoRotateSpeed = value} )
+        .name('Rotation speed');
 
     const backgroundFolder = gui.addFolder('Background');
     backgroundFolder.addColor(guiParams, 'backgroundColor').onChange(updateBackgroundColor).name('color').listen();

@@ -44,7 +44,9 @@ function generateLinkData(i_node1, i_node2, strength){
 async function drawLinksAndUpdateVisibility(linkList){
     drawLinks(linkList)
     .then(() => {linkMeshList.sort((x1, x2) => x2.link.strength - x1.link.strength)})
-    .then(() => updateVisibleLinks());
+    .then(() => {
+        ecoFiltering();
+    });
 }
 
 async function drawLinks(linkList){
@@ -109,6 +111,13 @@ function updateVisibleLinks() {
     updateAllDegreeLineLength();
 }
 
+function ecoFiltering(){
+    // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
+    // in other words : number of links = number of nodes * 3 / 2
+    guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
+    updateVisibleLinks();
+}
+
 function updateAllLinkMaterial(){
     colorMapSprite.setColorMap(guiParams.linkColorMap );
     for (let linkTuple of linkMeshList){
@@ -140,5 +149,6 @@ function generateLinkColorMapSprite(){
     redrawLinks,
     updateLinkOutline,
     updateVisibleLinks,
-    updateAllLinkMaterial}
+    updateAllLinkMaterial,
+    ecoFiltering}
      
