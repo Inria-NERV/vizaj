@@ -1,17 +1,23 @@
 import * as THREE from 'three';
+import { Vector3 } from 'three';
 import { cortexTriOnLoadCallback, csv3dCoordinatesOnLoadCallBack, loadData } from './load_data.js';
 import { scene, transformControls, cortexVertUrl, cortexTriUrl, GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
+import { deleteMesh } from './mesh_helper.js';
 
-let brainMesh;
-let orbitControlsEnabled = false;
+let extraItemMesh;
+let extraItemPosition = new Vector3(2,-13,0);
+let extraItemRotation = new Vector3(0,Math.PI,0);
+let extraItemScale = new Vector3(.8,.8,.8);
+let transformControlsEnabled = false;
 
 const cortexMaterial = new THREE.MeshStandardMaterial({
     color: '#ffc0cb',
-    side: THREE.BackSide
+    side: THREE.DoubleSide
   });
 
-function loadAndDrawCortexModel(){   
+function loadAndDrawCortexModel(){  
+    removeExtraItemMesh(); 
     loadCortexModel()
     .then((response) => makeVertCoordsList(response[0], response[1]))
     .then((response) => drawCortexModel(response));
@@ -42,24 +48,50 @@ function drawCortexModel(vertices){
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute( vertices, 3 ));
     geometry.computeVertexNormals();
-    brainMesh = new THREE.Mesh( geometry, cortexMaterial );
-    brainMesh.receiveShadow = true;
-    brainMesh.castShadow = true;
-    repositionBrainMesh( brainMesh );
-    brainMesh.name = 'cortex';
-    scene.add( brainMesh );
+    extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
+    initExtraItem();
+    scene.add( extraItemMesh );
 }
 
-function repositionBrainMesh(){
-    brainMesh.rotation.set(0,Math.PI,0);
-    brainMesh.position.set(2,-13,0);
-    const scale = .8;
-    brainMesh.scale.set(scale,scale,scale);
+function initExtraItem(){
+    extraItemMesh.receiveShadow = true;
+    extraItemMesh.castShadow = true;
+    repositionExtraItemMesh( extraItemMesh );
+}
+
+function drawExtraItemModel(geometry){
+    removeExtraItemMesh();
+    extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
+    initExtraItem();
+    scene.add(extraItemMesh);
+}
+
+function drawExtraItemSphereModel(){
+    const geometry = new THREE.SphereGeometry( 40, 32, 16 );
+    drawExtraItemModel(geometry);
+}
+
+function drawExtraItemCubeModel(){
+    const geometry = new THREE.BoxGeometry( 50, 50, 50 );
+    drawExtraItemModel(geometry);
+}
+
+function resetPositionExtraItemMesh(){
+    extraItemPosition = new Vector3(2,-13,0);
+    extraItemRotation = new Vector3(0,Math.PI,0);
+    extraItemScale = new Vector3(.8,.8,.8);
+    repositionExtraItemMesh();
+}
+
+function repositionExtraItemMesh(){
+    extraItemMesh.rotation.set(extraItemRotation.x, extraItemRotation.y, extraItemRotation.z);
+    extraItemMesh.position.set(extraItemPosition.x, extraItemPosition.y, extraItemPosition.z);
+    extraItemMesh.scale.set(extraItemScale.x, extraItemScale.y, extraItemScale.z);
 }
 
 function updateBrainMeshVisibility(){
-    brainMesh.visible = guiParams.showBrain;
-    brainMesh.layers.toggle(GLOBAL_LAYER);
+    extraItemMesh.visible = guiParams.showBrain;
+    extraItemMesh.layers.toggle(GLOBAL_LAYER);
 }
 
 function hideBrain(){
@@ -72,23 +104,52 @@ function showBrain(){
     updateBrainMeshVisibility();
 }
 
+function removeExtraItemMesh(){
+    if (extraItemMesh){
+        deleteMesh(extraItemMesh);
+        extraItemMesh = null;
+    }
+}
+
 function updateExtraItemMaterial(){
-    if (brainMesh){
-        brainMesh.material.color = new THREE.Color(guiParams.colorExtraItem);
+    if (extraItemMesh){
+        extraItemMesh.material.color = new THREE.Color(guiParams.colorExtraItem);
+    }
+}
+
+function updateExtraItemMesh(){
+    extraItemPosition = extraItemMesh.position;
+    extraItemRotation = extraItemMesh.rotation;
+    extraItemScale = extraItemMesh.scale;
+    disableTransformControls();
+    if (guiParams.extraItemMeshShape == 'brain'){
+        loadAndDrawCortexModel();
+    }
+    if (guiParams.extraItemMeshShape == 'sphere'){
+        drawExtraItemSphereModel();
+    }
+    if (guiParams.extraItemMeshShape == 'cube'){
+        drawExtraItemCubeModel();
     }
 }
 
 function toggleTransformControls(mode){
-    if (!brainMesh){return;}
-    if (!orbitControlsEnabled){
-        transformControls.attach( brainMesh );
-        orbitControlsEnabled = true;
+    if (!extraItemMesh){return;}
+    if (!transformControlsEnabled){
+        transformControls.attach( extraItemMesh );
+        transformControlsEnabled = true;
     }
-    else if (orbitControlsEnabled && transformControls.mode == mode){
-        transformControls.detach( brainMesh );
-        orbitControlsEnabled = false;
+    else if ( transformControls.mode == mode){
+        disableTransformControls();
     }
     transformControls.setMode(mode);
+}
+
+function disableTransformControls(){
+    if (transformControlsEnabled){
+        transformControls.detach( extraItemMesh );
+        transformControlsEnabled = false;
+    }
 }
 
 function translateModeTransformControls(){
@@ -103,12 +164,15 @@ function scaleModeTransformControls(){
 
 export {
     loadAndDrawCortexModel,
+    drawExtraItemSphereModel,
     updateBrainMeshVisibility,
     hideBrain,
     showBrain,
     updateExtraItemMaterial,
+    updateExtraItemMesh,
     translateModeTransformControls,
     rotateModeTransformControls,
     scaleModeTransformControls,
-    repositionBrainMesh
+    repositionExtraItemMesh as repositionBrainMesh,
+    resetPositionExtraItemMesh
 };

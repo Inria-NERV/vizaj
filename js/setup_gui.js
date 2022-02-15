@@ -12,10 +12,11 @@ import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, upd
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility, 
     updateExtraItemMaterial,
+    updateExtraItemMesh,
     translateModeTransformControls,
     rotateModeTransformControls,
     scaleModeTransformControls,
-    repositionBrainMesh } from './draw_cortex';
+    resetPositionExtraItemMesh } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
 
@@ -35,10 +36,11 @@ const guiParams = {
         guiParams.colorExtraItem = '#ffc0cb';
         updateExtraItemMaterial();
     },
+    extraItemMeshShape: 'brain',
     translateModeTransformControls: translateModeTransformControls,
     rotateModeTransformControls: rotateModeTransformControls,
     scaleModeTransformControls: scaleModeTransformControls,
-    repositionExtraItem: repositionBrainMesh,
+    resetExtraItemPosition: resetPositionExtraItemMesh,
 
     showDegreeLines: false,
     degreeLineRadius: 1,
@@ -212,11 +214,14 @@ function setupGui() {
     extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show');
     extraItemFolder.addColor(guiParams, 'colorExtraItem').name('Color').onChange(updateExtraItemMaterial).listen();
     extraItemFolder.add(guiParams, 'resetExtraItemColor').name('Reset color');
+    extraItemFolder.add(guiParams, 'extraItemMeshShape',
+        ['brain', 'sphere', 'cube'])
+        .name('Shape').onChange(updateExtraItemMesh);
     const moveExtraItemFolder = extraItemFolder.addFolder('Move extra item');
     moveExtraItemFolder.add(guiParams, 'translateModeTransformControls').name('Translate');
     moveExtraItemFolder.add(guiParams, 'rotateModeTransformControls').name('Rotate');
     moveExtraItemFolder.add(guiParams, 'scaleModeTransformControls').name('Scale');
-    moveExtraItemFolder.add(guiParams, 'repositionExtraItem').name('Reset');
+    moveExtraItemFolder.add(guiParams, 'resetExtraItemPosition').name('Reset');
 
     const sensorFolder = gui.addFolder('Nodes');
     sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');

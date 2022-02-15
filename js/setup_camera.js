@@ -7,7 +7,7 @@ import { guiParams } from './setup_gui';
 function setupCamera(){
     controls.autoRotate = guiParams.rotateCamera;
     controls.enableDamping = true;
-    controls.dampingFactor = 0.15;
+    controls.dampingFactor = .15;
 
     camera.position.z = 400;
     camera.position.y = 20;
