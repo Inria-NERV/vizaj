@@ -70,7 +70,9 @@ function init() {
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
   transformControls.addEventListener('dragging-changed', (event)=>{
-    orbitControls.enabled = !event.value
+    orbitControls.enableDamping = false;
+    orbitControls.enabled = !event.value;
+    orbitControls.enableDamping = true;
   });
   csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
@@ -80,6 +82,7 @@ function init() {
 
 function animate() {
   requestAnimationFrame(animate);
+  orbitControls.update();
   hoverDisplayUpdate();
   renderer.clear();
   renderer.render(scene, camera);
