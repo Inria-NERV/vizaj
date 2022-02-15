@@ -6,7 +6,7 @@ import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper.js';
 
 let extraItemMesh;
-let extraItemPosition = new Vector3(2,-13,0);
+let extraItemPosition = new Vector3(8,-13,0);
 let extraItemRotation = new Vector3(0,Math.PI,0);
 let extraItemScale = new Vector3(.8,.8,.8);
 let transformControlsEnabled = false;
@@ -77,7 +77,7 @@ function drawExtraItemCubeModel(){
 }
 
 function resetPositionExtraItemMesh(){
-    extraItemPosition = new Vector3(2,-13,0);
+    extraItemPosition = new Vector3(8,-13,0);
     extraItemRotation = new Vector3(0,Math.PI,0);
     extraItemScale = new Vector3(.8,.8,.8);
     repositionExtraItemMesh();

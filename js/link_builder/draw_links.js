@@ -98,10 +98,10 @@ async function clearAllLinks() {
 
 function updateVisibleLinks() {
     const fullyConnectedGraphLinkCount = sensorMeshList.length * (sensorMeshList.length - 1) / 2;
-    if (guiParams.maxStrengthToDisplay > linkMeshList.length / fullyConnectedGraphLinkCount){
-        guiParams.maxStrengthToDisplay = linkMeshList.length / fullyConnectedGraphLinkCount;
+    if (guiParams.linkDensity > linkMeshList.length / fullyConnectedGraphLinkCount){
+        guiParams.linkDensity = linkMeshList.length / fullyConnectedGraphLinkCount;
     }
-    const maxVisibleLinkIndice = fullyConnectedGraphLinkCount * guiParams.maxStrengthToDisplay;
+    const maxVisibleLinkIndice = fullyConnectedGraphLinkCount * guiParams.linkDensity;
     for (const link of linkMeshList.slice(0, maxVisibleLinkIndice)){
         link.mesh.visible = true;
     }
@@ -114,7 +114,7 @@ function updateVisibleLinks() {
 function ecoFiltering(){
     // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
     // in other words : number of links = number of nodes * 3 / 2
-    guiParams.maxStrengthToDisplay = 3 / 2 * sensorMeshList.length / linkMeshList.length;
+    guiParams.linkDensity = 3 / 2 * sensorMeshList.length / linkMeshList.length;
     updateVisibleLinks();
 }
 

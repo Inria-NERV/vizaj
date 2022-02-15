@@ -29,7 +29,7 @@ const guiParams = {
 
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
-    maxStrengthToDisplay: .2,
+    linkDensity: .2,
 
     backgroundColor: '#111133',
     resetBackgroundColor: resetBackgroundColor,
@@ -209,7 +209,7 @@ function setupGui() {
     backgroundFolder.add(guiParams, 'resetBackgroundColor').name('reset color');
 
     const linksToDisplayFolder = gui.addFolder('Filtering');
-    linksToDisplayFolder.add(guiParams, 'maxStrengthToDisplay', 0., 1.)
+    linksToDisplayFolder.add(guiParams, 'linkDensity', 0., 1.)
         .name('Density')
         .onChange (() => updateVisibleLinks())
         .listen();
@@ -229,7 +229,7 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'resetExtraItemPosition').name('Reset');
 
     const sensorFolder = gui.addFolder('Nodes');
-    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
+    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 2.).onChange(updateAllSensorRadius).listen().name('Radius');
     sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).listen().name('Opacity');
     sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
     sensorFolder.add(guiParams, 'sensorReset').name('Reset');
