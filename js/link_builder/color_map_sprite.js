@@ -54,7 +54,7 @@ class ColorMapSprite {
 
     drawBottomValueSprite(scene){
         this.bottomValueSprite = ColorMapSprite.generateValueSprite(this.getMinV(), this.bottomValueCanvas);
-        this.bottomValueSprite.position.y = -.58;
+        this.bottomValueSprite.position.y = -.6;
         scene.add(this.bottomValueSprite);
     }
 
