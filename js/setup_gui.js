@@ -126,7 +126,7 @@ const guiParams = {
     
   };
 
-const premadeLinkGeometriesList = ['Default', 'Bell', 'Triangle', 'Circle', 'Circle2', 'Rounded square', 'Peak', 'Flat'];
+const premadeLinkGeometriesList = ['Default', 'Bell', 'Triangle', 'Circle', 'Circle2', 'Rounded square', 'Peak', 'Straight'];
 function updateDefaultLinkGeometry(){
     switch (guiParams.linkGeometry){
         case 'Default':
@@ -171,7 +171,7 @@ function updateDefaultLinkGeometry(){
             guiParams.linkSensorAngles = 0.;
             guiParams.linkSensorHandleDistances = 1.;
             break;
-        case 'Flat':
+        case 'Straight':
             guiParams.linkHeight = 0;
             guiParams.linkTopPointHandleDistances = 0;
             guiParams.linkSensorAngles = 0.;
@@ -215,7 +215,7 @@ function setupGui() {
         .listen();
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
 
-    const extraItemFolder = gui.addFolder('Extra item');
+    const extraItemFolder = gui.addFolder('Support');
     extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show');
     extraItemFolder.addColor(guiParams, 'colorExtraItem').name('Color').onChange(updateExtraItemMaterial).listen();
     extraItemFolder.add(guiParams, 'resetExtraItemColor').name('Reset color');
@@ -229,12 +229,12 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'resetExtraItemPosition').name('Reset');
 
     const sensorFolder = gui.addFolder('Nodes');
-    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 2.).onChange(updateAllSensorRadius).listen().name('Radius');
+    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
     sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).listen().name('Opacity');
     sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
     sensorFolder.add(guiParams, 'sensorReset').name('Reset');
-
-    const linkFolder = gui.addFolder('Link');
+ 
+    const linkFolder = gui.addFolder('Links');
     const linkGeometryFolder = linkFolder.addFolder('Geometry');
     linkGeometryFolder.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
     linkGeometryFolder.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Top point handle distance');
