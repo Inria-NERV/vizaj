@@ -26,7 +26,9 @@ function connectivityMatrixOnLoadCallBack(data){
         const row = splittedData[i];
         const splittedRow = row.split(',');
         for (let j = 0; j < i; j++){
-            outList.push(generateLinkData(i, j, splittedRow[j]));
+            if (splittedRow[j] != 0 && splittedRow[j]){
+                outList.push(generateLinkData(i, j, splittedRow[j]));
+            }
         }
     }
     return outList;
