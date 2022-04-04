@@ -210,6 +210,7 @@ async function handleJsonFileSelect(evt){
   await drawSensorsAndUpdateGlobalValues(coordinatesList);
   assignSensorLabels(labelList);
   for (const [key, value] of Object.entries(graph.edges)){
+    if (value.metadata.corr_mat != 0 && value.metadata.corr_mat)
     linkList.push(generateLinkData(
       sensorIdDict[value.source], 
       sensorIdDict[value.target], 
