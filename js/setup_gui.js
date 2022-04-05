@@ -222,7 +222,7 @@ function setupGui() {
     extraItemFolder.add(guiParams, 'extraItemMeshShape',
         ['brain', 'sphere', 'cube'])
         .name('Shape').onChange(updateExtraItemMesh);
-    const moveExtraItemFolder = extraItemFolder.addFolder('Move extra item');
+    const moveExtraItemFolder = extraItemFolder.addFolder('Move support');
     moveExtraItemFolder.add(guiParams, 'translateModeTransformControls').name('Translate');
     moveExtraItemFolder.add(guiParams, 'rotateModeTransformControls').name('Rotate');
     moveExtraItemFolder.add(guiParams, 'scaleModeTransformControls').name('Scale');
