@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/three/build/three.module.js":[function(require,module,exports) {
+})({"dKqR":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -36362,7 +36362,7 @@ if (typeof window !== 'undefined') {
     window.__THREE__ = REVISION;
   }
 }
-},{}],"../node_modules/three/examples/jsm/controls/OrbitControls.js":[function(require,module,exports) {
+},{}],"xTGv":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37240,7 +37240,7 @@ class MapControls extends OrbitControls {
 }
 
 exports.MapControls = MapControls;
-},{"three":"../node_modules/three/build/three.module.js"}],"../node_modules/three/examples/jsm/controls/TransformControls.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"pE3U":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38348,7 +38348,7 @@ class TransformControlsPlane extends _three.Mesh {
 
 exports.TransformControlsPlane = TransformControlsPlane;
 TransformControlsPlane.prototype.isTransformControlsPlane = true;
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/load_data.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"S8od":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38476,7 +38476,7 @@ function parseRowCortexTri(row) {
 function loadJsonData(url) {
   return loadData(url, 'json file', jsonOnloadCallback);
 }
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/link_builder/link_mesh_generator.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"ihO1":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38611,7 +38611,7 @@ _defineProperty(linkVolumeGenerator, "LINK_SEGMENTS", 64);
 _defineProperty(linkVolumeGenerator, "LINK_RADIAL_SEGMENTS", 10);
 
 _defineProperty(linkVolumeGenerator, "LINK_RADIUS_SCALE", 15);
-},{"three":"../node_modules/three/build/three.module.js","../draw_sensors":"../js/draw_sensors.js","../setup_gui":"../js/setup_gui.js"}],"../js/mesh_helper.js":[function(require,module,exports) {
+},{"three":"dKqR","../draw_sensors":"OTn2","../setup_gui":"dQ6s"}],"w67D":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38640,7 +38640,7 @@ function disposeMesh(mesh) {
   mesh.geometry.dispose();
   mesh.material.dispose();
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js"}],"../js/draw_cortex.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main":"epB2"}],"CpRT":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38884,7 +38884,7 @@ function rotateModeTransformControls() {
 function scaleModeTransformControls() {
   toggleTransformControls('scale');
 }
-},{"three":"../node_modules/three/build/three.module.js","./load_data.js":"../js/load_data.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js","./mesh_helper.js":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/exporters/GLTFExporter.js":[function(require,module,exports) {
+},{"three":"dKqR","./load_data.js":"S8od","../public/main.js":"epB2","./setup_gui":"dQ6s","./mesh_helper.js":"w67D"}],"jZCO":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40735,7 +40735,7 @@ GLTFExporter.Utils = {
     return clip;
   }
 };
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/export_image.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"uhu3":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40861,7 +40861,7 @@ function saveFile(strData, filename) {
   link.click();
   document.body.removeChild(link);
 }
-},{"../public/main":"main.js","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"../node_modules/three/examples/jsm/exporters/GLTFExporter.js"}],"../js/add_light_and_background.js":[function(require,module,exports) {
+},{"../public/main":"epB2","../node_modules/three/examples/jsm/exporters/GLTFExporter.js":"jZCO"}],"BKG2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -40920,7 +40920,7 @@ function resetBackgroundColor() {
   _setup_gui.guiParams.backgroundColor = '#111133';
   updateBackgroundColor();
 }
-},{"../public/main":"main.js","three":"../node_modules/three/build/three.module.js","./setup_gui":"../js/setup_gui.js"}],"../js/setup_gui.js":[function(require,module,exports) {
+},{"../public/main":"epB2","three":"dKqR","./setup_gui":"dQ6s"}],"dQ6s":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41223,7 +41223,7 @@ function setupGui() {
   exportFileFolder.add(guiParams, 'export2dImage').name('Picture (.tif)');
   exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./link_builder/link_mesh_generator":"../js/link_builder/link_mesh_generator.js","./draw_cortex":"../js/draw_cortex.js","./draw_degree_line":"../js/draw_degree_line.js","./export_image":"../js/export_image.js","./add_light_and_background":"../js/add_light_and_background.js"}],"../js/link_builder/compute_link_shape.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main":"epB2","./draw_sensors":"OTn2","./link_builder/draw_links":"XiGW","./link_builder/link_mesh_generator":"ihO1","./draw_cortex":"CpRT","./draw_degree_line":"WMMm","./export_image":"uhu3","./add_light_and_background":"BKG2"}],"XLIo":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41308,7 +41308,7 @@ function computePointC(linkBasisA, linkBasisB, linkToGlobalMatrix, l) {
     handleRight: linkBasisControlPointC.clone().add(new THREE.Vector3(linkBasisB.x * _setup_gui.guiParams.linkTopPointHandleDistances, 0, 0)).applyQuaternion(rightHandleRotation).applyMatrix3(linkToGlobalMatrix)
   };
 }
-},{"three":"../node_modules/three/build/three.module.js","../setup_gui":"../js/setup_gui.js"}],"../js/draw_degree_line.js":[function(require,module,exports) {
+},{"three":"dKqR","../setup_gui":"dQ6s"}],"WMMm":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41524,7 +41524,7 @@ function redrawDegreeLines() {
 
   drawAllDegreeLines();
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main":"main.js","./draw_sensors":"../js/draw_sensors.js","./link_builder/compute_link_shape":"../js/link_builder/compute_link_shape.js","./setup_gui":"../js/setup_gui.js","./mesh_helper":"../js/mesh_helper.js"}],"../node_modules/three/examples/jsm/math/Lut.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main":"epB2","./draw_sensors":"OTn2","./link_builder/compute_link_shape":"XLIo","./setup_gui":"dQ6s","./mesh_helper":"w67D"}],"DhJM":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41660,7 +41660,7 @@ const ColorMapKeywords = {
   'grayscale': [[0.0, 0x000000], [0.2, 0x404040], [0.5, 0x7F7F80], [0.8, 0xBFBFBF], [1.0, 0xFFFFFF]]
 };
 exports.ColorMapKeywords = ColorMapKeywords;
-},{"three":"../node_modules/three/build/three.module.js"}],"../js/link_builder/color_map_sprite.js":[function(require,module,exports) {
+},{"three":"dKqR"}],"gQNC":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41850,7 +41850,7 @@ var ColorMapSprite = /*#__PURE__*/function () {
 }();
 
 exports.ColorMapSprite = ColorMapSprite;
-},{"three":"../node_modules/three/build/three.module.js","../mesh_helper":"../js/mesh_helper.js","../../node_modules/three/examples/jsm/math/Lut.js":"../node_modules/three/examples/jsm/math/Lut.js","../../public/main":"main.js"}],"../js/link_builder/draw_links.js":[function(require,module,exports) {
+},{"three":"dKqR","../mesh_helper":"w67D","../../node_modules/three/examples/jsm/math/Lut.js":"DhJM","../../public/main":"epB2"}],"XiGW":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42211,7 +42211,7 @@ function updateLinkColor(linkTuple) {
 function generateLinkColorMapSprite() {
   colorMapSprite.drawColorMapSprite(_main.uiScene);
 }
-},{"three":"../node_modules/three/build/three.module.js","../../public/main":"main.js","../draw_degree_line":"../js/draw_degree_line.js","../load_data":"../js/load_data.js","../setup_gui":"../js/setup_gui.js","../draw_sensors":"../js/draw_sensors.js","../mesh_helper":"../js/mesh_helper.js","./compute_link_shape":"../js/link_builder/compute_link_shape.js","./color_map_sprite.js":"../js/link_builder/color_map_sprite.js"}],"../js/draw_sensors.js":[function(require,module,exports) {
+},{"three":"dKqR","../../public/main":"epB2","../draw_degree_line":"WMMm","../load_data":"S8od","../setup_gui":"dQ6s","../draw_sensors":"OTn2","../mesh_helper":"w67D","./compute_link_shape":"XLIo","./color_map_sprite.js":"gQNC"}],"OTn2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -42749,7 +42749,7 @@ function _clearAllSensors() {
   }));
   return _clearAllSensors.apply(this, arguments);
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./load_data.js":"../js/load_data.js","./link_builder/draw_links":"../js/link_builder/draw_links.js","./mesh_helper":"../js/mesh_helper.js","./draw_degree_line.js":"../js/draw_degree_line.js","./setup_gui.js":"../js/setup_gui.js"}],"../node_modules/three/examples/jsm/libs/dat.gui.module.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main.js":"epB2","./load_data.js":"S8od","./link_builder/draw_links":"XiGW","./mesh_helper":"w67D","./draw_degree_line.js":"WMMm","./setup_gui.js":"dQ6s"}],"irr3":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45657,7 +45657,7 @@ var index = {
 };
 var _default = index;
 exports.default = _default;
-},{}],"../node_modules/regenerator-runtime/runtime.js":[function(require,module,exports) {
+},{}],"QVnC":[function(require,module,exports) {
 var define;
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
@@ -46414,7 +46414,7 @@ try {
   }
 }
 
-},{}],"../js/setup_camera.js":[function(require,module,exports) {
+},{}],"rmtI":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46455,17 +46455,17 @@ function setupCamera() {
 function updateRotateCamera() {
   _main.controls.autoRotate = _setup_gui.guiParams.rotateCamera;
 }
-},{"three":"../node_modules/three/build/three.module.js","../public/main.js":"main.js","./setup_gui":"../js/setup_gui.js"}],"../data/cortex_vert.csv":[function(require,module,exports) {
-module.exports = "/cortex_vert.963f0d70.csv";
-},{}],"../data/cortex_tri.csv":[function(require,module,exports) {
-module.exports = "/cortex_tri.54eda097.csv";
-},{}],"../data/sensor_labels.csv":[function(require,module,exports) {
-module.exports = "/sensor_labels.87a1706e.csv";
-},{}],"../data/sensor_coordinates.csv":[function(require,module,exports) {
-module.exports = "/sensor_coordinates.7c286084.csv";
-},{}],"../data/conn_matrix_0.csv":[function(require,module,exports) {
-module.exports = "/conn_matrix_0.5c498bf8.csv";
-},{}],"main.js":[function(require,module,exports) {
+},{"three":"dKqR","../public/main.js":"epB2","./setup_gui":"dQ6s"}],"W2Gw":[function(require,module,exports) {
+module.exports = "cortex_vert.6b91c19c.csv";
+},{}],"Kq1E":[function(require,module,exports) {
+module.exports = "cortex_tri.f028cefc.csv";
+},{}],"yqIO":[function(require,module,exports) {
+module.exports = "sensor_labels.1d7346b6.csv";
+},{}],"Dkox":[function(require,module,exports) {
+module.exports = "sensor_coordinates.011ddb17.csv";
+},{}],"GRyb":[function(require,module,exports) {
+module.exports = "conn_matrix_0.7fd9ba48.csv";
+},{}],"epB2":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -46826,7 +46826,7 @@ function _handleJsonFileSelect() {
 
             for (_i3 = 0, _Object$entries2 = Object.entries(graph.edges); _i3 < _Object$entries2.length; _i3++) {
               _Object$entries2$_i = _slicedToArray(_Object$entries2[_i3], 2), _key = _Object$entries2$_i[0], _value = _Object$entries2$_i[1];
-              linkList.push((0, _draw_links.generateLinkData)(sensorIdDict[_value.source], sensorIdDict[_value.target], _value.metadata.corr_mat));
+              if (_value.metadata.corr_mat != 0 && _value.metadata.corr_mat) linkList.push((0, _draw_links.generateLinkData)(sensorIdDict[_value.source], sensorIdDict[_value.target], _value.metadata.corr_mat));
             }
 
             _context2.next = 20;
@@ -46841,209 +46841,5 @@ function _handleJsonFileSelect() {
   }));
   return _handleJsonFileSelect.apply(this, arguments);
 }
-},{"three":"../node_modules/three/build/three.module.js","../node_modules/three/examples/jsm/controls/OrbitControls":"../node_modules/three/examples/jsm/controls/OrbitControls.js","../node_modules/three/examples/jsm/controls/TransformControls.js":"../node_modules/three/examples/jsm/controls/TransformControls.js","../js/draw_sensors.js":"../js/draw_sensors.js","../node_modules/three/examples/jsm/libs/dat.gui.module":"../node_modules/three/examples/jsm/libs/dat.gui.module.js","regenerator-runtime/runtime.js":"../node_modules/regenerator-runtime/runtime.js","../js/add_light_and_background":"../js/add_light_and_background.js","../js/draw_cortex.js":"../js/draw_cortex.js","../js/link_builder/draw_links":"../js/link_builder/draw_links.js","../js/setup_camera":"../js/setup_camera.js","../js/setup_gui":"../js/setup_gui.js","../js/load_data":"../js/load_data.js","../data/cortex_vert.csv":"../data/cortex_vert.csv","../data/cortex_tri.csv":"../data/cortex_tri.csv","../data/sensor_labels.csv":"../data/sensor_labels.csv","../data/sensor_coordinates.csv":"../data/sensor_coordinates.csv","../data/conn_matrix_0.csv":"../data/conn_matrix_0.csv"}],"../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
-var global = arguments[3];
-var OVERLAY_ID = '__parcel__error__overlay__';
-var OldModule = module.bundle.Module;
-
-function Module(moduleName) {
-  OldModule.call(this, moduleName);
-  this.hot = {
-    data: module.bundle.hotData,
-    _acceptCallbacks: [],
-    _disposeCallbacks: [],
-    accept: function (fn) {
-      this._acceptCallbacks.push(fn || function () {});
-    },
-    dispose: function (fn) {
-      this._disposeCallbacks.push(fn);
-    }
-  };
-  module.bundle.hotData = null;
-}
-
-module.bundle.Module = Module;
-var checkedAssets, assetsToAccept;
-var parent = module.bundle.parent;
-
-if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
-  var hostname = "" || location.hostname;
-  var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59005" + '/');
-
-  ws.onmessage = function (event) {
-    checkedAssets = {};
-    assetsToAccept = [];
-    var data = JSON.parse(event.data);
-
-    if (data.type === 'update') {
-      var handled = false;
-      data.assets.forEach(function (asset) {
-        if (!asset.isNew) {
-          var didAccept = hmrAcceptCheck(global.parcelRequire, asset.id);
-
-          if (didAccept) {
-            handled = true;
-          }
-        }
-      }); // Enable HMR for CSS by default.
-
-      handled = handled || data.assets.every(function (asset) {
-        return asset.type === 'css' && asset.generated.js;
-      });
-
-      if (handled) {
-        console.clear();
-        data.assets.forEach(function (asset) {
-          hmrApply(global.parcelRequire, asset);
-        });
-        assetsToAccept.forEach(function (v) {
-          hmrAcceptRun(v[0], v[1]);
-        });
-      } else if (location.reload) {
-        // `location` global exists in a web worker context but lacks `.reload()` function.
-        location.reload();
-      }
-    }
-
-    if (data.type === 'reload') {
-      ws.close();
-
-      ws.onclose = function () {
-        location.reload();
-      };
-    }
-
-    if (data.type === 'error-resolved') {
-      console.log('[parcel] ✨ Error resolved');
-      removeErrorOverlay();
-    }
-
-    if (data.type === 'error') {
-      console.error('[parcel] 🚨  ' + data.error.message + '\n' + data.error.stack);
-      removeErrorOverlay();
-      var overlay = createErrorOverlay(data);
-      document.body.appendChild(overlay);
-    }
-  };
-}
-
-function removeErrorOverlay() {
-  var overlay = document.getElementById(OVERLAY_ID);
-
-  if (overlay) {
-    overlay.remove();
-  }
-}
-
-function createErrorOverlay(data) {
-  var overlay = document.createElement('div');
-  overlay.id = OVERLAY_ID; // html encode message and stack trace
-
-  var message = document.createElement('div');
-  var stackTrace = document.createElement('pre');
-  message.innerText = data.error.message;
-  stackTrace.innerText = data.error.stack;
-  overlay.innerHTML = '<div style="background: black; font-size: 16px; color: white; position: fixed; height: 100%; width: 100%; top: 0px; left: 0px; padding: 30px; opacity: 0.85; font-family: Menlo, Consolas, monospace; z-index: 9999;">' + '<span style="background: red; padding: 2px 4px; border-radius: 2px;">ERROR</span>' + '<span style="top: 2px; margin-left: 5px; position: relative;">🚨</span>' + '<div style="font-size: 18px; font-weight: bold; margin-top: 20px;">' + message.innerHTML + '</div>' + '<pre>' + stackTrace.innerHTML + '</pre>' + '</div>';
-  return overlay;
-}
-
-function getParents(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return [];
-  }
-
-  var parents = [];
-  var k, d, dep;
-
-  for (k in modules) {
-    for (d in modules[k][1]) {
-      dep = modules[k][1][d];
-
-      if (dep === id || Array.isArray(dep) && dep[dep.length - 1] === id) {
-        parents.push(k);
-      }
-    }
-  }
-
-  if (bundle.parent) {
-    parents = parents.concat(getParents(bundle.parent, id));
-  }
-
-  return parents;
-}
-
-function hmrApply(bundle, asset) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (modules[asset.id] || !bundle.parent) {
-    var fn = new Function('require', 'module', 'exports', asset.generated.js);
-    asset.isNew = !modules[asset.id];
-    modules[asset.id] = [fn, asset.deps];
-  } else if (bundle.parent) {
-    hmrApply(bundle.parent, asset);
-  }
-}
-
-function hmrAcceptCheck(bundle, id) {
-  var modules = bundle.modules;
-
-  if (!modules) {
-    return;
-  }
-
-  if (!modules[id] && bundle.parent) {
-    return hmrAcceptCheck(bundle.parent, id);
-  }
-
-  if (checkedAssets[id]) {
-    return;
-  }
-
-  checkedAssets[id] = true;
-  var cached = bundle.cache[id];
-  assetsToAccept.push([bundle, id]);
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    return true;
-  }
-
-  return getParents(global.parcelRequire, id).some(function (id) {
-    return hmrAcceptCheck(global.parcelRequire, id);
-  });
-}
-
-function hmrAcceptRun(bundle, id) {
-  var cached = bundle.cache[id];
-  bundle.hotData = {};
-
-  if (cached) {
-    cached.hot.data = bundle.hotData;
-  }
-
-  if (cached && cached.hot && cached.hot._disposeCallbacks.length) {
-    cached.hot._disposeCallbacks.forEach(function (cb) {
-      cb(bundle.hotData);
-    });
-  }
-
-  delete bundle.cache[id];
-  bundle(id);
-  cached = bundle.cache[id];
-
-  if (cached && cached.hot && cached.hot._acceptCallbacks.length) {
-    cached.hot._acceptCallbacks.forEach(function (cb) {
-      cb();
-    });
-
-    return true;
-  }
-}
-},{}]},{},["../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","main.js"], null)
-//# sourceMappingURL=/main.1f19ae8e.js.map
+},{"three":"dKqR","../node_modules/three/examples/jsm/controls/OrbitControls":"xTGv","../node_modules/three/examples/jsm/controls/TransformControls.js":"pE3U","../js/draw_sensors.js":"OTn2","../node_modules/three/examples/jsm/libs/dat.gui.module":"irr3","regenerator-runtime/runtime.js":"QVnC","../js/add_light_and_background":"BKG2","../js/draw_cortex.js":"CpRT","../js/link_builder/draw_links":"XiGW","../js/setup_camera":"rmtI","../js/setup_gui":"dQ6s","../js/load_data":"S8od","../data/cortex_vert.csv":"W2Gw","../data/cortex_tri.csv":"Kq1E","../data/sensor_labels.csv":"yqIO","../data/sensor_coordinates.csv":"Dkox","../data/conn_matrix_0.csv":"GRyb"}]},{},["epB2"], null)
+//# sourceMappingURL=main.ee3196e8.js.map
