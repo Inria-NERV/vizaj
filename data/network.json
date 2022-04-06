@@ -38,18 +38,14 @@
             {
                 "source":"0",
                 "target":"1",
-                "directed":                false,
-                "metadata":{
-                    "corr_mat":                    0.8849602908
-                }
+                "directed": false,
+                "strength":  0.8849602908
             },
             {
                 "source":"0",
                 "target":"2",
-                "directed":                false,
-                "metadata":{
-                    "corr_mat":                    0.8027855757
-                }
+                "directed": false,
+                "strength": 0.8027855757
             }
         ]
     }
