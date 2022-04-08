@@ -216,7 +216,7 @@ function setupGui() {
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
 
     const extraItemFolder = gui.addFolder('Support');
-    extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show');
+    extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show').listen();
     extraItemFolder.addColor(guiParams, 'colorExtraItem').name('Color').onChange(updateExtraItemMaterial).listen();
     extraItemFolder.add(guiParams, 'resetExtraItemColor').name('Reset color');
     extraItemFolder.add(guiParams, 'extraItemMeshShape',

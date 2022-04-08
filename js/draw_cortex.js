@@ -89,19 +89,19 @@ function repositionExtraItemMesh(){
     extraItemMesh.scale.set(extraItemScale.x, extraItemScale.y, extraItemScale.z);
 }
 
-function updateBrainMeshVisibility(){
-    extraItemMesh.visible = guiParams.showBrain;
+function updateExtraItemMeshVisibility(){
+    extraItemMesh.visible = guiParams.showExtraItem;
     extraItemMesh.layers.toggle(GLOBAL_LAYER);
 }
 
-function hideBrain(){
-    guiParams.showBrain = false;
-    updateBrainMeshVisibility();
+function hideExtraItem(){
+    guiParams.showExtraItem = false;
+    updateExtraItemMeshVisibility();
 }
 
-function showBrain(){
-    guiParams.showBrain = true;
-    updateBrainMeshVisibility();
+function showExtraItem(){
+    guiParams.showExtraItem = true;
+    updateExtraItemMeshVisibility();
 }
 
 function removeExtraItemMesh(){
@@ -121,6 +121,7 @@ function updateExtraItemMesh(){
     extraItemPosition = extraItemMesh.position;
     extraItemRotation = extraItemMesh.rotation;
     extraItemScale = extraItemMesh.scale;
+    showExtraItem();
     disableTransformControls();
     if (guiParams.extraItemMeshShape == 'brain'){
         loadAndDrawCortexModel();
@@ -165,9 +166,9 @@ function scaleModeTransformControls(){
 export {
     loadAndDrawCortexModel,
     drawExtraItemSphereModel,
-    updateBrainMeshVisibility,
-    hideBrain,
-    showBrain,
+    updateExtraItemMeshVisibility as updateBrainMeshVisibility,
+    hideExtraItem as hideBrain,
+    showExtraItem as showBrain,
     updateExtraItemMaterial,
     updateExtraItemMesh,
     translateModeTransformControls,
