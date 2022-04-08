@@ -1,0 +1,32 @@
+{
+    "graph":{
+        "nodes":{
+            "0":{
+                "type":"node type",
+                "label":"label1",
+                "position":{
+                    "x": 0,
+                    "y": -10,
+                    "z": 0 
+                }
+            },
+            "1":{
+                "type":"node type",
+                "label":"label2",
+                "position":{
+                    "x": 0,
+                    "y": 10,
+                    "z": 0 
+                }
+            }
+        },
+        "edges":[
+            {
+                "source":"0",
+                "target":"1",
+                "directed": false,
+                "strength":  1
+            }
+        ]
+    }
+}
