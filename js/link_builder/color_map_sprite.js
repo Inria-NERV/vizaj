@@ -1,9 +1,8 @@
-import * as THREE from "three";
-import { deleteMesh } from "../mesh_helper";
-import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
-import { uiScene } from "../../public/main";
 
-class ColorMapSprite {
+import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
+import { linkMeshList } from '../../public/main.js'; 
+
+class ColorMapCanvas {
     constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0, canvasLen=1000 ){
         this.lut = new Lut();
         this.lut.setColorMap( colorMapName );
@@ -18,45 +17,32 @@ class ColorMapSprite {
     }
 
     lut;
-    colorMapSprite;
-    topValueCanvas;
-    bottomValueCanvas;
-    topValueSprite;
-    bottomValueSprite;
     getMaxV() {return this.lut.maxV;}
     getMinV() {return this.lut.minV;}
 
-    drawColorMapSprite(scene){
-        const spriteMaterial = new THREE.SpriteMaterial( {
-            map: new THREE.CanvasTexture(this.lut.createCanvas()),
-            visible: true
-        });
-        this.colorMapSprite = new THREE.Sprite(spriteMaterial);
-        this.colorMapSprite.scale.x = 0.075;
-        scene.add(this.colorMapSprite);
-        this.drawTopValueSprite(scene);
-        this.drawBottomValueSprite(scene);
+    drawColorMapCanvas(){
+        if (!linkMeshList || linkMeshList.length == 0){ return; }
+        const colorMap = document.getElementById("colorMap");
+        colorMap.textContent = "";
+
+        const topValue = document.createElement("div");
+        topValue.innerText = parseFloat(this.getMaxV()).toFixed(2);
+        topValue.className = "colorMapText";
+        const bottomValue = document.createElement("div");
+        bottomValue.innerText = parseFloat(this.getMinV()).toFixed(2);
+        bottomValue.className = "colorMapText";
+
+        const canvas = this.lut.createCanvas();
+        canvas.setAttribute("id", "colorBar");
+        colorMap.appendChild(topValue);
+        colorMap.appendChild(canvas);
+        colorMap.appendChild(bottomValue);
     }
 
     clear(){
-        this.topValueSprite.material.map.image.getContext( '2d' ).clearRect(0,0,1000,1000);
-        this.bottomValueSprite.material.map.image.getContext( '2d' ).clearRect(0,0,1000,1000);
-        deleteMesh(this.topValueSprite, uiScene);
-        deleteMesh(this.bottomValueSprite, uiScene);
-        deleteMesh(this.colorMapSprite, uiScene);
+        document.getElementById("colorMap").textContent = "";
     }
 
-    drawTopValueSprite(scene){
-        this.topValueSprite = ColorMapSprite.generateValueSprite(this.getMaxV(), this.topValueCanvas);
-        this.topValueSprite.position.y = .53;
-        scene.add(this.topValueSprite);
-    }
-
-    drawBottomValueSprite(scene){
-        this.bottomValueSprite = ColorMapSprite.generateValueSprite(this.getMinV(), this.bottomValueCanvas);
-        this.bottomValueSprite.position.y = -.6;
-        scene.add(this.bottomValueSprite);
-    }
 
     getColor(val){
         return this.lut.getColor(val);
@@ -66,61 +52,17 @@ class ColorMapSprite {
         if (linkColorMap){
             this.lut.setColorMap( linkColorMap );
         }
-        const map = this.colorMapSprite.material.map;
-        this.lut.updateCanvas( map.image );
-        map.needsUpdate = true;
+        this.drawColorMapCanvas();
     }
 
-    updateSpriteValueScale(){
-        if (this.topValueSprite){
-            ColorMapSprite.setSpriteScale(this.topValueSprite);
+    static show(val=true){
+        if(val){
+            document.getElementById("colorMap").style.visibility = 'visible';
         }
-        if (this.bottomValueSprite){
-            ColorMapSprite.setSpriteScale(this.bottomValueSprite);
+        if(!val){
+            document.getElementById("colorMap").style.visibility = 'hidden';
         }
-    }
-
-    show(val=true){
-        if (this.colorMapSprite){
-            this.colorMapSprite.visible = val;
-        }
-        if (this.topValueSprite){
-            this.topValueSprite.visible = val;
-        }
-        if (this.bottomValueSprite){
-            this.bottomValueSprite.visible = val;
-        }
-    }
-
-    static setSpriteScale(sprite){
-        sprite.scale.set(.085 * window.innerHeight / 789, .15 * window.innerWidth / 1440,1);
-    }
-
-    static updateTextCanvas(message, canvas){
-        let ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.textAlign = 'left';
-        ctx.font = "500px Arial";
-        ctx.fillStyle = "white";
-        ctx.fillText(message,10,500);
-    }
-
-    static createTextSprite(message, canvas){
-        ColorMapSprite.updateTextCanvas(message, canvas);
-        const amap = new THREE.CanvasTexture(canvas);
-        const mat = new THREE.SpriteMaterial(
-            {map: amap, visible: true}
-        );
-        const sprite = new THREE.Sprite(mat);
-        return sprite;
-    }
-
-
-    static generateValueSprite(number, canvas){
-        const sprite = ColorMapSprite.createTextSprite(parseFloat(number).toFixed(2), canvas);
-        ColorMapSprite.setSpriteScale(sprite);
-        return sprite;
     }
 }
 
-export { ColorMapSprite }
+export { ColorMapCanvas }

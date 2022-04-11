@@ -8,7 +8,7 @@ import { gui, controls,
     sensorMeshList} from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
-import { redrawLinks, colorMapSprite, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial, ecoFiltering } from './link_builder/draw_links';
+import { redrawLinks, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial, ecoFiltering } from './link_builder/draw_links';
 import{ linkLineGenerator, linkVolumeGenerator } from './link_builder/link_mesh_generator';
 import { updateBrainMeshVisibility, 
     updateExtraItemMaterial,
@@ -20,6 +20,7 @@ import { updateBrainMeshVisibility,
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
 import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_background';
+import { ColorMapCanvas } from './link_builder/color_map_sprite';
 
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
@@ -244,7 +245,7 @@ function setupGui() {
 
     const colorMapFolder = linkFolder.addFolder('Color map');
     colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial).name('Color map');
-    colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {colorMapSprite.show(guiParams.showColorMap)}).name('Show color bar');
+    colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {ColorMapCanvas.show(guiParams.showColorMap)}).name('Show color bar');
 
     linkGeometryFolder.add(guiParams, 'linkGeometry', premadeLinkGeometriesList).onChange(updateDefaultLinkGeometry).name('Geometry');
 

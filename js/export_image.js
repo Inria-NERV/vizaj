@@ -1,4 +1,4 @@
-import { renderer, scene, onWindowResize, camera, uiScene, uiCamera } from "../public/main";
+import { renderer, scene, onWindowResize, camera } from "../public/main";
 import { GLTFExporter } from '../node_modules/three/examples/jsm/exporters/GLTFExporter.js';
 
 const strMime = 'image/tif';
@@ -37,7 +37,6 @@ async function export2DImage(){
         await new Promise((resolve, reject)=> {
             renderer.setSize(3000, 3000 * window.innerHeight / window.innerWidth, false);
             renderer.render(scene, camera);
-            renderer.render(uiScene, uiCamera);
             setTimeout(()=>{resolve()}, .1);
         });
         const imgData = renderer.domElement.toDataURL(strMime);

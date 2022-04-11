@@ -10,7 +10,7 @@ import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, 
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, colorMapSprite, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, colorMapCanvas, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData } from "../js/load_data";
@@ -34,13 +34,11 @@ const linkMeshList = [];
 const sensorMeshList = [];
 
 const scene = new THREE.Scene();
-const uiScene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
   preserveDrawingBuffer: true,
 });
 renderer.domElement.id = 'renderer';
 let camera = new THREE.PerspectiveCamera();
-let uiCamera = new THREE.OrthographicCamera();
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 const transformControls = new TransformControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
@@ -87,16 +85,12 @@ function animate() {
   renderer.clear();
   renderer.render(scene, camera);
   renderer.clearDepth();
-  renderer.render(uiScene, uiCamera);
 }
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  if(colorMapSprite){
-    colorMapSprite.updateSpriteValueScale();
-  }
 }
 
 async function generateSceneElements() {
@@ -222,8 +216,6 @@ async function handleJsonFileSelect(evt){
 export {
     scene,
     camera,
-    uiScene,
-    uiCamera,
     transformControls,
     orbitControls as controls,
     renderer,

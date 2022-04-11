@@ -1,14 +1,14 @@
 import * as THREE from "three";
-import { sensorMeshList, scene, uiScene, linkMeshList, LINK_LAYER} from '../../public/main';
+import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import {updateAllDegreeLineLength } from "../draw_degree_line";
 import { loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
-import { ColorMapSprite } from './color_map_sprite.js';
+import { ColorMapCanvas } from './color_map_sprite.js';
 
-let colorMapSprite;
+let colorMapCanvas;
 
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
@@ -61,8 +61,7 @@ async function drawLinks(linkList){
     }
     const maxLinkStrength = Math.max.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
     const minLinkStrength = Math.min.apply(Math, linkMeshList.map(linkMesh => linkMesh.link.strength));
-    colorMapSprite = new ColorMapSprite(guiParams.linkColorMap, maxLinkStrength, minLinkStrength);
-    generateLinkColorMapSprite();
+    colorMapCanvas = new ColorMapCanvas(guiParams.linkColorMap, maxLinkStrength, minLinkStrength);
     updateAllLinkMaterial();
 }
 
@@ -95,7 +94,7 @@ async function clearAllLinks() {
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);
     }
-    colorMapSprite.clear();
+    colorMapCanvas.clear();
 }
 
 function updateVisibleLinks() {
@@ -121,7 +120,7 @@ function ecoFiltering(){
 }
 
 function updateAllLinkMaterial(){
-    colorMapSprite.setColorMap(guiParams.linkColorMap );
+    colorMapCanvas.setColorMap(guiParams.linkColorMap );
     for (let linkTuple of linkMeshList){
         updateLinkMaterial(linkTuple);
     }
@@ -134,17 +133,13 @@ function updateLinkMaterial(linkTuple){
 }
 
 function updateLinkColor(linkTuple){
-    const color = colorMapSprite.getColor(linkTuple.link.strength);
+    const color = colorMapCanvas.getColor(linkTuple.link.strength);
     linkTuple.mesh.material.color = color;
-}
-
-function generateLinkColorMapSprite(){
-    colorMapSprite.drawColorMapSprite(uiScene);
 }
 
  export {
     clearAllLinks,
-    colorMapSprite,
+    colorMapCanvas as colorMapSprite,
     generateLinkData,
     loadAndDrawLinks,
     drawLinksAndUpdateVisibility,
