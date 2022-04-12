@@ -39,6 +39,10 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.domElement.id = 'renderer';
 let camera = new THREE.PerspectiveCamera();
+
+const uiScene = new THREE.Scene();
+let uiCamera = new THREE.OrthographicCamera();
+
 const orbitControls = new OrbitControls(camera, renderer.domElement);
 const transformControls = new TransformControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
@@ -85,6 +89,7 @@ function animate() {
   renderer.clear();
   renderer.render(scene, camera);
   renderer.clearDepth();
+  renderer.render(uiScene, uiCamera);
 }
 
 function onWindowResize() {
@@ -233,5 +238,7 @@ export {
     jsonInput,
     emptyIntersected,
     intersectedNodeList,
-    onWindowResize
+    onWindowResize,
+    uiScene,
+    uiCamera
 };

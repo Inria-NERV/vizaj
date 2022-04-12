@@ -139,9 +139,9 @@ function updateLinkColor(linkTuple){
 
  export {
     clearAllLinks,
-    colorMapCanvas as colorMapSprite,
     generateLinkData,
     loadAndDrawLinks,
+    colorMapCanvas,
     drawLinksAndUpdateVisibility,
     redrawLinks,
     updateLinkOutline,

@@ -1,5 +1,8 @@
-import { renderer, scene, onWindowResize, camera } from "../public/main";
+import { renderer, scene, onWindowResize, camera, uiScene, uiCamera, linkMeshList } from "../public/main";
 import { GLTFExporter } from '../node_modules/three/examples/jsm/exporters/GLTFExporter.js';
+import { ColorMapSprite } from './link_builder/color_map_sprite';
+import { colorMapCanvas } from "./link_builder/draw_links";
+import { guiParams } from "./setup_gui";
 
 const strMime = 'image/tif';
 
@@ -33,14 +36,23 @@ async function exportSceneToGLTF( scene ) {
 async function export2DImage(){
     try {
         isExporting2DImage = true;
+        let colorMapSprite;
         window.removeEventListener("resize", onWindowResize);
         await new Promise((resolve, reject)=> {
+            if (linkMeshList && linkMeshList.length > 0 && guiParams.showColorMap) {
+                colorMapSprite = new ColorMapSprite();
+                colorMapSprite.draw();
+            }
             renderer.setSize(3000, 3000 * window.innerHeight / window.innerWidth, false);
             renderer.render(scene, camera);
+            renderer.render(uiScene, uiCamera);
             setTimeout(()=>{resolve()}, .1);
         });
         const imgData = renderer.domElement.toDataURL(strMime);
         saveFile(imgData, "network.tif");
+        if (colorMapSprite){
+            colorMapSprite.clear();
+        }
         renderer.setSize(window.innerWidth, window.innerHeight, false);
         window.addEventListener("resize", onWindowResize);
         isExporting2DImage = false;

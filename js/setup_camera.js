@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-import { camera, controls, renderer, LINK_LAYER} from '../public/main.js';
+import { camera, uiCamera, controls, renderer, LINK_LAYER} from '../public/main.js';
 import { guiParams } from './setup_gui';
 
 function setupCamera(){
     controls.autoRotate = guiParams.rotateCamera;
     controls.enableDamping = true;
     controls.dampingFactor = .15;
+
+    uiCamera.position.set(0.85, 0, 1);
 
     camera.position.z = 400;
     camera.position.y = 20;
