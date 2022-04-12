@@ -8,12 +8,6 @@ class ColorMapCanvas {
         this.lut.setColorMap( colorMapName );
         this.lut.setMax(maxLinkStrength);
         this.lut.setMin(minLinkStrength);
-        this.topValueCanvas = document.createElement('canvas');
-        this.topValueCanvas.width = canvasLen;
-        this.topValueCanvas.height = canvasLen;
-        this.bottomValueCanvas = document.createElement('canvas');
-        this.bottomValueCanvas.width = canvasLen;
-        this.bottomValueCanvas.height = canvasLen;
     }
 
     lut;
