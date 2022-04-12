@@ -7,7 +7,12 @@ class ColorMapCanvas {
         this.lut = new Lut();
         this.lut.setColorMap( colorMapName );
         this.lut.setMax(maxLinkStrength);
-        this.lut.setMin(minLinkStrength);
+        if (maxLinkStrength == minLinkStrength){
+            this.lut.setMin(minLinkStrength - 0.001);
+        }
+        else {
+            this.lut.setMin(minLinkStrength);
+        }
     }
 
     lut;
