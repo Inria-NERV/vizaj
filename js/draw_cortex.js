@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { cortexTriOnLoadCallback, csv3dCoordinatesOnLoadCallBack, loadData } from './load_data.js';
-import { scene, transformControls, cortexVertUrl, cortexTriUrl, GLOBAL_LAYER } from "../public/main.js";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { scene, transformControls, 
+    cortexMeshUrl, GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper.js';
 
@@ -19,36 +21,35 @@ const cortexMaterial = new THREE.MeshStandardMaterial({
 function loadAndDrawCortexModel(){  
     removeExtraItemMesh(); 
     loadCortexModel()
-    .then((response) => makeVertCoordsList(response[0], response[1]))
     .then((response) => drawCortexModel(response));
     return;
 }
 
-function loadCortexModel(){
-    return Promise.all([loadCortexVert(), loadCortexTri()]);
-}
-function loadCortexVert(){
-    return loadData(cortexVertUrl, 'cortex vertices', csv3dCoordinatesOnLoadCallBack);
-}
-function loadCortexTri(){
-    return loadData(cortexTriUrl, 'cortex faces', cortexTriOnLoadCallback);
+async function loadCortexModel(){
+    const loader = new GLTFLoader();
+    let cortexGeometry;
+    await new Promise((resolve, reject) =>
+        loader.load(cortexMeshUrl,
+            function ( gltf ) {
+                const hemi0Mesh = gltf.scene.children[0].children[0];
+                const hemi1Mesh = gltf.scene.children[0].children[1];
+                cortexGeometry = BufferGeometryUtils.mergeBufferGeometries([hemi0Mesh.geometry, hemi1Mesh.geometry]);
+                resolve();
+            },
+            function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            function ( error ) {
+                console.log( error );
+                reject();
+            }
+        )
+    );
+    return cortexGeometry;
 }
 
-async function makeVertCoordsList(cortexVert, cortexTri){
-    const positions = [];
-    for (let coords of cortexTri){
-        Array.prototype.push.apply(positions, cortexVert[coords[0]]);
-        Array.prototype.push.apply(positions, cortexVert[coords[1]]);
-        Array.prototype.push.apply(positions, cortexVert[coords[2]]);
-    }
-    return new Float32Array(positions);
-}
-
-function drawCortexModel(vertices){
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute( vertices, 3 ));
-    geometry.computeVertexNormals();
-    extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
+function drawCortexModel(cortexGeometry){
+    extraItemMesh = new THREE.Mesh( cortexGeometry, cortexMaterial );
     initExtraItem();
     scene.add( extraItemMesh );
 }

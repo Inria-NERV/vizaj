@@ -29,12 +29,11 @@ function onloadCallback(data, parseRowMethod){
 }
 
 export function defaultOnLoadCallback(data) {return onloadCallback(data, (x)=>x); }
+
 export function csv3dCoordinatesOnLoadCallBack(data) {
     return onloadCallback(data, parseCsv3dCoordinatesRow);
 }
-export function cortexTriOnLoadCallback(data){
-    return onloadCallback(data, parseRowCortexTri);
-}
+
 function jsonOnloadCallback(data){
     return JSON.parse(data);
 }

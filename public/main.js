@@ -17,8 +17,7 @@ import { loadJsonData } from "../js/load_data";
 
 const highlightedLinksPreviousMaterials = [];
 
-let cortexVertUrl = require('../data/cortex_vert.csv');
-let cortexTriUrl = require('../data/cortex_tri.csv');
+let cortexMeshUrl = require('../data/cortex_model.glb');
 let sensorLabelsUrl = require('../data/sensor_labels.csv');
 let sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
@@ -227,8 +226,7 @@ export {
     linkMeshList,
     sensorMeshList,
     gui,
-    cortexVertUrl, 
-    cortexTriUrl, 
+    cortexMeshUrl,
     sensorMaterial,
     GLOBAL_LAYER,
     LINK_LAYER,
