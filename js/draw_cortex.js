@@ -57,7 +57,7 @@ function drawCortexModel(cortexGeometry){
 function initExtraItem(){
     extraItemMesh.receiveShadow = true;
     extraItemMesh.castShadow = true;
-    repositionExtraItemMesh( extraItemMesh );
+    resetPositionExtraItemMesh( );
 }
 
 function drawExtraItemModel(geometry){
@@ -68,19 +68,19 @@ function drawExtraItemModel(geometry){
 }
 
 function drawExtraItemSphereModel(){
-    const geometry = new THREE.SphereGeometry( 40, 32, 16 );
+    const geometry = new THREE.SphereGeometry( 32, 32, 16 );
     drawExtraItemModel(geometry);
 }
 
 function drawExtraItemCubeModel(){
-    const geometry = new THREE.BoxGeometry( 50, 50, 50 );
+    const geometry = new THREE.BoxGeometry( 40, 40, 40 );
     drawExtraItemModel(geometry);
 }
 
 function resetPositionExtraItemMesh(){
-    extraItemPosition = new Vector3(8,-13,0);
-    extraItemRotation = new Vector3(0,Math.PI,0);
-    extraItemScale = new Vector3(.8,.8,.8);
+    extraItemPosition = new Vector3(0,-17,0);
+    extraItemRotation = new Vector3(0,0,0);
+    extraItemScale = new Vector3(1,1,1);
     repositionExtraItemMesh();
 }
 
