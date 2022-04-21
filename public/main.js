@@ -70,6 +70,7 @@ function init() {
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
+  document.addEventListener("click", onDocumentMouseClick);
   transformControls.addEventListener('dragging-changed', (event)=>{
     orbitControls.enableDamping = false;
     orbitControls.enabled = !event.value;
@@ -114,6 +115,11 @@ function onDocumentMouseMove(event) {
   const padding = 15;
   sensorNameDiv.style.top = event.clientY + padding + "px";
   sensorNameDiv.style.left = event.clientX + padding + "px";
+}
+
+function onDocumentMouseClick(event) {
+  event.preventDefault();
+
 }
 
 function hoverDisplayUpdate() {

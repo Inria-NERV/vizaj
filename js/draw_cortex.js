@@ -11,6 +11,7 @@ let extraItemMesh;
 let extraItemPosition = new Vector3(8,-13,0);
 let extraItemRotation = new Vector3(0,Math.PI,0);
 let extraItemScale = new Vector3(.8,.8,.8);
+
 let transformControlsEnabled = false;
 
 const cortexMaterial = new THREE.MeshStandardMaterial({
@@ -57,7 +58,7 @@ function drawCortexModel(cortexGeometry){
 function initExtraItem(){
     extraItemMesh.receiveShadow = true;
     extraItemMesh.castShadow = true;
-    resetPositionExtraItemMesh( );
+    repositionExtraItemMesh();
 }
 
 function drawExtraItemModel(geometry){
@@ -176,5 +177,6 @@ export {
     rotateModeTransformControls,
     scaleModeTransformControls,
     repositionExtraItemMesh as repositionBrainMesh,
-    resetPositionExtraItemMesh
+    resetPositionExtraItemMesh,
+    disableTransformControls
 };

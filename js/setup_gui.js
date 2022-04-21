@@ -16,7 +16,8 @@ import { updateBrainMeshVisibility,
     translateModeTransformControls,
     rotateModeTransformControls,
     scaleModeTransformControls,
-    resetPositionExtraItemMesh } from './draw_cortex';
+    resetPositionExtraItemMesh,
+    disableTransformControls } from './draw_cortex';
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMaterial, updateAllDegreeLineVisibility } from './draw_degree_line';
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
 import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_background';
@@ -46,6 +47,7 @@ const guiParams = {
     rotateModeTransformControls: rotateModeTransformControls,
     scaleModeTransformControls: scaleModeTransformControls,
     resetExtraItemPosition: resetPositionExtraItemMesh,
+    closeTransformControls: disableTransformControls,
 
     showDegreeLines: false,
     degreeLineRadius: 1,
@@ -228,6 +230,7 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'rotateModeTransformControls').name('Rotate');
     moveExtraItemFolder.add(guiParams, 'scaleModeTransformControls').name('Scale');
     moveExtraItemFolder.add(guiParams, 'resetExtraItemPosition').name('Reset');
+    moveExtraItemFolder.add(guiParams, 'closeTransformControls').name('Close move helper')
 
     const sensorFolder = gui.addFolder('Nodes');
     sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
