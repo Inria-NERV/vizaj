@@ -13,6 +13,7 @@ let colorMapCanvas;
 async function loadAndDrawLinks(linksDataFileUrl){
     const links = await loadLinks(linksDataFileUrl);
     await drawLinksAndUpdateVisibility(links);
+    ecoFiltering();
 }
 
 async function loadLinks(linksDataFileUrl){
@@ -47,7 +48,7 @@ async function drawLinksAndUpdateVisibility(linkList){
     drawLinks(linkList)
     .then(() => {linkMeshList.sort((x1, x2) => x2.link.strength - x1.link.strength)})
     .then(() => {
-        ecoFiltering();
+        updateVisibleLinks();
     });
 }
 

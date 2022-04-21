@@ -54,7 +54,8 @@ class linkVolumeGenerator extends linkMeshGenerator{
         const geometry = new THREE.TubeGeometry(
             curvePath,
             this.LINK_SEGMENTS,
-            (1 - link.normDist) * guiParams.linkThickness * this.LINK_RADIUS_SCALE / Math.sqrt(sensorMeshList.length),
+            ((1 - link.normDist) * (1-.3) + .3) //we scale this value ranged linearily from 0 to 1 to make it range linearily from .3 to 1
+             * guiParams.linkThickness * this.LINK_RADIUS_SCALE / Math.sqrt(sensorMeshList.length),
             this.LINK_RADIAL_SEGMENTS,
             false
         );

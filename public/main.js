@@ -10,7 +10,7 @@ import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, 
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, colorMapCanvas, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, colorMapCanvas, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData } from "../js/load_data";
@@ -215,6 +215,7 @@ async function handleJsonFileSelect(evt){
       value.strength));
   }
   await drawLinksAndUpdateVisibility(linkList);
+  ecoFiltering();
 }
 
 export {
