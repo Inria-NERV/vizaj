@@ -6,11 +6,11 @@ import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
-import { loadAndDrawCortexModel } from "../js/draw_cortex.js";
+import { loadAndDrawCortexModel, handleTransformControlChangeEvent, updateTransformControlHistory } from "../js/draw_cortex.js";
 import { loadAndDrawSensors, 
   clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, colorMapCanvas, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
+import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData } from "../js/load_data";
@@ -23,6 +23,8 @@ let sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
+
+let mouseButtonIsDown = false;
 
 const enlightenedSensorMaterial = new THREE.MeshPhysicalMaterial({
   color: 0xffffff,
@@ -70,12 +72,14 @@ function init() {
   
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
-  document.addEventListener("click", onDocumentMouseClick);
   transformControls.addEventListener('dragging-changed', (event)=>{
     orbitControls.enableDamping = false;
     orbitControls.enabled = !event.value;
     orbitControls.enableDamping = true;
   });
+  transformControls.addEventListener("objectChange", handleTransformControlChangeEvent);
+  renderer.domElement.addEventListener("mousedown", () => {mouseButtonIsDown=true});
+  renderer.domElement.addEventListener("mouseup", onRendererMouseUp);
   csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
   csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
@@ -117,9 +121,9 @@ function onDocumentMouseMove(event) {
   sensorNameDiv.style.left = event.clientX + padding + "px";
 }
 
-function onDocumentMouseClick(event) {
-  event.preventDefault();
-
+function onRendererMouseUp(event){
+  mouseButtonIsDown = false;
+  updateTransformControlHistory();
 }
 
 function hoverDisplayUpdate() {
@@ -245,5 +249,6 @@ export {
     intersectedNodeList,
     onWindowResize,
     uiScene,
-    uiCamera
+    uiCamera,
+    mouseButtonIsDown
 };

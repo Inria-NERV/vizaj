@@ -3,14 +3,19 @@ import { Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { scene, transformControls, 
+    mouseButtonIsDown,
     cortexMeshUrl, GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper.js';
 
 let extraItemMesh;
-let extraItemPosition = new Vector3(8,-13,0);
-let extraItemRotation = new Vector3(0,Math.PI,0);
-let extraItemScale = new Vector3(.8,.8,.8);
+
+let initExtraItemPosition = new Vector3(0,-13,0);
+let initExtraItemRotation = new Vector3(0,0,0);
+let initExtraItemScale = new Vector3(.8,.8,.8);
+
+let transformControlHistory = [];
+let transformControlHistoryToken;
 
 let transformControlsEnabled = false;
 
@@ -22,7 +27,7 @@ const cortexMaterial = new THREE.MeshStandardMaterial({
 function loadAndDrawCortexModel(){  
     removeExtraItemMesh(); 
     loadCortexModel()
-    .then((response) => drawCortexModel(response));
+    .then((response) => drawExtraItemModel(response));
     return;
 }
 
@@ -49,22 +54,19 @@ async function loadCortexModel(){
     return cortexGeometry;
 }
 
-function drawCortexModel(cortexGeometry){
-    extraItemMesh = new THREE.Mesh( cortexGeometry, cortexMaterial );
-    initExtraItem();
-    scene.add( extraItemMesh );
-}
-
-function initExtraItem(){
-    extraItemMesh.receiveShadow = true;
-    extraItemMesh.castShadow = true;
-    repositionExtraItemMesh();
-}
 
 function drawExtraItemModel(geometry){
-    removeExtraItemMesh();
+    let position = initExtraItemPosition;
+    let rotation = initExtraItemRotation;
+    let scale = initExtraItemScale;
+    if (extraItemMesh){
+        position = extraItemMesh.position.clone();
+        rotation = extraItemMesh.rotation.clone();
+        scale = extraItemMesh.scale.clone();
+        removeExtraItemMesh();
+    }
     extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
-    initExtraItem();
+    initNewExtraItemShape(position, rotation, scale);
     scene.add(extraItemMesh);
 }
 
@@ -79,16 +81,24 @@ function drawExtraItemCubeModel(){
 }
 
 function resetPositionExtraItemMesh(){
-    extraItemPosition = new Vector3(0,-17,0);
-    extraItemRotation = new Vector3(0,0,0);
-    extraItemScale = new Vector3(1,1,1);
-    repositionExtraItemMesh();
+    transformControlHistory.push({
+        position: extraItemMesh.position.clone(),
+        rotation: extraItemMesh.rotation.clone(),
+        scale: extraItemMesh.scale.clone()
+    });
+    repositionExtraItemMesh(initExtraItemPosition, initExtraItemRotation, initExtraItemScale);
 }
 
-function repositionExtraItemMesh(){
-    extraItemMesh.rotation.set(extraItemRotation.x, extraItemRotation.y, extraItemRotation.z);
-    extraItemMesh.position.set(extraItemPosition.x, extraItemPosition.y, extraItemPosition.z);
-    extraItemMesh.scale.set(extraItemScale.x, extraItemScale.y, extraItemScale.z);
+function initNewExtraItemShape(position, rotation, scale){
+    extraItemMesh.receiveShadow = true;
+    extraItemMesh.castShadow = true;
+    repositionExtraItemMesh(position, rotation, scale);
+}
+
+function repositionExtraItemMesh(position, rotation, scale){
+    extraItemMesh.position.set(position.x, position.y, position.z);
+    extraItemMesh.rotation.set(rotation.x, rotation.y, rotation.z);
+    extraItemMesh.scale.set(scale.x, scale.y, scale.z);
 }
 
 function updateExtraItemMeshVisibility(){
@@ -120,9 +130,6 @@ function updateExtraItemMaterial(){
 }
 
 function updateExtraItemMesh(){
-    extraItemPosition = extraItemMesh.position;
-    extraItemRotation = extraItemMesh.rotation;
-    extraItemScale = extraItemMesh.scale;
     showExtraItem();
     disableTransformControls();
     if (guiParams.extraItemMeshShape == 'brain'){
@@ -165,6 +172,29 @@ function scaleModeTransformControls(){
     toggleTransformControls('scale');
 }
 
+function handleTransformControlChangeEvent(event){
+    if (mouseButtonIsDown && transformControlHistoryToken == null){
+        transformControlHistoryToken = {
+            position: extraItemMesh.position.clone(),
+            rotation: extraItemMesh.rotation.clone(),
+            scale: extraItemMesh.scale.clone()
+        };
+    }
+}
+
+function updateTransformControlHistory(){
+    if (transformControlHistoryToken){
+        transformControlHistory.push(transformControlHistoryToken);
+        transformControlHistoryToken = null;
+      }
+}
+
+function undoTransformControls(){
+    if (transformControlHistory.length == 0){ return; }
+    const previousTransfo = transformControlHistory.pop();
+    repositionExtraItemMesh(previousTransfo.position, previousTransfo.rotation, previousTransfo.scale);
+}
+
 export {
     loadAndDrawCortexModel,
     drawExtraItemSphereModel,
@@ -176,7 +206,9 @@ export {
     translateModeTransformControls,
     rotateModeTransformControls,
     scaleModeTransformControls,
-    repositionExtraItemMesh as repositionBrainMesh,
     resetPositionExtraItemMesh,
-    disableTransformControls
+    disableTransformControls,
+    handleTransformControlChangeEvent,
+    updateTransformControlHistory,
+    undoTransformControls
 };
