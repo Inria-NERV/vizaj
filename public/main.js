@@ -13,7 +13,7 @@ import { loadAndDrawSensors,
 import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
-import { loadJsonData } from "../js/load_data";
+import { loadJsonData, jsonLoadingNodeCheckForError } from "../js/load_data";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -199,33 +199,55 @@ function handleMontageLabelsFileSelect(evt) {
 }
 
 async function handleJsonFileSelect(evt){
-  const jsonUrl = getNewFileUrl(evt);
-  const jsonData = await loadJsonData(jsonUrl);
-  const graph = jsonData.graph;
-  const coordinatesList  = [];
-  const labelList = [];
-  const linkList = [];
-  const sensorIdDict = {};
-  for (const [key, value] of Object.entries(graph.nodes)){
-    coordinatesList.push([value.position.x, value.position.y, value.position.z]);
-    let label = '';
-    if (value.label) { label = value.label; }
-    labelList.push(label);
-    sensorIdDict[key] = labelList.length - 1;
+  try{
+    const jsonUrl = getNewFileUrl(evt);
+    const fileName = evt.target.files[0].name;
+    const jsonData = await loadJsonData(jsonUrl);
+    const graph = jsonData.graph;
+    const coordinatesList  = [];
+    const labelList = [];
+    const linkList = [];
+    const sensorIdDict = {};
+    let i = 0;
+    for (const [key, value] of Object.entries(graph.nodes)){
+      jsonLoadingNodeCheckForError(key, value, i, fileName);
+      i++;
+      coordinatesList.push([value.position.x, value.position.y, value.position.z]);
+      let label = '';
+      if (value.label) { label = value.label; }
+      labelList.push(label);
+      sensorIdDict[key] = labelList.length - 1;
+    }
+    await clearAllLinks();
+    await clearAllSensors();
+    await drawSensorsAndUpdateGlobalValues(coordinatesList);
+    assignSensorLabels(labelList);
+    for (const [key, value] of Object.entries(graph.edges)){
+      if (value.strength != 0 && value.strength)
+      linkList.push(generateLinkData(
+        sensorIdDict[value.source], 
+        sensorIdDict[value.target], 
+        value.strength));
+    }
+    await drawLinksAndUpdateVisibility(linkList);
+    ecoFiltering();
   }
-  await clearAllLinks();
-  await clearAllSensors();
-  await drawSensorsAndUpdateGlobalValues(coordinatesList);
-  assignSensorLabels(labelList);
-  for (const [key, value] of Object.entries(graph.edges)){
-    if (value.strength != 0 && value.strength)
-    linkList.push(generateLinkData(
-      sensorIdDict[value.source], 
-      sensorIdDict[value.target], 
-      value.strength));
+  catch(e){
+    const message = e.name + " : " + e.message;
+    userLogMessage(message);
+
   }
-  await drawLinksAndUpdateVisibility(linkList);
-  ecoFiltering();
+}
+
+function userLogMessage(message){
+  console.log(message);
+  const logElement = document.createElement("div");
+  logElement.textContent = message;
+  logElement.setAttribute("class", "log");
+  const htmlLogElement = document.getElementById("logs").appendChild(logElement);
+  setTimeout(() => {
+    htmlLogElement.remove();
+  }, 15000);
 }
 
 export {

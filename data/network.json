@@ -6,17 +6,16 @@
         "metadata":{
             "somekey":"somevalue"
         },
-        "nodes":{
-            "0":{
+        "nodes":[
+            {
                 "type":"node type",
                 "label":"label1",
                 "position":{
                     "x": 4,
-                    "y": 4,
-                    "z": 0 
+                    "y": 4
                 }
             },
-            "1":{
+            {
                 "type":"node type",
                 "label":"label2",
                 "position":{
@@ -25,7 +24,7 @@
                     "z": 2 
                 }
             },
-            "2":{
+            {
                 "type":"node type",
                 "position":{
                     "x": -4,
@@ -33,7 +32,7 @@
                     "z": 2 
                 }
             }
-        },
+        ],
         "edges":[
             {
                 "source":"0",

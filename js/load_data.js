@@ -52,3 +52,28 @@ export function loadJsonData(url){
     return loadData(url, 'json file', jsonOnloadCallback);
 }
 
+export function jsonLoadingNodeCheckForError(key, value,i, fileName){
+    let e;
+    if (value.position == null){
+      e = new TypeError("Couldn't load file " + fileName + " : position missing for node " + i.toString());
+    }
+    else if (value.position.x == null){
+      e = new TypeError("Couldn't load file " + fileName + " : position coordinate x missing for node " + i.toString());
+    }
+    else if (value.position.y == null){
+      e = new TypeError("Couldn't load file " + fileName + " : position coordinate y missing for node " + i.toString());
+    }
+    else if (value.position.z == null){
+      e = new TypeError("Couldn't load file " + fileName + " : position coordinate z missing for node " + i.toString());
+    }
+  
+  
+    if (e){
+      if (value.label){
+        e.message = e.message + " (" + value.label + ")";
+      }
+      throw e;
+    }
+    return;
+  }
+
