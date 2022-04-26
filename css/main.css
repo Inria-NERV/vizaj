@@ -66,17 +66,20 @@
     color: white;
     visibility: visible;
   }
-  15% {
+  5% {
     background-color: black;
   }
-
-
-  90% {
+  95% {
     color: white;
   }
   100% {
-    color: red;
+    color: black;
   }
+}
+
+.notransition {
+  animation-name: none !important;
+  animation-duration: none !important;
 }
   
 body {

@@ -14,6 +14,7 @@ import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVi
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError } from "../js/load_data";
+import { userLogMessage } from "../js/logs_helper";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -239,16 +240,7 @@ async function handleJsonFileSelect(evt){
   }
 }
 
-function userLogMessage(message){
-  console.log(message);
-  const logElement = document.createElement("div");
-  logElement.textContent = message;
-  logElement.setAttribute("class", "log");
-  const htmlLogElement = document.getElementById("logs").appendChild(logElement);
-  setTimeout(() => {
-    htmlLogElement.remove();
-  }, 15000);
-}
+
 
 export {
     scene,

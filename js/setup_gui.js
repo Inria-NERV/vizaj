@@ -23,6 +23,7 @@ import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineMateri
 import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image';
 import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_background';
 import { ColorMapCanvas } from './link_builder/color_map_sprite';
+import { showLogs, hideLogs } from "../js/logs_helper";
 
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
@@ -128,6 +129,9 @@ const guiParams = {
         }
     },
     export3Dgltf: () => export3Dgltf(),
+
+    showLogs: showLogs,
+    hideLogs: hideLogs
     
   };
 
@@ -294,7 +298,11 @@ function setupGui() {
 
     const exportFileFolder = gui.addFolder('Export');
     exportFileFolder.add(guiParams, 'export2dImage').name('Picture (.tif)');
-    exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');
+    exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');``
+
+    const logsFolder = gui.addFolder('Logs');
+    logsFolder.add(guiParams, 'showLogs').name("Show");
+    logsFolder.add(guiParams, 'hideLogs').name("Hide");
 
 }
 
