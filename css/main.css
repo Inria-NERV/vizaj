@@ -63,17 +63,10 @@
 @keyframes logAnim {
   0% {
     background-color: white;
-    color: white;
     visibility: visible;
   }
   5% {
     background-color: black;
-  }
-  95% {
-    color: white;
-  }
-  100% {
-    color: black;
   }
 }
 

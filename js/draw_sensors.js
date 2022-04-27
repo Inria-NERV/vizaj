@@ -4,7 +4,7 @@ import { scene,
     intersectedNodeList,
     emptyIntersected
  } from "../public/main.js";
-import { csv3dCoordinatesOnLoadCallBack, loadData } from "./load_data.js";
+import { csv3dCoordinatesOnLoadCallBack, csvMontageLoadingCheckForError, csvSensorCoordinatesCheckForError, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { deleteMesh } from "./mesh_helper";
 import { drawAllDegreeLines } from './draw_degree_line.js';
@@ -31,20 +31,17 @@ const sensorMaterial =  new THREE.MeshPhysicalMaterial({
 
 let maxSensorDistance = 0.;
 
-async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl){
+async function clearLoadAndDrawSensors(sensorCoordinatesUrl, sensorLabelsUrl, fileName){
+    const data = await loadSensorCoordinates(sensorCoordinatesUrl);  
+    csvMontageLoadingCheckForError(data, fileName);
     await clearAllLinks();
     await clearAllSensors();
-    await loadAndDrawSensors(sensorCoordinatesUrl);
+    await drawSensorsAndUpdateGlobalValues(data);
     if (sensorLabelsUrl){
         await loadAndAssignSensorLabels(sensorLabelsUrl);
     }
 }
 
-async function loadAndDrawSensors(sensorCoordinatesUrl) {  
-    const data = await loadSensorCoordinates(sensorCoordinatesUrl);
-    await drawSensorsAndUpdateGlobalValues(data);
-
-}
 async function drawSensorsAndUpdateGlobalValues(data){
     await getMontageBarycenter(data);
     await drawAllSensors(data);
@@ -58,9 +55,9 @@ async function loadSensorCoordinates(sensorCoordinatesUrl) {
     return data;
 }
 
-//TODO: check if number fo labels correspond to number of nodes
 async function loadAndAssignSensorLabels(sensorLabelsUrl){
     const labelList = await loadSensorLabels(sensorLabelsUrl);
+    csvSensorCoordinatesCheckForError(labelList);
     assignSensorLabels(labelList);
 }
 
@@ -201,8 +198,8 @@ export {
     sensorMaterial,
     drawSensor,
     drawSensorsAndUpdateGlobalValues,
-    loadAndDrawSensors, 
     loadAndAssignSensorLabels,
+    loadSensorCoordinates,
     clearLoadAndDrawSensors,
     assignSensorLabels,
     sensorMeshList, 

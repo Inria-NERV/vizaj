@@ -1,20 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from '../node_modules/three/examples/jsm/controls/TransformControls.js';
-import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, sensorMaterial } from "../js/draw_sensors.js";
+import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, loadSensorCoordinates, sensorMaterial } from "../js/draw_sensors.js";
 import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
 
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel, handleTransformControlChangeEvent, updateTransformControlHistory } from "../js/draw_cortex.js";
-import { loadAndDrawSensors, 
-  clearLoadAndDrawSensors, 
+import { clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { setupGui, guiParams } from '../js/setup_gui';
-import { loadJsonData, jsonLoadingNodeCheckForError } from "../js/load_data";
-import { userLogMessage } from "../js/logs_helper";
+import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
+import { userLogError, userLogMessage } from "../js/logs_helper";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -108,7 +107,8 @@ async function generateSceneElements() {
   addLightAndBackground();
   scene.add( transformControls );
   loadAndDrawCortexModel();
-  await loadAndDrawSensors(sensorCoordinatesUrl);
+  const data = await loadSensorCoordinates(sensorCoordinatesUrl);
+  await drawSensorsAndUpdateGlobalValues(data);
   await loadAndAssignSensorLabels(sensorLabelsUrl);
   await loadAndDrawLinks(connectivityMatrixUrl);
 }
@@ -184,26 +184,46 @@ function getNewFileUrl(evt){
 
 function handleConnectivityMatrixFileSelect(evt) {
   const fileUrl = getNewFileUrl(evt);
-  clearAllLinks();
-  loadAndDrawLinks(fileUrl);
+  const fileName = evt.target.files[0].name;
+  loadAndDrawLinks(fileUrl).then(
+      ()=>{ userLogMessage("Connectivity matrix file " + fileName + "succesfully loaded.", "green")},
+        (e) => userLogError(e, fileName)
+    );
 }
 
 function handleMontageCoordinatesFileSelect(evt) {
   sensorCoordinatesUrl = getNewFileUrl(evt);
-  guiParams.mneMontage = -1;
-  clearLoadAndDrawSensors(sensorCoordinatesUrl);
+  const fileName = evt.target.files[0].name;
+  clearLoadAndDrawSensors(sensorCoordinatesUrl)
+    .then(() => userLogMessage("Coordinates file " + fileName + " succesfully loaded.", "green"),
+      (e)=>userLogError(e, fileName)
+    );
 }
 
 function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
-  loadAndAssignSensorLabels(sensorLabelsUrl);
+  const fileName = evt.target.files[0].name;
+  loadAndAssignSensorLabels(sensorLabelsUrl)
+    .then(() => userLogMessage("Labels file " + fileName + "succesfully loaded.", "green"), 
+      (e)=>userLogError(e, fileName)
+    );
 }
 
 async function handleJsonFileSelect(evt){
+  const jsonUrl = getNewFileUrl(evt);
+  const fileName = evt.target.files[0].name;
   try{
-    const jsonUrl = getNewFileUrl(evt);
-    const fileName = evt.target.files[0].name;
     const jsonData = await loadJsonData(jsonUrl);
+    if (!jsonData.graph){
+      throw new TypeError("Graph attribute is missing.");
+    }
+    if (!jsonData.graph.nodes){
+      throw new TypeError("No nodes folder.");
+    }
+    if (!jsonData.graph.edges){
+      throw new TypeError("No edges folder.");
+    }
+
     const graph = jsonData.graph;
     const coordinatesList  = [];
     const labelList = [];
@@ -211,7 +231,7 @@ async function handleJsonFileSelect(evt){
     const sensorIdDict = {};
     let i = 0;
     for (const [key, value] of Object.entries(graph.nodes)){
-      jsonLoadingNodeCheckForError(key, value, i, fileName);
+      jsonLoadingNodeCheckForError(key, value, i);
       i++;
       coordinatesList.push([value.position.x, value.position.y, value.position.z]);
       let label = '';
@@ -219,10 +239,20 @@ async function handleJsonFileSelect(evt){
       labelList.push(label);
       sensorIdDict[key] = labelList.length - 1;
     }
+
+    i=0;
+    for (const [key, value] of Object.entries(graph.edges)){
+      jsonLoadingEdgeCheckForError(key, value, i, coordinatesList.length);
+      i++;
+    }
+
+    // ------- update the mesh once basic errors are checked
+
     await clearAllLinks();
     await clearAllSensors();
     await drawSensorsAndUpdateGlobalValues(coordinatesList);
     assignSensorLabels(labelList);
+
     for (const [key, value] of Object.entries(graph.edges)){
       if (value.strength != 0 && value.strength)
       linkList.push(generateLinkData(
@@ -230,12 +260,14 @@ async function handleJsonFileSelect(evt){
         sensorIdDict[value.target], 
         value.strength));
     }
+
     await drawLinksAndUpdateVisibility(linkList);
     ecoFiltering();
+
+    userLogMessage('Json file ' + fileName + ' succesfully loaded.', 'green');
   }
   catch(e){
-    const message = e.name + " : " + e.message;
-    userLogMessage(message);
+    userLogError(e, fileName);
 
   }
 }

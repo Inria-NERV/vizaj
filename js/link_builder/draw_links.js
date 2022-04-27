@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import {updateAllDegreeLineLength } from "../draw_degree_line";
-import { loadData } from '../load_data';
+import { csvConnectivityMatrixCheckForError, loadData } from '../load_data';
 import { guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
@@ -11,18 +11,23 @@ import { ColorMapCanvas } from './color_map_sprite.js';
 let colorMapCanvas;
 
 async function loadAndDrawLinks(linksDataFileUrl){
-    const links = await loadLinks(linksDataFileUrl);
+    const rawData = await loadLinks(linksDataFileUrl);
+    csvConnectivityMatrixCheckForError(rawData);
+    const links = connectivityMatrixExtractData(rawData);
+    clearAllLinks();
     await drawLinksAndUpdateVisibility(links);
     ecoFiltering();
 }
 
 async function loadLinks(linksDataFileUrl){
-    return loadData(linksDataFileUrl, 'connectivity matrix', connectivityMatrixOnLoadCallBack);
+    return loadData(linksDataFileUrl, 'connectivity matrix');
 }
 
-function connectivityMatrixOnLoadCallBack(data){
+
+
+function connectivityMatrixExtractData(data){
     const outList = [];
-    const splittedData = data.split('\n').filter(x => x !== null && x !== '');
+    const splittedData = data.filter(x => x !== null && x !== '');
     for (let i = 0; i < splittedData.length; i++){
         const row = splittedData[i];
         const splittedRow = row.split(',');
@@ -95,7 +100,9 @@ async function clearAllLinks() {
         const link = linkMeshList.pop();
         deleteMesh(link.mesh);
     }
-    colorMapCanvas.clear();
+    if(colorMapCanvas){
+        colorMapCanvas.clear();
+    }
 }
 
 function updateVisibleLinks() {

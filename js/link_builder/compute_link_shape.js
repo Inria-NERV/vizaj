@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Matrix3, Vector3 } from "three";
 import { guiParams } from '../setup_gui';
 
-//This point is tho translate the origin where the coordinates of the link are computed
+//This point is to translate the origin where the coordinates of the link are computed
 // since all links align with the plan of (0,0,0) and the position of the two nodes, we alter the position of the nodes 
 // in order to make the links face where we want
 
