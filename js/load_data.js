@@ -23,8 +23,13 @@ export async function loadData(url, dataName, onLoadCallback = defaultOnLoadCall
 
 function onloadCallback(data, parseRowMethod){
     const dataOut = [];
-    for (let row of data.split('\n').filter(x => x !== null && x !== '')){
+    let rows = data.split('\n');
+    const lastRow = rows.pop();
+    for (let row of rows){
         dataOut.push(parseRowMethod(row));
+    }
+    if (lastRow){
+      dataOut.push(parseRowMethod(lastRow));
     }
     return dataOut;
 }
@@ -41,8 +46,7 @@ function jsonOnloadCallback(data){
 
 export function parseCsv3dCoordinatesRow(row) { 
     let splitted_row = row.split(",");
-    splitted_row = splitted_row.map((x) => parseFloat(x));
-    return [splitted_row[1], splitted_row[2], splitted_row[0]];
+    return splitted_row.map((x) => parseFloat(x));
 }
 
 export function parseRowCortexTri(row) {
@@ -116,6 +120,7 @@ export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount){
 
 export function csvMontageLoadingCheckForError(data){
   let i = 0;
+  console.log(data);
   for (let row of data){
     if (row.length != 3){
         throw new TypeError("Row "+ i + " has " + row.length + 'values , should be 3. (N.B. : separator is \',\' character).');
@@ -135,7 +140,7 @@ export function csvMontageLoadingCheckForError(data){
   return;
 }
 
-export function csvSensorCoordinatesCheckForError(data){
+export function csvSensorLabelsCheckForError(data){
   
 }
 
@@ -147,7 +152,7 @@ export function csvConnectivityMatrixCheckForError(data){
   for (let row of data){
     const values = row.split(',');
     if (values.length != sensorMeshList.length){
-      throw new TypeError("Number of values of row " + i + " of file (" + (values.length + 1) + ") differs from count of sensors (" + (sensorMeshList.length + 1) + ")")
+      throw new TypeError("Number of values of row " + i + "(" + (values.length + 1) + " rows) differs from count of sensors (" + (sensorMeshList.length + 1) + ")")
     }
     i++;
   }

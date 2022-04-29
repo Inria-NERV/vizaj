@@ -204,7 +204,7 @@ function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
   const fileName = evt.target.files[0].name;
   loadAndAssignSensorLabels(sensorLabelsUrl)
-    .then(() => userLogMessage("Labels file " + fileName + "succesfully loaded.", "green"), 
+    .then(() => userLogMessage("Labels file " + fileName + " succesfully loaded.", "green"), 
       (e)=>userLogError(e, fileName)
     );
 }

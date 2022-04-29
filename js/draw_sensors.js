@@ -4,7 +4,7 @@ import { scene,
     intersectedNodeList,
     emptyIntersected
  } from "../public/main.js";
-import { csv3dCoordinatesOnLoadCallBack, csvMontageLoadingCheckForError, csvSensorCoordinatesCheckForError, loadData } from "./load_data.js";
+import { csv3dCoordinatesOnLoadCallBack, csvMontageLoadingCheckForError, csvSensorLabelsCheckForError, loadData } from "./load_data.js";
 import { clearAllLinks } from './link_builder/draw_links';
 import { deleteMesh } from "./mesh_helper";
 import { drawAllDegreeLines } from './draw_degree_line.js';
@@ -57,7 +57,7 @@ async function loadSensorCoordinates(sensorCoordinatesUrl) {
 
 async function loadAndAssignSensorLabels(sensorLabelsUrl){
     const labelList = await loadSensorLabels(sensorLabelsUrl);
-    csvSensorCoordinatesCheckForError(labelList);
+    csvSensorLabelsCheckForError(labelList);
     assignSensorLabels(labelList);
 }
 
@@ -196,7 +196,6 @@ async function clearAllSensors(){
 
 export {
     sensorMaterial,
-    drawSensor,
     drawSensorsAndUpdateGlobalValues,
     loadAndAssignSensorLabels,
     loadSensorCoordinates,
