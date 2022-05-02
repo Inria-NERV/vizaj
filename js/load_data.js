@@ -1,5 +1,6 @@
 
 import * as THREE from "three";
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { sensorMeshList } from "./draw_sensors";
  
 export async function loadData(url, dataName, onLoadCallback = defaultOnLoadCallback){
@@ -19,6 +20,27 @@ export async function loadData(url, dataName, onLoadCallback = defaultOnLoadCall
         )
     );
     return dataOut;
+}
+
+export async function loadGltfModel(url, dataName='', onLoadCallback = (gltf) => {return gltf.scene.children[0].geometry;}){
+  const loader = new GLTFLoader();
+  let geometry;
+  await new Promise((resolve, reject) =>
+      loader.load(url,
+          function ( gltf ) {
+              geometry = onLoadCallback(gltf);
+              resolve();
+          },
+          function ( xhr ) {
+              console.log( 'Loading ' + dataName + ' : ' + ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+          },
+          function ( error ) {
+              console.log( error );
+              reject();
+          }
+      )
+  );
+  return geometry;
 }
 
 function onloadCallback(data, parseRowMethod){
@@ -157,4 +179,3 @@ export function csvConnectivityMatrixCheckForError(data){
     i++;
   }
 }
-

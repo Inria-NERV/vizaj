@@ -18,6 +18,8 @@ import { userLogError, userLogMessage } from "../js/logs_helper";
 const highlightedLinksPreviousMaterials = [];
 
 let cortexMeshUrl = require('../data/cortex_model.glb');
+let innerSkullMeshUrl = require('../data/innskull.glb');
+let scalpMeshUrl = require('../data/scalp.glb');
 let sensorLabelsUrl = require('../data/sensor_labels.csv');
 let sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
 let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
@@ -272,8 +274,6 @@ async function handleJsonFileSelect(evt){
   }
 }
 
-
-
 export {
     scene,
     camera,
@@ -284,6 +284,8 @@ export {
     sensorMeshList,
     gui,
     cortexMeshUrl,
+    innerSkullMeshUrl,
+    scalpMeshUrl,
     sensorMaterial,
     GLOBAL_LAYER,
     LINK_LAYER,

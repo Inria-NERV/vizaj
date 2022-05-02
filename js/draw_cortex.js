@@ -1,12 +1,15 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
 import { scene, transformControls, 
     mouseButtonIsDown,
-    cortexMeshUrl, GLOBAL_LAYER } from "../public/main.js";
+    cortexMeshUrl,
+    innerSkullMeshUrl, 
+    scalpMeshUrl,
+     GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper.js';
+import { loadGltfModel } from './load_data.js';
 
 let extraItemMesh;
 
@@ -21,7 +24,8 @@ let transformControlsEnabled = false;
 
 const cortexMaterial = new THREE.MeshStandardMaterial({
     color: '#ffc0cb',
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    flatShading: false
   });
 
 function loadAndDrawCortexModel(){  
@@ -31,29 +35,40 @@ function loadAndDrawCortexModel(){
     return;
 }
 
-async function loadCortexModel(){
-    const loader = new GLTFLoader();
-    let cortexGeometry;
-    await new Promise((resolve, reject) =>
-        loader.load(cortexMeshUrl,
-            function ( gltf ) {
-                const hemi0Mesh = gltf.scene.children[0].children[0];
-                const hemi1Mesh = gltf.scene.children[0].children[1];
-                cortexGeometry = BufferGeometryUtils.mergeBufferGeometries([hemi0Mesh.geometry, hemi1Mesh.geometry]);
-                resolve();
-            },
-            function ( xhr ) {
-                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-            },
-            function ( error ) {
-                console.log( error );
-                reject();
-            }
-        )
-    );
-    return cortexGeometry;
+function drawExtraItemInnerSkullModel(){
+    loadInnerSkullModel().then((response) => drawExtraItemModel(response));
 }
 
+function loadAndDrawScalpModel(){
+    loadScalpModel().then((response) => drawExtraItemModel(response));
+}
+
+function drawExtraItemSphereModel(){
+    const geometry = new THREE.SphereGeometry( 32, 32, 16 );
+    drawExtraItemModel(geometry);
+}
+
+function drawExtraItemCubeModel(){
+    const geometry = new THREE.BoxGeometry( 40, 40, 40 );
+    drawExtraItemModel(geometry);
+}
+
+function loadCortexModel(){
+    return loadGltfModel(cortexMeshUrl, 'cortex model',
+        (gltf) => {
+            const hemi0Mesh = gltf.scene.children[0].children[0];
+            const hemi1Mesh = gltf.scene.children[0].children[1];
+            return BufferGeometryUtils.mergeBufferGeometries([hemi0Mesh.geometry, hemi1Mesh.geometry]);
+    });
+}
+
+function loadInnerSkullModel(){
+    return loadGltfModel(innerSkullMeshUrl, 'inner skull model');
+}
+
+function loadScalpModel(){
+    return loadGltfModel(scalpMeshUrl, 'Scalp model');
+}
 
 function drawExtraItemModel(geometry){
     let position = initExtraItemPosition;
@@ -66,18 +81,10 @@ function drawExtraItemModel(geometry){
         removeExtraItemMesh();
     }
     extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
+    extraItemMesh.geometry.computeVertexNormals();
+
     initNewExtraItemShape(position, rotation, scale);
     scene.add(extraItemMesh);
-}
-
-function drawExtraItemSphereModel(){
-    const geometry = new THREE.SphereGeometry( 32, 32, 16 );
-    drawExtraItemModel(geometry);
-}
-
-function drawExtraItemCubeModel(){
-    const geometry = new THREE.BoxGeometry( 40, 40, 40 );
-    drawExtraItemModel(geometry);
 }
 
 function resetPositionExtraItemMesh(){
@@ -134,6 +141,12 @@ function updateExtraItemMesh(){
     disableTransformControls();
     if (guiParams.extraItemMeshShape == 'brain'){
         loadAndDrawCortexModel();
+    }
+    if (guiParams.extraItemMeshShape == 'innerSkull'){
+        drawExtraItemInnerSkullModel();
+    }
+    if (guiParams.extraItemMeshShape == 'scalp'){
+        loadAndDrawScalpModel();
     }
     if (guiParams.extraItemMeshShape == 'sphere'){
         drawExtraItemSphereModel();
