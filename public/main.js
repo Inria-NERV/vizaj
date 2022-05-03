@@ -2,18 +2,17 @@ import * as THREE from "three";
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from '../node_modules/three/examples/jsm/controls/TransformControls.js';
 import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, loadSensorCoordinates, sensorMaterial } from "../js/draw_sensors.js";
-import { GUI } from '../node_modules/three/examples/jsm/libs/dat.gui.module';
 import "regenerator-runtime/runtime.js";
-
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel, handleTransformControlChangeEvent, updateTransformControlHistory } from "../js/draw_cortex.js";
 import { clearLoadAndDrawSensors, 
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
-import { setupGui, guiParams } from '../js/setup_gui';
+import { setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
+import { GUI } from "three/examples/jsm/libs/dat.gui.module";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -50,7 +49,7 @@ const orbitControls = new OrbitControls(camera, renderer.domElement);
 const transformControls = new TransformControls(camera, renderer.domElement);
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
-const gui = new GUI();
+let gui = new GUI();
 
 document.body.appendChild(renderer.domElement);
 const sensorNameDiv = document.getElementById("sensorName");

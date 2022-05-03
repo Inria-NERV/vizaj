@@ -3,9 +3,7 @@ import { gui, controls,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,
-    jsonInput, 
-    linkMeshList,
-    sensorMeshList} from '../public/main';
+    jsonInput } from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial, ecoFiltering } from './link_builder/draw_links';
@@ -206,7 +204,10 @@ function linkThicknessUpdate() {
     redrawLinks();
 }
 
+let linkDensity;
+
 function setupGui() {
+    console.log(gui.__controllers);
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} )
         .name('Rotate');
@@ -218,10 +219,10 @@ function setupGui() {
     backgroundFolder.add(guiParams, 'resetBackgroundColor').name('reset color');
 
     const linksToDisplayFolder = gui.addFolder('Filtering');
-    linksToDisplayFolder.add(guiParams, 'linkDensity', 0., 1.)
+    linkDensity = linksToDisplayFolder.add(guiParams, 'linkDensity', 0., 1.)
         .name('Density')
-        .onChange (() => updateVisibleLinks())
-        .listen();
+        .onChange (() => {updateVisibleLinks();})
+        .step(.01);
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
 
     const extraItemFolder = gui.addFolder('Support');
@@ -240,17 +241,27 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'undoTransformControls').name('Undo');
     
     const sensorFolder = gui.addFolder('Nodes');
-    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).listen().name('Radius');
-    sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).listen().name('Opacity');
-    sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).listen().name('Color');
+    sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 1.).onChange(updateAllSensorRadius).name('Radius')
+        .listen().step(.01);
+    sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).name('Opacity')
+        .listen().step(.01);
+    sensorFolder.addColor(guiParams, 'sensorColor').onChange(updateAllSensorMaterial).name('Color')
+        .listen();
     sensorFolder.add(guiParams, 'sensorReset').name('Reset');
  
     const linkFolder = gui.addFolder('Links');
     const linkGeometryFolder = linkFolder.addFolder('Geometry');
-    linkGeometryFolder.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).listen().name('Height');
-    linkGeometryFolder.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Top point handle distance');
-    linkGeometryFolder.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).listen().name('Sensor angle');
-    linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance');
+    linkGeometryFolder.add(guiParams, 'linkHeight', 0, 2).onChange(updateLinkOutline).name('Height')
+        .step(.01).listen();
+    linkGeometryFolder.add(guiParams, 'linkTopPointHandleDistances', 0, 1).onChange(updateLinkOutline).name('Top point handle distance')
+        .step(.01)
+        .listen();
+    linkGeometryFolder.add(guiParams, 'linkSensorAngles', 0, 1).onChange(updateLinkOutline).name('Sensor angle')
+        .step(.01)
+        .listen();
+    linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1).onChange(updateLinkOutline).listen().name('Sensor handle distance')
+        .step(.01)
+        .listen();
     //we purposedly don't allow change of top point angle
 
     const colorMapFolder = linkFolder.addFolder('Color map');
@@ -266,6 +277,7 @@ function setupGui() {
             redrawDegreeLines();
         })
         .name('Link alignment')
+        .step(.01)
         .listen();
     linkAlignmentTarget.add(guiParams, 'resetLinkAlignmentTarget')
         .name('Reset');
@@ -277,16 +289,23 @@ function setupGui() {
     const linkVolumeFolder = linkFolder.addFolder('Link radius');
     linkVolumeFolder.add(guiParams, 'makeLinkLineMesh').name('Line');
     linkVolumeFolder.add(guiParams, 'makeLinkVolumeMesh').name('Volume');
-    linkVolumeFolder.add(guiParams, 'linkThickness', 0, 4).onChange(linkThicknessUpdate).listen().name('Link radius');
+    linkVolumeFolder.add(guiParams, 'linkThickness', 0, 4).onChange(linkThicknessUpdate).name('Link radius')
+        .step(.01).listen();
 
-    linkFolder.add(guiParams, 'linkOpacity', 0., 1.).onChange(updateAllLinkMaterial).listen().name('Opacity');
+    linkFolder.add(guiParams, 'linkOpacity', 0., 1.).onChange(updateAllLinkMaterial).name('Opacity')
+        .step(.01).listen();
 
     const degreeLineFolder = gui.addFolder('Degree lines');
-    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateAllDegreeLineVisibility).name('Show degree line').listen();
-    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius').listen();
-    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLineLength).name('Length').listen();
-    degreeLineFolder.add(guiParams, 'degreeLineOpacity', 0., 1.).onChange(updateAllDegreeLineMaterial).listen().name('Opacity');
-    degreeLineFolder.addColor(guiParams, 'degreeLineColor').onChange(updateAllDegreeLineMaterial).listen().name('Color');
+    degreeLineFolder.add(guiParams, 'showDegreeLines').onChange(updateAllDegreeLineVisibility).name('Show degree line')
+        .listen();
+    degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius')
+        .step(.01).listen();
+    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLineLength).name('Length')
+        .step(.01).listen();
+    degreeLineFolder.add(guiParams, 'degreeLineOpacity', 0., 1.).onChange(updateAllDegreeLineMaterial).name('Opacity')
+        .step(.01).listen();
+    degreeLineFolder.addColor(guiParams, 'degreeLineColor').onChange(updateAllDegreeLineMaterial).name('Color')
+        .listen();
     degreeLineFolder.add(guiParams, 'degreeLineReset').name('Reset');
 
     const fileLoadFolder = gui.addFolder('Load files');
