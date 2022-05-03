@@ -207,7 +207,6 @@ function linkThicknessUpdate() {
 let linkDensity;
 
 function setupGui() {
-    console.log(gui.__controllers);
     const cameraFolder = gui.addFolder('Camera');
     cameraFolder.add(guiParams, 'autoRotateCamera').onChange( () => {controls.autoRotate = guiParams.autoRotateCamera} )
         .name('Rotate');
@@ -277,7 +276,7 @@ function setupGui() {
             redrawDegreeLines();
         })
         .name('Link alignment')
-        .step(.01)
+        .step(1)
         .listen();
     linkAlignmentTarget.add(guiParams, 'resetLinkAlignmentTarget')
         .name('Reset');
@@ -300,7 +299,7 @@ function setupGui() {
         .listen();
     degreeLineFolder.add(guiParams, 'degreeLineRadius', 0., 1.).onChange(redrawDegreeLines).name('Radius')
         .step(.01).listen();
-    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 1.).onChange(updateAllDegreeLineLength).name('Length')
+    degreeLineFolder.add(guiParams, 'degreeLineLength', 0., 4.).onChange(updateAllDegreeLineLength).name('Length')
         .step(.01).listen();
     degreeLineFolder.add(guiParams, 'degreeLineOpacity', 0., 1.).onChange(updateAllDegreeLineMaterial).name('Opacity')
         .step(.01).listen();
