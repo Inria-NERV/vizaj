@@ -1,0 +1,82 @@
+
+
+.fileInput {
+  position:fixed;
+  visibility: hidden;
+}
+
+#sensorName {
+    position:fixed;
+    width: 100%;
+    z-index: 50;
+    color: white;
+    display: block;
+    font-family:'Trebuchet MS'; 
+    font-size:23px;
+  }
+
+.colorMapText{
+  color: white;
+  font-family: 'Trebuchet MS';
+  font-weight: lighter;
+  font-size: 2vmax;
+  text-align: center;
+}
+
+#colorBar {
+  height: 100%;
+  width: 100%;
+  margin-top: .5vmax;
+  margin-bottom: .5vmax;
+  margin-left: .35vmax;
+}
+
+#colorMap {
+    top: 20%;
+    bottom: 30%;
+    left: 5%;
+    right: 92%;
+    z-index:100;
+    position: absolute;
+    visibility: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  
+#logs {
+  position: absolute;
+  z-index: 150;
+  width: 40%;
+  height: 50%;
+  overflow: hidden;
+}
+
+#logs > .log {
+  background-color: black;
+  color: white;
+  font-family: Monospace;
+  animation-name: logAnim;
+  animation-duration: 15s;
+  visibility:hidden;
+}
+
+@keyframes logAnim {
+  0% {
+    background-color: white;
+    visibility: visible;
+  }
+  5% {
+    background-color: black;
+  }
+}
+
+.notransition {
+  animation-name: none !important;
+  animation-duration: none !important;
+}
+  
+body {
+  margin: 0;
+}
+
+/*# sourceMappingURL=main.615db052.css.map */

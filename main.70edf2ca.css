@@ -43,8 +43,40 @@
     flex-direction: column;
   }
   
-  body {
-    margin: 0;
+#logs {
+  position: absolute;
+  z-index: 150;
+  width: 40%;
+  height: 50%;
+  overflow: hidden;
+}
+
+#logs > .log {
+  background-color: black;
+  color: white;
+  font-family: Monospace;
+  animation-name: logAnim;
+  animation-duration: 15s;
+  visibility:hidden;
+}
+
+@keyframes logAnim {
+  0% {
+    background-color: white;
+    visibility: visible;
   }
+  5% {
+    background-color: black;
+  }
+}
+
+.notransition {
+  animation-name: none !important;
+  animation-duration: none !important;
+}
+  
+body {
+  margin: 0;
+}
 
 /*# sourceMappingURL=/main.70edf2ca.css.map */
