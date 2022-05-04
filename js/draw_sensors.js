@@ -49,7 +49,6 @@ async function drawSensorsAndUpdateGlobalValues(data){
     await drawAllDegreeLines();
 }
 
-
 async function loadSensorCoordinates(sensorCoordinatesUrl) {
     const data = await loadData(sensorCoordinatesUrl, 'sensor coordinates', csv3dCoordinatesOnLoadCallBack);
     return data;
@@ -103,9 +102,9 @@ async function drawSensor(coordinates, meanSensorDistance){
         sensorGeometry,
         sensorMaterial
     );
-    sensor.position.x = (coordinates[0]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.x;
-    sensor.position.y = (coordinates[1]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.y;
-    sensor.position.z = (coordinates[2]) / meanSensorDistance * SCALE_FACTOR - montageBarycenter.z;
+    sensor.position.x = (coordinates[0] - montageBarycenter.x) / meanSensorDistance * SCALE_FACTOR;
+    sensor.position.y = (coordinates[1] - montageBarycenter.y) / meanSensorDistance * SCALE_FACTOR;
+    sensor.position.z = (coordinates[2] - montageBarycenter.z) / meanSensorDistance * SCALE_FACTOR;
     sensor.castShadow = false;
     sensor.name = '';
     scene.add(sensor);
@@ -179,6 +178,7 @@ async function getMontageBarycenter(positions){
         y += position[1];
         z += position[2];
     }
+    
     montageBarycenter.set(
         x/positions.length,
         y/positions.length,

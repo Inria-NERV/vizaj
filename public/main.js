@@ -234,7 +234,7 @@ async function handleJsonFileSelect(evt){
     for (const [key, value] of Object.entries(graph.nodes)){
       jsonLoadingNodeCheckForError(key, value, i);
       i++;
-      coordinatesList.push([value.position.x, value.position.y, value.position.z]);
+      coordinatesList.push([parseFloat(value.position.x), parseFloat(value.position.y), parseFloat(value.position.z)]);
       let label = '';
       if (value.label) { label = value.label; }
       labelList.push(label);
@@ -248,7 +248,6 @@ async function handleJsonFileSelect(evt){
     }
 
     // ------- update the mesh once basic errors are checked
-
     await clearAllLinks();
     await clearAllSensors();
     await drawSensorsAndUpdateGlobalValues(coordinatesList);
