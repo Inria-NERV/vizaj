@@ -8,7 +8,7 @@ import { csv3dCoordinatesOnLoadCallBack, csvMontageLoadingCheckForError, csvSens
 import { clearAllLinks } from './link_builder/draw_links';
 import { deleteMesh } from "./mesh_helper";
 import { drawAllDegreeLines } from './draw_degree_line.js';
-import { guiParams } from './setup_gui.js';
+import { guiControllers, guiParams } from './setup_gui.js';
 
 let sensorCount = 0;
 
@@ -149,6 +149,7 @@ function updateAllSensorMaterial(){
             updateSensorMaterial(sensor.mesh);
         }
     }
+    guiControllers.sensorOpacity.updateDisplay();
 }
 
 function updateSensorMaterial(mesh){
@@ -162,6 +163,7 @@ function updateAllSensorRadius(){
             updateSensorRadius(sensor.mesh);
         }
     }
+    guiControllers.sensorRadius.updateDisplay();
 }
 
 function updateSensorRadius(mesh){

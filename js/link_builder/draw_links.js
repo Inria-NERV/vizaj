@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import {updateAllDegreeLineLength } from "../draw_degree_line";
 import { csvConnectivityMatrixCheckForError, loadData } from '../load_data';
-import { guiParams } from '../setup_gui';
+import { guiControllers, guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
 import { getSplinePoints } from './compute_link_shape';
@@ -55,6 +55,7 @@ async function drawLinksAndUpdateVisibility(linkList){
     .then(() => {
         updateVisibleLinks();
     });
+    guiControllers.linkDensity.max(linkList.length / (sensorMeshList.length * (sensorMeshList.length - 1) / 2));
 }
 
 async function drawLinks(linkList){
@@ -83,6 +84,10 @@ function updateLinkOutline(){
         }
         position.needsUpdate = true;
     }
+    guiControllers.linkHeight.updateDisplay();
+    guiControllers.linkTopPointHandleDistances.updateDisplay();
+    guiControllers.linkSensorAngles.updateDisplay();
+    guiControllers.linkSensorHandleDistances.updateDisplay();
 }
 
 function redrawLinks(){
@@ -93,6 +98,8 @@ function redrawLinks(){
         linkListTemp.push(link.link);
     }
     drawLinksAndUpdateVisibility(linkListTemp);
+    guiControllers.linkAlignmentTarget.updateDisplay();
+    guiControllers.linkThickness.updateDisplay();
 }
 
 async function clearAllLinks() {
@@ -103,6 +110,8 @@ async function clearAllLinks() {
     if(colorMapCanvas){
         colorMapCanvas.clear();
     }
+    guiControllers.linkDensity.max(0);
+    guiControllers.linkDensity;
 }
 
 function updateVisibleLinks() {
@@ -118,6 +127,7 @@ function updateVisibleLinks() {
         link.mesh.visible = false;
     }
     updateAllDegreeLineLength();
+    guiControllers.linkDensity.updateDisplay();
 }
 
 function ecoFiltering(){
@@ -132,6 +142,7 @@ function updateAllLinkMaterial(){
     for (let linkTuple of linkMeshList){
         updateLinkMaterial(linkTuple);
     }
+    guiControllers.linkOpacity.updateDisplay();
 }
 
 function updateLinkMaterial(linkTuple){

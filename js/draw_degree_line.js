@@ -3,7 +3,7 @@ import { Float32BufferAttribute } from 'three';
 import { scene, linkMeshList, LINK_LAYER } from '../public/main';
 import { sensorMeshList } from './draw_sensors';
 import { centerPoint } from './link_builder/compute_link_shape';
-import { guiParams } from './setup_gui';
+import { guiControllers, guiParams } from './setup_gui';
 import { deleteMesh } from './mesh_helper';
 
 let degreeLineMaterial;
@@ -77,6 +77,9 @@ async function drawAllDegreeLines(){
     for (let i = 0; i < sensorMeshList.length; i++){
         sensorMeshList[i] = drawDegreeLine(sensorMeshList[i]);
     }
+    guiControllers.degreeLineLength.updateDisplay();
+    guiControllers.degreeLineRadius.updateDisplay();
+    guiControllers.degreeLineOpacity.updateDisplay();
 }
 
 function getNodeDegree(sensorMesh){
@@ -103,6 +106,7 @@ function updateAllDegreeLineMaterial(){
     for (let sensor of sensorMeshList){
         updatDegreeLineMaterial(sensor.degreeLine);
     }
+    guiControllers.degreeLineOpacity.updateDisplay();
 }
 
 function updatDegreeLineMaterial(mesh){
@@ -116,6 +120,7 @@ function updateAllDegreeLineLength(){
             updateDegreeLineLength(sensor);
         }
     }
+    guiControllers.degreeLineLength.updateDisplay();
 }
 
 function updateAllDegreeLineVisibility(){
