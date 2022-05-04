@@ -239,7 +239,9 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'undoTransformControls').name('Undo');
     
     const sensorFolder = gui.addFolder('Nodes');
-    guiControllers.sensorRadius = sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 4.).onChange(updateAllSensorRadius).name('Radius')
+    guiControllers.sensorRadius = sensorFolder.add(guiParams, 'sensorRadiusFactor', 0., 2.)
+        .onChange(updateAllSensorRadius)
+        .name('Radius')
         .step(.01);
     guiControllers.sensorOpacity = sensorFolder.add(guiParams, 'sensorOpacity', 0., 1.).onChange(updateAllSensorMaterial).name('Opacity')
         .step(.01);
