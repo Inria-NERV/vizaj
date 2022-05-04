@@ -316,7 +316,7 @@ function setupGui() {
 
     const exportFileFolder = gui.addFolder('Export');
     exportFileFolder.add(guiParams, 'export2dImage').name('Picture (.tif)');
-    exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');``
+    exportFileFolder.add(guiParams, 'export3Dgltf').name('Object (.gltf)');
 
     const logsFolder = gui.addFolder('Logs');
     logsFolder.add(guiParams, 'showLogs').name("Show");
