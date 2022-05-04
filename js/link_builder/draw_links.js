@@ -111,7 +111,7 @@ async function clearAllLinks() {
         colorMapCanvas.clear();
     }
     guiControllers.linkDensity.max(0);
-    guiControllers.linkDensity;
+    guiParams.linkDensity = 0;
 }
 
 function updateVisibleLinks() {

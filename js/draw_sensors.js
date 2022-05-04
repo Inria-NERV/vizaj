@@ -14,11 +14,12 @@ let sensorCount = 0;
 
 const montageBarycenter = new THREE.Vector3();
 
-const SENSOR_RADIUS = 3 * 10 ;
+export const SENSOR_RADIUS = 3.8;
 const SENSOR_SEGMENTS = 20;
 const SENSOR_RINGS = 50;
 
-const RADIUS_SCALE = Math.sqrt(8);
+const MIN_RADIUS_SCALE = .1;
+const MAX_RADIUS_SCALE = 4;
 
 const SCALE_FACTOR = 100;
 
@@ -77,18 +78,20 @@ async function drawAllSensors(coordinatesList){
     for (let coordinates of coordinatesList) {
         await drawSensor(coordinates, meanSensorDistance);
       }
+    guiParams.sensorRadiusFactor = Math.min(
+        Math.max(8/Math.sqrt(sensorCount), MIN_RADIUS_SCALE), 
+        MAX_RADIUS_SCALE);
+    updateAllSensorRadius();
 }
 
 async function drawSensor(coordinates, meanSensorDistance){
-    const radiusScale = 1 / Math.max(Math.sqrt(sensorCount), RADIUS_SCALE);
-
     const dotGeometry = new THREE.SphereGeometry(
         0,
         SENSOR_SEGMENTS,
         SENSOR_RINGS
     );
     const sensorGeometry = new THREE.SphereGeometry(
-        SENSOR_RADIUS * radiusScale, 
+        SENSOR_RADIUS, 
         SENSOR_SEGMENTS, 
         SENSOR_RINGS);
     dotGeometry.position = sensorGeometry.position;
