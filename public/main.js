@@ -59,7 +59,10 @@ const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
 const jsonInput = document.getElementById("jsonInput");
 
 //intersectedNodeList is used to check wether the mouse intersects with a sensor
-var intersectedNodeList;
+var intersectedNode;
+
+//mouseDownDate is used to check the time between mouseDown and mouseUpEvents in order to yield a clickEvent is the time is low enough
+let mouseDownDate;
 
 init();
 animate();
@@ -79,7 +82,7 @@ function init() {
     orbitControls.enableDamping = true;
   });
   transformControls.addEventListener("objectChange", handleTransformControlChangeEvent);
-  renderer.domElement.addEventListener("mousedown", () => {mouseButtonIsDown=true});
+  renderer.domElement.addEventListener("mousedown", onRendererMouseDown);
   renderer.domElement.addEventListener("mouseup", onRendererMouseUp);
   csvConnMatrixInput.addEventListener("change", handleConnectivityMatrixFileSelect, false);
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
@@ -123,34 +126,45 @@ function onDocumentMouseMove(event) {
   sensorNameDiv.style.left = event.clientX + padding + "px";
 }
 
+function onRendererMouseDown(event){
+  mouseButtonIsDown=true;
+  mouseDownDate = Date.now();
+}
+
 function onRendererMouseUp(event){
   mouseButtonIsDown = false;
+  if (Date.now() - mouseDownDate < 500){
+    onDocumentMouseClick(event);
+  }
   updateTransformControlHistory();
 }
 
+function onDocumentMouseClick(event){
+  
+}
+
 function hoverDisplayUpdate() {
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(scene.children);
-  if (intersects.length !== 0 && sensorMeshList.map(x=>x.mesh).includes(intersects[0].object)) {
-    if (intersectedNodeList != intersects[0].object) {
-      emptyIntersected();
-      intersectedNodeList = intersects[0].object;
-      fillIntersected();
-    }
-  }
-  else{
-    emptyIntersected();
+  const intersects = getRaycastedNodes();
+  emptyIntersected();
+  if (intersects.length) {
+    intersectedNode = intersects[0].object;
+    fillIntersected();
   }
 }
 
+function getRaycastedNodes(){
+  raycaster.setFromCamera(mouse, camera);
+  return raycaster.intersectObjects(sensorMeshList.map(x=>x.mesh));
+}
+
 function emptyIntersected() {
-  if (intersectedNodeList) {
-    intersectedNodeList.material = sensorMaterial;
+  if (intersectedNode) {
+    intersectedNode.material = sensorMaterial;
     if (guiParams.sensorOpacity == 0){
-      intersectedNodeList.visible = true;
+      intersectedNode.visible = true;
     }
   }
-  intersectedNodeList = null;
+  intersectedNode = null;
   sensorNameDiv.innerHTML = "";
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
@@ -162,11 +176,11 @@ function emptyIntersected() {
 }
 
 function fillIntersected() {
-  intersectedNodeList.material = enlightenedSensorMaterial;
-  intersectedNodeList.visible = true;
-  sensorNameDiv.innerHTML = intersectedNodeList.name;
+  intersectedNode.material = enlightenedSensorMaterial;
+  intersectedNode.visible = true;
+  sensorNameDiv.innerHTML = intersectedNode.name;
   for (const linkMesh of linkMeshList){
-    if (linkMesh.link.node1 === intersectedNodeList || linkMesh.link.node2 === intersectedNodeList)
+    if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode)
     {
       highlightedLinksPreviousMaterials.push({
         node1: linkMesh.link.node1,
@@ -296,7 +310,7 @@ export {
     csvNodeLabelsInput,
     jsonInput,
     emptyIntersected,
-    intersectedNodeList,
+    intersectedNode as intersectedNodeList,
     onWindowResize,
     uiScene,
     uiCamera,
