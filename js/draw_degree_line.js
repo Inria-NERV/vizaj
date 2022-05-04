@@ -62,7 +62,7 @@ function drawDegreeLine(sensor){
 
     sensor.degreeLine = line;
     updateDegreeLineLength(sensor);
-    updatDegreeLineMaterial(line);
+    updateDegreeLineMaterial(line);
     updateDegreeLineVisibility(line);
 
     scene.add(line);
@@ -104,12 +104,15 @@ function updateDegreeLineLength(sensor){
 
 function updateAllDegreeLineMaterial(){
     for (let sensor of sensorMeshList){
-        updatDegreeLineMaterial(sensor.degreeLine);
+        updateDegreeLineMaterial(sensor.degreeLine);
+    }
+    if(guiParams.degreeLineOpacity == 0){
+        hideDegreeLines();
     }
     guiControllers.degreeLineOpacity.updateDisplay();
 }
 
-function updatDegreeLineMaterial(mesh){
+function updateDegreeLineMaterial(mesh){
     mesh.material.opacity = guiParams.degreeLineOpacity;
     mesh.material.color = new THREE.Color(guiParams.degreeLineColor);
 }
@@ -131,6 +134,18 @@ function updateAllDegreeLineVisibility(){
 
 function updateDegreeLineVisibility(mesh){
     mesh.visible = guiParams.showDegreeLines;
+    if(guiParams.degreeLineOpacity==0){
+        guiParams.degreeLineOpacity = .6;
+        updateAllDegreeLineMaterial();
+    }
+}
+
+function hideDegreeLines(){
+    for(let sensor of sensorMeshList){
+        const degreeLineMesh = sensor.degreeLine;
+        degreeLineMesh.visible = false;
+    }
+    guiParams.showDegreeLines = false;
 }
 
 function redrawDegreeLines(){

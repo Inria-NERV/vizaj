@@ -151,12 +151,24 @@ function updateAllSensorMaterial(){
             updateSensorMaterial(sensor.mesh);
         }
     }
+    if (guiParams.sensorOpacity == 0){
+        showSensors(false);
+    }
+    else{
+        showSensors();
+    }
     guiControllers.sensorOpacity.updateDisplay();
 }
 
 function updateSensorMaterial(mesh){
     mesh.material.opacity = guiParams.sensorOpacity;
     mesh.material.color = new THREE.Color(guiParams.sensorColor);
+}
+
+function showSensors(show=true){
+    for (let sensor of sensorMeshList){
+        sensor.mesh.visible = show;
+    }
 }
 
 function updateAllSensorRadius(){

@@ -148,6 +148,12 @@ function updateAllLinkMaterial(){
 function updateLinkMaterial(linkTuple){
     const mesh = linkTuple.mesh;
     mesh.material.opacity = guiParams.linkOpacity;
+    if (guiParams.linkOpacity == 0){
+        mesh.visible = false;
+    }
+    else{
+        mesh.visible = true;
+    }
     updateLinkColor(linkTuple);
 }
 

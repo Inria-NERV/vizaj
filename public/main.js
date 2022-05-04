@@ -9,7 +9,7 @@ import { clearLoadAndDrawSensors,
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
 import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
-import { setupGui } from '../js/setup_gui';
+import { guiParams, setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from "three/examples/jsm/libs/dat.gui.module";
@@ -146,6 +146,9 @@ function hoverDisplayUpdate() {
 function emptyIntersected() {
   if (intersectedNodeList) {
     intersectedNodeList.material = sensorMaterial;
+    if (guiParams.sensorOpacity == 0){
+      intersectedNodeList.visible = true;
+    }
   }
   intersectedNodeList = null;
   sensorNameDiv.innerHTML = "";
@@ -160,6 +163,7 @@ function emptyIntersected() {
 
 function fillIntersected() {
   intersectedNodeList.material = enlightenedSensorMaterial;
+  intersectedNodeList.visible = true;
   sensorNameDiv.innerHTML = intersectedNodeList.name;
   for (const linkMesh of linkMeshList){
     if (linkMesh.link.node1 === intersectedNodeList || linkMesh.link.node2 === intersectedNodeList)
