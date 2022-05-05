@@ -66,7 +66,7 @@ class ColorMapCanvas {
     }
 }
 
-//this one exists in the scene, on 
+//this one exists in the scene, it is generated in order to print the color map
 class ColorMapSprite{
 
     colorMapSprite;
