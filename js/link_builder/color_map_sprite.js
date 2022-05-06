@@ -64,6 +64,12 @@ class ColorMapCanvas {
             document.getElementById("colorMap").style.visibility = 'hidden';
         }
     }
+
+    static changeTextColor(color){
+        let elements = document.getElementsByClassName('colorMapText');
+        if (!elements) return;
+        for (let e of elements) e.style.color = color;
+    }
 }
 
 //this one exists in the scene, it is generated in order to print the color map

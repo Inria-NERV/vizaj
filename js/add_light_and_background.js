@@ -1,6 +1,8 @@
 import {scene} from '../public/main';
 import * as THREE from 'three';
 import { guiParams } from './setup_gui';
+import { hexAToRGBA, hexToHsl } from './color_helper';
+import { ColorMapCanvas } from './link_builder/color_map_sprite';
 
 export function addLightAndBackground() {
   updateBackgroundColor();
@@ -27,6 +29,13 @@ export function addLightAndBackground() {
 }
 
 export function updateBackgroundColor(){
+  const hslColor = hexToHsl(guiParams.backgroundColor);
+  if (hslColor.l >= 50){
+    ColorMapCanvas.changeTextColor('black');
+  }
+  if (hslColor.l < 50){
+    ColorMapCanvas.changeTextColor('white');
+  }
   scene.background = new THREE.Color(guiParams.backgroundColor);
 }
 
