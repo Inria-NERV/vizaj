@@ -1,0 +1,38 @@
+{
+    "graph":{
+        "directed":        false,
+        "type":"graph type",
+        "label":"some name",
+        "metadata":{
+            "somekey":"somevalue"
+        },
+        "nodes":[
+            {
+                "type":"node type",
+                "label":"label1",
+                "position":{
+                    "x": 10,
+                    "y": 0,
+                    "z": -8
+                }
+            },
+            {
+                "type":"node type",
+                "label":"label2",
+                "position":{
+                    "x": 10,
+                    "y": 0,
+                    "z": 8
+                }
+            }
+        ],
+        "edges":[
+            {
+                "source":"0",
+                "target":"1",
+                "directed": false,
+                "strength":  10000000
+            }
+        ]
+    }
+}

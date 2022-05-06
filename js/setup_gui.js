@@ -261,11 +261,11 @@ function setupGui() {
         .step(.01);
     guiControllers.linkSensorAngles = linkGeometryFolder.add(guiParams, 'linkSensorAngles', 0, 1)
         .onChange(updateLinkOutline)
-        .name('Sensor angle')
+        .name('Node angle')
         .step(.01);
     guiControllers.linkSensorHandleDistances = linkGeometryFolder.add(guiParams, 'linkSensorHandleDistances', 0, 1)
         .onChange(updateLinkOutline)
-        .name('Sensor handle distance')
+        .name('Node handle distance')
         .step(.01);
     //we purposedly don't allow change of top point angle
 
