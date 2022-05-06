@@ -166,6 +166,7 @@ function emptyIntersected() {
   }
   intersectedNode = null;
   sensorNameDiv.innerHTML = "";
+  sensorNameDiv.style.visibility = 'hidden';
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
     for (const linkMesh of linkMeshList
@@ -179,6 +180,7 @@ function fillIntersected() {
   intersectedNode.material = enlightenedSensorMaterial;
   intersectedNode.visible = true;
   sensorNameDiv.innerHTML = intersectedNode.name;
+  sensorNameDiv.style.visibility = 'visible';
   for (const linkMesh of linkMeshList){
     if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode)
     {
