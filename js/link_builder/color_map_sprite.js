@@ -145,7 +145,7 @@ class ColorMapSprite{
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.textAlign = 'left';
         ctx.font = "500px Arial";
-        ctx.fillStyle = "white";
+        ctx.fillStyle = document.getElementsByClassName('colorMapText')[0].style.color;
         ctx.fillText(message,10,500);
     }
 
