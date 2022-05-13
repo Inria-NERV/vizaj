@@ -3,6 +3,8 @@ import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
 import { linkMeshList, uiScene } from '../../public/main.js'; 
 import { colorMapCanvas } from './draw_links';
 import { deleteMesh } from '../mesh_helper.js';
+import { hexToHsl } from "../color_helper.js";
+import { guiParams } from "../setup_gui.js";
 
 class ColorMapCanvas {
     constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0, canvasLen=1000 ){
@@ -38,6 +40,7 @@ class ColorMapCanvas {
         colorMap.appendChild(topValue);
         colorMap.appendChild(canvas);
         colorMap.appendChild(bottomValue);
+        ColorMapCanvas.adaptTextColor(guiParams.backgroundColor);
     }
 
     clear(){
@@ -70,6 +73,17 @@ class ColorMapCanvas {
         if (!elements) return;
         for (let e of elements) e.style.color = color;
     }
+
+    static adaptTextColor(backgroundColor){
+        const hslColor = hexToHsl(backgroundColor);
+        if (hslColor.l >= 50){
+            ColorMapCanvas.changeTextColor('black');
+        }
+        if (hslColor.l < 50){
+        ColorMapCanvas.changeTextColor('white');
+        }
+    }
+    
 }
 
 //this one exists in the scene, it is generated in order to print the color map

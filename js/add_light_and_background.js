@@ -29,13 +29,7 @@ export function addLightAndBackground() {
 }
 
 export function updateBackgroundColor(){
-  const hslColor = hexToHsl(guiParams.backgroundColor);
-  if (hslColor.l >= 50){
-    ColorMapCanvas.changeTextColor('black');
-  }
-  if (hslColor.l < 50){
-    ColorMapCanvas.changeTextColor('white');
-  }
+  ColorMapCanvas.adaptTextColor(guiParams.backgroundColor);
   scene.background = new THREE.Color(guiParams.backgroundColor);
 }
 
