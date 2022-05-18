@@ -213,8 +213,8 @@ function setupGui() {
         .name('Rotation speed');
 
     const backgroundFolder = gui.addFolder('Background');
-    backgroundFolder.addColor(guiParams, 'backgroundColor').onChange(updateBackgroundColor).name('color').listen();
-    backgroundFolder.add(guiParams, 'resetBackgroundColor').name('reset color');
+    backgroundFolder.addColor(guiParams, 'backgroundColor').onChange(updateBackgroundColor).name('Color').listen();
+    backgroundFolder.add(guiParams, 'resetBackgroundColor').name('Reset color');
 
     const linksToDisplayFolder = gui.addFolder('Filtering');
     guiControllers.linkDensity = linksToDisplayFolder.add(guiParams, 'linkDensity', 0., 1.)
