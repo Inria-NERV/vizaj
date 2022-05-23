@@ -235,7 +235,7 @@ function setupGui() {
     moveExtraItemFolder.add(guiParams, 'rotateModeTransformControls').name('Rotate');
     moveExtraItemFolder.add(guiParams, 'scaleModeTransformControls').name('Scale');
     moveExtraItemFolder.add(guiParams, 'resetExtraItemPosition').name('Reset');
-    moveExtraItemFolder.add(guiParams, 'closeTransformControls').name('Close move helper');
+    moveExtraItemFolder.add(guiParams, 'closeTransformControls').name('Close helper');
     moveExtraItemFolder.add(guiParams, 'undoTransformControls').name('Undo');
     
     const sensorFolder = gui.addFolder('Nodes');
