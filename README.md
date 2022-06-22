@@ -1,2 +1,2 @@
-# connectivity_tibo
-Tool to display brain connectivity from EEG
+# Vizaj
+Tool to display brain connectivity from EEG, this is Vizaj !!!
