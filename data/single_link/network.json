@@ -2,6 +2,7 @@
     "graph":{
         "nodes":{
             "0":{
+                "id": 0,
                 "type":"node type",
                 "label":"label1",
                 "position":{

@@ -249,21 +249,21 @@ async function handleJsonFileSelect(evt){
     const coordinatesList  = [];
     const labelList = [];
     const linkList = [];
-    const sensorIdDict = {};
+    const sensorIdMap = new Map();
     let i = 0;
     for (const [key, value] of Object.entries(graph.nodes)){
-      jsonLoadingNodeCheckForError(key, value, i);
+      jsonLoadingNodeCheckForError(key, value, i, sensorIdMap);
       i++;
       coordinatesList.push([parseFloat(value.position.x), parseFloat(value.position.y), parseFloat(value.position.z)]);
       let label = '';
       if (value.label) { label = value.label; }
       labelList.push(label);
-      sensorIdDict[key] = labelList.length - 1;
+      sensorIdMap.set(value.id.toString(), labelList.length - 1);
     }
 
     i=0;
     for (const [key, value] of Object.entries(graph.edges)){
-      jsonLoadingEdgeCheckForError(key, value, i, coordinatesList.length);
+      jsonLoadingEdgeCheckForError(key, value, i, coordinatesList.length, sensorIdMap);
       i++;
     }
 
@@ -276,8 +276,8 @@ async function handleJsonFileSelect(evt){
     for (const [key, value] of Object.entries(graph.edges)){
       if (value.strength != 0 && value.strength)
       linkList.push(generateLinkData(
-        sensorIdDict[value.source], 
-        sensorIdDict[value.target], 
+        sensorIdMap.get(value.source.toString()), 
+        sensorIdMap.get(value.target.toString()), 
         value.strength));
     }
 

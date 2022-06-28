@@ -1,14 +1,15 @@
 
 export function userLogError(e, fileName){
+    console.log(e);
     let message = e.message;
     if (fileName){
         message = "Couldn't load file " + fileName + " : " + message;
     }
-    userLogMessage(e.name + ": " + message);
+    userLogMessage(e.name + ": " + message, "red", false);
 }
 
-export function userLogMessage(message, color='white'){
-    console.log(message);
+export function userLogMessage(message, color='white', shouldConsoleLog=true){
+    if (shouldConsoleLog) {console.log(message);}
     const logElement = document.createElement("div");
     logElement.textContent = currentDate() + ': ' + message;
     logElement.setAttribute("class", "log");

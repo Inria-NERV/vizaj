@@ -80,7 +80,7 @@ export function loadJsonData(url){
     return loadData(url, 'json file', jsonOnloadCallback);
 }
 
-export function jsonLoadingNodeCheckForError(key, value,i){
+export function jsonLoadingNodeCheckForError(key, value,i, sensorIdMap){
     let e;
     if (value.position == null){
       e = new TypeError("Position missing for node " + i.toString());
@@ -103,6 +103,12 @@ export function jsonLoadingNodeCheckForError(key, value,i){
     else if(isNaN(value.position.z)){
       e = new TypeError("Node " + i.toString() + " has a NaN z coordinate (value = " + value.position.z + ")");
     }
+    else if (isNaN(value.id)){
+      e = new TypeError("id missing for node " + i.toString());
+    }
+    else if (sensorIdMap.get(value.id)){
+      e = new TypeError("duplicate node id " + value.id.toString());
+    }
   
     if (e){
       if (value.label){
@@ -113,7 +119,7 @@ export function jsonLoadingNodeCheckForError(key, value,i){
     return;
   }
 
-export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount){
+export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount, sensorIdMap){
   let e;
   if (value.source == null){
     e = new TypeError("Source missing for edge " + i.toString());
@@ -132,6 +138,12 @@ export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount){
   }
   else if (value.target >= nodeCount){
     e = new TypeError("Target indice (" + value.target + ") is higher than number of nodes (" + nodeCount + ") for edge " + i.toString());
+  }
+  else if (isNaN(sensorIdMap.get(value.source))){
+    e = new TypeError("Source node id not existing (\"" + value.source.toString() +"\") for edge " + i.toString());
+  }
+  else if (isNaN(sensorIdMap.get(value.target))){
+    e = new TypeError("Target node not existing (\"" + value.source.toString() +"\") for edge " + i.toString());
   }
 
   if (e){

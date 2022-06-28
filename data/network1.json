@@ -2,6 +2,7 @@
     "graph":{
         "nodes":[
             {
+                "id": "0",
                 "label":"label1",
                 "position":{
                     "x": 10,
@@ -10,6 +11,7 @@
                 }
             },
             {
+                "id": "1",
                 "label":"label2",
                 "position":{
                     "x": 10,

@@ -8,6 +8,7 @@
         },
         "nodes":[
             {
+                "id": 0,
                 "type":"node type",
                 "label":"label1",
                 "position":{
@@ -17,6 +18,7 @@
                 }
             },
             {
+                "id": 1,
                 "type":"node type",
                 "label":"label2",
                 "position":{
@@ -26,6 +28,7 @@
                 }
             },
             {
+                "id": 2,
                 "type":"node type",
                 "position":{
                     "x": -4,
