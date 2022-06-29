@@ -133,12 +133,6 @@ export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount, sensorIdMa
   else if(isNaN(value.target)){
     e = new TypeError("Edge " + i.toString() + " has a NaN target (value = " + value.target + ")");
   }
-  else if (value.source >= nodeCount){
-    e = new TypeError("Source indice (" + value.source + ") is higher than number of nodes (" + nodeCount + ") for edge " + i.toString());
-  }
-  else if (value.target >= nodeCount){
-    e = new TypeError("Target indice (" + value.target + ") is higher than number of nodes (" + nodeCount + ") for edge " + i.toString());
-  }
   else if (isNaN(sensorIdMap.get(value.source))){
     e = new TypeError("Source node id not existing (\"" + value.source.toString() +"\") for edge " + i.toString());
   }
