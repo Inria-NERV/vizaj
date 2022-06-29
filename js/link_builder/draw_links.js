@@ -60,6 +60,10 @@ async function drawLinksAndUpdateVisibility(linkList){
 
 async function drawLinks(linkList){
     for (const link of linkList){
+        if (link.node1.position.distanceTo(link.node2.position) == 0){
+            console.log("Ignored link between nodes " + link.node1.id + " and " + link.node2.id +" : nodes are superimposed.");
+            continue
+        }
         const splinePoints = getSplinePoints(link);
         const curveObject = guiParams.linkGenerator.generateLink(splinePoints, link);
         curveObject.layers.set(LINK_LAYER);
