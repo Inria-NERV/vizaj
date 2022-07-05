@@ -138,11 +138,7 @@ Manage the radius, opacity and color of the links connecting the network.
     * *Reset* : reset the radius, opacity and color of the nodes to their initial state.
 
 * *Links* :
-Manage the radius, opacity and color of the links that populate the network. For more information, check the paper (check the section *geometry of the links* ). The links are drawn and customized along values on those two figures : 
-<img width="980" alt="Capture d’écran 2022-07-05 à 16 27 48" src="https://user-images.githubusercontent.com/81815333/177351510-b049abed-5afe-475f-84e6-766b8d7918c4.png">
-
-<img width="1006" alt="mediator" src="https://user-images.githubusercontent.com/81815333/177354384-a9823c83-c66d-48d6-b73f-6b5d7667ccd1.png">
-
+Manage the radius, opacity and color of the links that populate the network. For more information, check the paper (check the section *geometry of the links* ). The links are drawn and customized along values on the figures in the end of the document.
     * *Geometry* : Manage the link geometry as explained in part 3.1 .
         * *Height* : height of the link (distance h in figure).
         * *Top point handle* : influence of the handle on the top point, a higher value means a flatter link at its summit. A low value means a peak summit (This corresponds to the distance dU in the figure).
@@ -161,7 +157,7 @@ Manage the radius, opacity and color of the links that populate the network. For
         * *Line* : set the link radius to 0.
         * *Volume* : set the link radius to 1.
         * *Link radius* : o	Link radius: change the link radius. If the link radius is equal to 0, the links become lines of a pixel of width. If this radius is greater than 0, the links become cylinder propagated along the line.
-        * *Opacity}: set the opacity of the links.
+        * *Opacity : set the opacity of the links.
 
 * *Degree lines* :
 Manage the degree lines. Note that they align with the link alignment target in the links panel.
@@ -188,3 +184,11 @@ Export the scene as a picture or a 3d model.
 * *Logs* :
     * *Show* : show all logs of the current session.
     * *Hide* : hide all logs currently displayed.
+
+# Figures
+Those two figures support the explanation of the customization of values that define the links. For more information, see the paper.
+
+<img width="980" alt="Capture d’écran 2022-07-05 à 16 27 48" src="https://user-images.githubusercontent.com/81815333/177351510-b049abed-5afe-475f-84e6-766b8d7918c4.png">
+
+<img width="1006" alt="mediator" src="https://user-images.githubusercontent.com/81815333/177354384-a9823c83-c66d-48d6-b73f-6b5d7667ccd1.png">
+
