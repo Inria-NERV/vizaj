@@ -133,11 +133,11 @@ export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount, sensorIdMa
   else if(isNaN(value.target)){
     e = new TypeError("Edge " + i.toString() + " has a NaN target (value = " + value.target + ")");
   }
-  else if (isNaN(sensorIdMap.get(value.source))){
+  else if (isNaN(sensorIdMap.get(value.source.toString()))){
     e = new TypeError("Source node id not existing (\"" + value.source.toString() +"\") for edge " + i.toString());
   }
-  else if (isNaN(sensorIdMap.get(value.target))){
-    e = new TypeError("Target node not existing (\"" + value.source.toString() +"\") for edge " + i.toString());
+  else if (isNaN(sensorIdMap.get(value.target.toString()))){
+    e = new TypeError("Target node not existing (\"" + value.target.toString() +"\") for edge " + i.toString());
   }
 
   if (e){
@@ -148,10 +148,9 @@ export function jsonLoadingEdgeCheckForError(key, value,i, nodeCount, sensorIdMa
 
 export function csvMontageLoadingCheckForError(data){
   let i = 0;
-  console.log(data);
   for (let row of data){
     if (row.length != 3){
-        throw new TypeError("Row "+ i + " has " + row.length + 'values , should be 3. (N.B. : separator is \',\' character).');
+        throw new TypeError("Row "+ i + " has " + row.length + ' values , should be 3. (N.B. : separator is \',\' character).');
     }
     if (isNaN(row[0])){
         throw new TypeError("Can't convert value to integer. (row " + i +")");

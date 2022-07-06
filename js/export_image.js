@@ -23,7 +23,6 @@ async function exportSceneToGLTF( scene ) {
             const output = JSON.stringify( gltf, null, 2 );
             const blob = new Blob( [ output ], { type: 'text/plain' } );
             const blobData = URL.createObjectURL( blob );
-            console.log(blobData);
             saveFile( blobData, 'scene.gltf' );
         },
         function(error){ 
