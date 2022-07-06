@@ -26,7 +26,7 @@ const cortexMaterial = new THREE.MeshStandardMaterial({
     color: '#ffc0cb',
     side: THREE.DoubleSide,
     flatShading: false
-  });
+});
 
 function loadAndDrawCortexModel(){  
     removeExtraItemMesh(); 
