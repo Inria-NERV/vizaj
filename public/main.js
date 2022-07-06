@@ -38,6 +38,7 @@ const sensorMeshList = [];
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
   preserveDrawingBuffer: true,
+  antialias: true
 });
 renderer.domElement.id = 'renderer';
 let camera = new THREE.PerspectiveCamera();
