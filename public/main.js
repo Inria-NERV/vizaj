@@ -13,6 +13,7 @@ import { guiParams, setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from "three/examples/jsm/libs/dat.gui.module";
+import { hexToHsl } from "../js/color_helper";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -189,8 +190,9 @@ function fillIntersected() {
         node1: linkMesh.link.node1,
         node2: linkMesh.link.node2,
         material: linkMesh.mesh.material});
+      let color = hexToHsl(guiParams.backgroundColor).l < 50 ? new THREE.Color(1,1,1) : new THREE.Color(0,0,0);
       linkMesh.mesh.material = new THREE.LineBasicMaterial({
-        color : new THREE.Color(1, 1, 1), 
+        color : color, 
         opacity: 1,
         transparent: false
       });
