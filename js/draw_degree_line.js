@@ -55,8 +55,6 @@ function drawDegreeLine(sensor){
 
     const line = new THREE.Mesh(geometry, degreeLineMaterial);
     line.morphTargetInfluences = [];
-
-    line.visible = guiParams.de
     
     line.layers.set(LINK_LAYER);
 
@@ -107,7 +105,10 @@ function updateAllDegreeLineMaterial(){
         updateDegreeLineMaterial(sensor.degreeLine);
     }
     if(guiParams.degreeLineOpacity == 0){
-        hideDegreeLines();
+        showDegreeLines(false);
+    }
+    else{
+        showDegreeLines(true);
     }
     guiControllers.degreeLineOpacity.updateDisplay();
 }
@@ -140,12 +141,12 @@ function updateDegreeLineVisibility(mesh){
     }
 }
 
-function hideDegreeLines(){
+function showDegreeLines(show=true){
     for(let sensor of sensorMeshList){
         const degreeLineMesh = sensor.degreeLine;
-        degreeLineMesh.visible = false;
+        degreeLineMesh.visible = show;
     }
-    guiParams.showDegreeLines = false;
+    guiParams.showDegreeLines = show;
 }
 
 function redrawDegreeLines(){
