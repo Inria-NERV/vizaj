@@ -141,7 +141,7 @@ Manage the radius, opacity and color of the links connecting the network.
 Manage the radius, opacity and color of the links that populate the network. For more information, check the paper (check the section *geometry of the links* ). The links are drawn and customized along values on the figures in the end of the document.
     * *Geometry* : Manage the link geometry as explained in part 3.1 .
         * *Height* : height of the link (distance h in figure).
-        * *Top point handle* : influence of the handle on the top point, a higher value means a flatter link at its summit. A low value means a peak summit (This corresponds to the distance dU in the figure).
+        * *Top point handle distance* : influence of the handle on the top point, a higher value means a flatter link at its summit. A low value means a peak summit (This corresponds to the distance dU in the figure).
         * *Node angle* : this value times pi is the angle between the tangent axis to the link, and the link between the two nodes at the position of the node. (This corresponds to the value alpha in the figure).
         * *Node handle distance* : influence of the handle near the nodes (this value corresponds to the distance dS).
         * *Geometry* : this scrolling menu sets any of the the default geometries presented in the paper.
