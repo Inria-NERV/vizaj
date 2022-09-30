@@ -1,6 +1,8 @@
 Vizaj - a javascript based interactive tool for visualizing complex networks in 3D
 =====
 
+<img src="https://user-images.githubusercontent.com/81815333/193279909-d910edb2-e3c5-4875-b3f0-09d374a7dbb2.png" width="200" />
+
 This tool aims to be a 3d visualization tool for networks with fixed node position. It it provided with a GUI which helps customizing the nodes, links background, support item, camera and any extra informations.
 
 The camera can be rotated by drag and drop. Right-click drag and drop translates the camera. Scrolling zooms and unzooms.
