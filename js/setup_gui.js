@@ -87,7 +87,7 @@ const guiParams = {
     },
 
     linkGenerator: linkLineGenerator,
-    linkAlignmentTarget: 30,
+    linkAlignmentTarget: 0,
 
     ecoFiltering: ecoFiltering,
 
