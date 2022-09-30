@@ -36,7 +36,7 @@ const guiParams = {
     backgroundColor: '#111133',
     resetBackgroundColor: resetBackgroundColor,
 
-    showExtraItem: true,
+    showExtraItem: false,
     colorExtraItem: '#ffc0cb',
     resetExtraItemColor: () =>{
         guiParams.colorExtraItem = '#ffc0cb';

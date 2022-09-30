@@ -82,6 +82,7 @@ function drawExtraItemModel(geometry){
     }
     extraItemMesh = new THREE.Mesh( geometry, cortexMaterial );
     extraItemMesh.geometry.computeVertexNormals();
+    updateExtraItemMeshVisibility();
 
     initNewExtraItemShape(position, rotation, scale);
     scene.add(extraItemMesh);
@@ -212,8 +213,8 @@ export {
     loadAndDrawCortexModel,
     drawExtraItemSphereModel,
     updateExtraItemMeshVisibility as updateBrainMeshVisibility,
-    hideExtraItem as hideBrain,
-    showExtraItem as showBrain,
+    hideExtraItem,
+    showExtraItem,
     updateExtraItemMaterial,
     updateExtraItemMesh,
     translateModeTransformControls,
