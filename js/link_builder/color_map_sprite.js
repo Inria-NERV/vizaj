@@ -112,7 +112,7 @@ class ColorMapSprite{
         });
 
         this.colorMapSprite = new THREE.Sprite(spriteMaterial);
-        this.colorMapSprite.scale.x = 0.075;
+        this.colorMapSprite.scale.x = 0.03;
         scene.add(this.colorMapSprite);
         this.drawTopValueSprite(scene);
         this.drawBottomValueSprite(scene);
