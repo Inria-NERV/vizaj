@@ -31,8 +31,7 @@ const cortexMaterial = new THREE.MeshStandardMaterial({
 function loadAndDrawCortexModel(){  
     removeExtraItemMesh(); 
     loadCortexModel()
-    .then((response) => drawExtraItemModel(response));
-    return;
+        .then((response) => drawExtraItemModel(response));
 }
 
 function drawExtraItemInnerSkullModel(){
@@ -111,7 +110,8 @@ function repositionExtraItemMesh(position, rotation, scale){
 
 function updateExtraItemMeshVisibility(){
     extraItemMesh.visible = guiParams.showExtraItem;
-    extraItemMesh.layers.toggle(GLOBAL_LAYER);
+    if(guiParams.showExtraItem) {extraItemMesh.layers.enable(GLOBAL_LAYER)}
+    else {extraItemMesh.layers.disable(GLOBAL_LAYER)};
 }
 
 function hideExtraItem(){
