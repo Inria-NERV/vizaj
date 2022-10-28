@@ -1,4 +1,4 @@
-Vizaj - An interactive javascript tool for visualizing spatial networks
+Vizaj - A free online interactive software for visualizing spatial networks
 =====
 
 <img src="https://user-images.githubusercontent.com/81815333/193279909-d910edb2-e3c5-4875-b3f0-09d374a7dbb2.png" width="200" />
