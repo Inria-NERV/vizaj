@@ -182,7 +182,7 @@ function fillIntersected() {
   intersectedNode.material = enlightenedSensorMaterial;
   intersectedNode.visible = true;
   sensorNameDiv.innerHTML = intersectedNode.name;
-  sensorNameDiv.style.visibility = 'visible';
+  if (sensorNameDiv.innerHTML){sensorNameDiv.style.visibility = 'visible';}
   for (const linkMesh of linkMeshList){
     if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode)
     {
