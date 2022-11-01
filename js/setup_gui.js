@@ -220,7 +220,7 @@ function setupGui() {
     guiControllers.linkDensity = linksToDisplayFolder.add(guiParams, 'linkDensity', 0., 1.)
         .name('Density')
         .onChange (updateVisibleLinks)
-        .step(.01);
+        .step(.0001);
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
 
     const extraItemFolder = gui.addFolder('Support');
