@@ -24,7 +24,7 @@
   color: white;
   font-family: 'Trebuchet MS';
   font-weight: lighter;
-  font-size: 2vmax;
+  font-size: 1.5vmax;
   text-align: center;
 }
 
@@ -37,8 +37,8 @@
 }
 
 #colorMap {
-    top: 20%;
-    bottom: 30%;
+    top: 60%;
+    bottom: 20%;
     left: 3%;
     right: 95%;
     z-index:100;

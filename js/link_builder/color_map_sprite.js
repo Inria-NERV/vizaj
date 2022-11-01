@@ -7,7 +7,7 @@ import { hexToHsl } from "../color_helper.js";
 import { guiParams } from "../setup_gui.js";
 
 class ColorMapCanvas {
-    constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0, canvasLen=1000 ){
+    constructor( colorMapName, maxLinkStrength=1, minLinkStrength=0 ){
         this.lut = new Lut();
         this.lut.setColorMap( colorMapName );
         this.lut.setMax(maxLinkStrength);
@@ -95,6 +95,7 @@ class ColorMapSprite{
     bottomValueSprite;
     topValueCanvas;
     bottomValueCanvas;
+    xPosition = -.04;
 
     constructor(_colorMapCanvas=colorMapCanvas, canvasLen=1000){
         this.colorMapCanvas = _colorMapCanvas;
@@ -112,7 +113,10 @@ class ColorMapSprite{
         });
 
         this.colorMapSprite = new THREE.Sprite(spriteMaterial);
-        this.colorMapSprite.scale.x = 0.03;
+        this.colorMapSprite.scale.x = 0.035;
+        this.colorMapSprite.scale.y = 0.4;
+        this.colorMapSprite.position.x += this.xPosition;
+        this.colorMapSprite.position.y += -.49;
         scene.add(this.colorMapSprite);
         this.drawTopValueSprite(scene);
         this.drawBottomValueSprite(scene);
@@ -128,19 +132,21 @@ class ColorMapSprite{
 
     drawTopValueSprite(scene){
         this.topValueSprite = ColorMapSprite.generateValueSprite(this.colorMapCanvas.getMaxV(), this.topValueCanvas);
-        this.topValueSprite.position.y = .53;
+        this.topValueSprite.position.x += this.xPosition;
+        this.topValueSprite.position.y -= .25;
         scene.add(this.topValueSprite);
     }
 
     drawBottomValueSprite(scene){
         this.bottomValueSprite = ColorMapSprite.generateValueSprite(this.colorMapCanvas.getMinV(), this.bottomValueCanvas);
-        this.bottomValueSprite.position.y = -.6;
+        this.bottomValueSprite.position.x += this.xPosition;
+        this.bottomValueSprite.position.y -= .77;
         scene.add(this.bottomValueSprite);
     }
 
     static generateValueSprite(number, canvas){
         const sprite = ColorMapSprite.createTextSprite(parseFloat(number).toFixed(2), canvas);
-        ColorMapSprite.setSpriteScale(sprite);
+        ColorMapSprite.setTextSpriteScale(sprite);
         return sprite;
     }
 
@@ -163,8 +169,9 @@ class ColorMapSprite{
         ctx.fillText(message,10,500);
     }
 
-    static setSpriteScale(sprite){
-        sprite.scale.set(.085 * window.innerHeight / 789, .15 * window.innerWidth / 1440,1);
+    static setTextSpriteScale(sprite){
+        let scaleFactor = .7;
+        sprite.scale.set(scaleFactor * .085 * window.innerHeight / 789, scaleFactor * .15 * window.innerWidth / 1440,1);
     }
 }
 
