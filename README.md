@@ -9,6 +9,8 @@ This tool aims to be a 3d visualization tool for networks with fixed node positi
 
 The camera can be rotated by drag and drop. Right-click drag and drop translates the camera. Scrolling zooms and unzooms.
 
+The online app can be accessed here https://bci-net.github.io/vizaj/
+
 # Load data
 
 Each node provided on the data generates a sphere that represents it. Each node needs to have a location and a strength. The strength is displayed in the color of the links, and can be used to filter the links we wish to display. The user specifies as input the graph density he wants. This density corresponds to the proportion of strongest links displayed.
