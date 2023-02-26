@@ -3,7 +3,9 @@ Vizaj - A free online interactive software for visualizing spatial networks
 
 <img src="https://user-images.githubusercontent.com/81815333/193279909-d910edb2-e3c5-4875-b3f0-09d374a7dbb2.png" width="200" />
 
-Vizaj is based on Three.js and is licensed under the terms of the BSD-3-Clause license.
+Vizaj is based on Three.js and the sofwtare is licensed under the terms of the BSD-3-Clause license.
+
+The example data contained in the BCI-NET/vizaj/data folder can be freely reused under the CC BY license.
 
 This tool aims to be a 3d visualization tool for networks with fixed node position. It it provided with a GUI which helps customizing the nodes, links background, support item, camera and any extra informations.
 
