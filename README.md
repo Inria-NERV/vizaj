@@ -5,8 +5,6 @@ Vizaj - A free online interactive software for visualizing spatial networks
 
 Vizaj is based on Three.js and the sofwtare is licensed under the terms of the BSD-3-Clause license.
 
-All data contained in the BCI-NET/vizaj/data folder can be freely reused under the CC BY license.
-
 This tool aims to be a 3d visualization tool for networks with fixed node position. It it provided with a GUI which helps customizing the nodes, links background, support item, camera and any extra informations.
 
 The camera can be rotated by drag and drop. Right-click drag and drop translates the camera. Scrolling zooms and unzooms.
@@ -18,12 +16,14 @@ The online app can be accessed here https://bci-net.github.io/vizaj/
 Each node provided on the data generates a sphere that represents it. Each node needs to have a location and a strength. The strength is displayed in the color of the links, and can be used to filter the links we wish to display. The user specifies as input the graph density he wants. This density corresponds to the proportion of strongest links displayed.
 
 
-The data can be loaded using two file formats: .csv and .json. 
+The data can be loaded using two file formats: .csv and .json (see BCI-NET/vizaj/data for some examples).
+
 
 ## .csv files
 
 When loading using .csv files, the user needs to provide a node position file, a connectivity matrix file, and an optional label file.
 The separator used by default is a comma ‘,’. 
+
 The node position .csv file has a row per node, with x, y and z coordinates separated by commas. 
 Each row of the label file is linked to its corresponding node. The entire row is parsed as the label of the node. The label can then be displayed on the scene. Note that the label file is entirely optional. Note that the coordinates should be loaded first, then the nodes will be computed and drawn, and only then the labels and connectivity matrix.
 
