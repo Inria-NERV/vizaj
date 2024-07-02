@@ -1,3 +1,4 @@
+import { WebGLCoordinateSystem } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Object3D } from '../core/Object3D.js';
 
@@ -7,12 +8,16 @@ class Camera extends Object3D {
 
 		super();
 
+		this.isCamera = true;
+
 		this.type = 'Camera';
 
 		this.matrixWorldInverse = new Matrix4();
 
 		this.projectionMatrix = new Matrix4();
 		this.projectionMatrixInverse = new Matrix4();
+
+		this.coordinateSystem = WebGLCoordinateSystem;
 
 	}
 
@@ -25,17 +30,15 @@ class Camera extends Object3D {
 		this.projectionMatrix.copy( source.projectionMatrix );
 		this.projectionMatrixInverse.copy( source.projectionMatrixInverse );
 
+		this.coordinateSystem = source.coordinateSystem;
+
 		return this;
 
 	}
 
 	getWorldDirection( target ) {
 
-		this.updateWorldMatrix( true, false );
-
-		const e = this.matrixWorld.elements;
-
-		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
+		return super.getWorldDirection( target ).negate();
 
 	}
 
@@ -62,7 +65,5 @@ class Camera extends Object3D {
 	}
 
 }
-
-Camera.prototype.isCamera = true;
 
 export { Camera };

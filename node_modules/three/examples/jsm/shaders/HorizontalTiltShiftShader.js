@@ -7,7 +7,9 @@
  * - "r" parameter control where "focused" horizontal line lies
  */
 
-var HorizontalTiltShiftShader = {
+const HorizontalTiltShiftShader = {
+
+	name: 'HorizontalTiltShiftShader',
 
 	uniforms: {
 

@@ -157,7 +157,7 @@ function unicodeToShiftjis( str ) {
 
 	if ( u2sTable === undefined ) {
 
-		const encoder = new MMDParser.CharsetEncoder(); // eslint-disable-line no-undef
+		const encoder = new MMDParser.CharsetEncoder();
 		const table = encoder.s2uTable;
 		u2sTable = {};
 
@@ -186,7 +186,7 @@ function unicodeToShiftjis( str ) {
 
 		if ( value === undefined ) {
 
-			throw 'cannot convert charcode 0x' + code.toString( 16 );
+			throw new Error( 'cannot convert charcode 0x' + code.toString( 16 ) );
 
 		} else if ( value > 0xff ) {
 

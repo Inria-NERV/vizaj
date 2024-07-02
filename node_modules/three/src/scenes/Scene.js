@@ -1,4 +1,5 @@
 import { Object3D } from '../core/Object3D.js';
+import { Euler } from '../math/Euler.js';
 
 class Scene extends Object3D {
 
@@ -6,19 +7,26 @@ class Scene extends Object3D {
 
 		super();
 
+		this.isScene = true;
+
 		this.type = 'Scene';
 
 		this.background = null;
 		this.environment = null;
 		this.fog = null;
 
-		this.overrideMaterial = null;
+		this.backgroundBlurriness = 0;
+		this.backgroundIntensity = 1;
+		this.backgroundRotation = new Euler();
 
-		this.autoUpdate = true; // checked by the renderer
+		this.environmentIntensity = 1;
+		this.environmentRotation = new Euler();
+
+		this.overrideMaterial = null;
 
 		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) );
 
 		}
 
@@ -32,9 +40,15 @@ class Scene extends Object3D {
 		if ( source.environment !== null ) this.environment = source.environment.clone();
 		if ( source.fog !== null ) this.fog = source.fog.clone();
 
+		this.backgroundBlurriness = source.backgroundBlurriness;
+		this.backgroundIntensity = source.backgroundIntensity;
+		this.backgroundRotation.copy( source.backgroundRotation );
+
+		this.environmentIntensity = source.environmentIntensity;
+		this.environmentRotation.copy( source.environmentRotation );
+
 		if ( source.overrideMaterial !== null ) this.overrideMaterial = source.overrideMaterial.clone();
 
-		this.autoUpdate = source.autoUpdate;
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
@@ -47,12 +61,17 @@ class Scene extends Object3D {
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
+		if ( this.backgroundBlurriness > 0 ) data.object.backgroundBlurriness = this.backgroundBlurriness;
+		if ( this.backgroundIntensity !== 1 ) data.object.backgroundIntensity = this.backgroundIntensity;
+		data.object.backgroundRotation = this.backgroundRotation.toArray();
+
+		if ( this.environmentIntensity !== 1 ) data.object.environmentIntensity = this.environmentIntensity;
+		data.object.environmentRotation = this.environmentRotation.toArray();
+
 		return data;
 
 	}
 
 }
-
-Scene.prototype.isScene = true;
 
 export { Scene };

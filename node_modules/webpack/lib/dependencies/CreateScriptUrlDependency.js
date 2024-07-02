@@ -12,10 +12,13 @@ const NullDependency = require("./NullDependency");
 /** @typedef {import("webpack-sources").ReplaceSource} ReplaceSource */
 /** @typedef {import("../Dependency")} Dependency */
 /** @typedef {import("../DependencyTemplate").DependencyTemplateContext} DependencyTemplateContext */
+/** @typedef {import("../javascript/JavascriptParser").Range} Range */
+/** @typedef {import("../serialization/ObjectMiddleware").ObjectDeserializerContext} ObjectDeserializerContext */
+/** @typedef {import("../serialization/ObjectMiddleware").ObjectSerializerContext} ObjectSerializerContext */
 
 class CreateScriptUrlDependency extends NullDependency {
 	/**
-	 * @param {[number, number]} range range
+	 * @param {Range} range range
 	 */
 	constructor(range) {
 		super();
@@ -24,6 +27,24 @@ class CreateScriptUrlDependency extends NullDependency {
 
 	get type() {
 		return "create script url";
+	}
+
+	/**
+	 * @param {ObjectSerializerContext} context context
+	 */
+	serialize(context) {
+		const { write } = context;
+		write(this.range);
+		super.serialize(context);
+	}
+
+	/**
+	 * @param {ObjectDeserializerContext} context context
+	 */
+	deserialize(context) {
+		const { read } = context;
+		this.range = read();
+		super.deserialize(context);
 	}
 }
 

@@ -1,6 +1,5 @@
 import {
 	BufferGeometry,
-	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
@@ -153,7 +152,7 @@ class GCodeLoader extends Loader {
 				//Layer change detection is or made by watching Z, it's made by watching when we extrude at a new Z position
 				if ( delta( state.e, line.e ) > 0 ) {
 
-					line.extruding = delta( state.e, line.e ) > 0;
+					state.extruding = delta( state.e, line.e ) > 0;
 
 					if ( currentLayer == undefined || line.z != currentLayer.z ) {
 
@@ -189,7 +188,6 @@ class GCodeLoader extends Loader {
 				line.y = args.y !== undefined ? args.y : line.y;
 				line.z = args.z !== undefined ? args.z : line.z;
 				line.e = args.e !== undefined ? args.e : line.e;
-				state = line;
 
 			} else {
 
@@ -252,7 +250,7 @@ class GCodeLoader extends Loader {
 
 		}
 
-		object.quaternion.setFromEuler( new Euler( - Math.PI / 2, 0, 0 ) );
+		object.rotation.set( - Math.PI / 2, 0, 0 );
 
 		return object;
 

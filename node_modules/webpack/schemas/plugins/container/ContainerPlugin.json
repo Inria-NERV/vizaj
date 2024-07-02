@@ -1,5 +1,10 @@
 {
   "definitions": {
+    "AmdContainer": {
+      "description": "Add a container for define/require functions in the AMD module.",
+      "type": "string",
+      "minLength": 1
+    },
     "AuxiliaryComment": {
       "description": "Add a comment in the UMD wrapper.",
       "anyOf": [
@@ -199,6 +204,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "amdContainer": {
+          "$ref": "#/definitions/AmdContainer"
+        },
         "auxiliaryComment": {
           "$ref": "#/definitions/AuxiliaryComment"
         },
@@ -218,7 +226,7 @@
       "required": ["type"]
     },
     "LibraryType": {
-      "description": "Type of library (types included by default are 'var', 'module', 'assign', 'assign-properties', 'this', 'window', 'self', 'global', 'commonjs', 'commonjs2', 'commonjs-module', 'amd', 'amd-require', 'umd', 'umd2', 'jsonp', 'system', but others might be added by plugins).",
+      "description": "Type of library (types included by default are 'var', 'module', 'assign', 'assign-properties', 'this', 'window', 'self', 'global', 'commonjs', 'commonjs2', 'commonjs-module', 'commonjs-static', 'amd', 'amd-require', 'umd', 'umd2', 'jsonp', 'system', but others might be added by plugins).",
       "anyOf": [
         {
           "enum": [
@@ -233,6 +241,7 @@
             "commonjs",
             "commonjs2",
             "commonjs-module",
+            "commonjs-static",
             "amd",
             "amd-require",
             "umd",

@@ -200,3 +200,42 @@ Those two figures support the explanation of the customization of values that de
 
 <img width="1006" alt="mediator" src="https://user-images.githubusercontent.com/81815333/177354384-a9823c83-c66d-48d6-b73f-6b5d7667ccd1.png">
 
+# Development
+
+## Installation
+
+To install Vizaj on your machine, you need to clone the repository and install the dependencies. Vizaj is based on Three.js and the dependencies are managed by npm. To install the dependencies, run the following command in the root directory of the project:
+
+```
+npm install
+```
+
+## Run the software
+
+To run Vizaj, you need to start a local server. You can use the following command to start a local server:
+
+```
+npm run start
+```
+
+Vizaj is then accessible at the following address: http://localhost:1234/
+
+## Build
+
+To build Vizaj, you can use the following command:
+
+```
+npm run build
+```
+
+The build is then available in the `dist` directory.
+
+## Deploy 
+
+To deploy Vizaj, you can use the following command:
+
+```
+npm run deploy
+```
+
+The software is then deployed to the `gh-pages` branch of the repository.

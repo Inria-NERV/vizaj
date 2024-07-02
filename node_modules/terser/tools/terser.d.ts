@@ -1,11 +1,15 @@
 /// <reference lib="es2015" />
 
-import { RawSourceMap } from 'source-map';
+import { SectionedSourceMapInput, EncodedSourceMap, DecodedSourceMap } from '@jridgewell/source-map';
 
 export type ECMA = 5 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
 
+export type ConsoleProperty = keyof typeof console;
+type DropConsoleOption = boolean | ConsoleProperty[];
+
 export interface ParseOptions {
     bare_returns?: boolean;
+    /** @deprecated legacy option. Currently, all supported EcmaScript is valid to parse. */
     ecma?: ECMA;
     html5_comments?: boolean;
     shebang?: boolean;
@@ -23,7 +27,7 @@ export interface CompressOptions {
     dead_code?: boolean;
     defaults?: boolean;
     directives?: boolean;
-    drop_console?: boolean;
+    drop_console?: DropConsoleOption;
     drop_debugger?: boolean;
     ecma?: ECMA;
     evaluate?: boolean;
@@ -46,6 +50,7 @@ export interface CompressOptions {
     passes?: number;
     properties?: boolean;
     pure_funcs?: string[];
+    pure_new?: boolean;
     pure_getters?: boolean | 'strict';
     reduce_funcs?: boolean;
     reduce_vars?: boolean;
@@ -80,16 +85,52 @@ export interface MangleOptions {
     keep_classnames?: boolean | RegExp;
     keep_fnames?: boolean | RegExp;
     module?: boolean;
+    nth_identifier?: SimpleIdentifierMangler | WeightedIdentifierMangler;
     properties?: boolean | ManglePropertiesOptions;
     reserved?: string[];
     safari10?: boolean;
     toplevel?: boolean;
 }
 
+/**
+ * An identifier mangler for which the output is invariant with respect to the source code.
+ */
+export interface SimpleIdentifierMangler {
+    /**
+     * Obtains the nth most favored (usually shortest) identifier to rename a variable to.
+     * The mangler will increment n and retry until the return value is not in use in scope, and is not a reserved word.
+     * This function is expected to be stable; Evaluating get(n) === get(n) should always return true.
+     * @param n The ordinal of the identifier.
+     */
+    get(n: number): string;
+}
+
+/**
+ * An identifier mangler that leverages character frequency analysis to determine identifier precedence.
+ */
+export interface WeightedIdentifierMangler extends SimpleIdentifierMangler {
+    /**
+     * Modifies the internal weighting of the input characters by the specified delta.
+     * Will be invoked on the entire printed AST, and then deduct mangleable identifiers.
+     * @param chars The characters to modify the weighting of.
+     * @param delta The numeric weight to add to the characters.
+     */
+    consider(chars: string, delta: number): number;
+    /**
+     * Resets character weights.
+     */
+    reset(): void;
+    /**
+     * Sorts identifiers by character frequency, in preparation for calls to get(n).
+     */
+    sort(): void;
+}
+
 export interface ManglePropertiesOptions {
     builtins?: boolean;
     debug?: boolean;
     keep_quoted?: boolean | 'strict';
+    nth_identifier?: SimpleIdentifierMangler | WeightedIdentifierMangler;
     regex?: RegExp | string;
     reserved?: string[];
 }
@@ -108,6 +149,7 @@ export interface FormatOptions {
     }) => boolean );
     ecma?: ECMA;
     ie8?: boolean;
+    keep_numbers?: boolean;
     indent_level?: number;
     indent_start?: number;
     inline_script?: boolean;
@@ -156,16 +198,19 @@ export interface MinifyOptions {
 
 export interface MinifyOutput {
     code?: string;
-    map?: RawSourceMap | string;
+    map?: EncodedSourceMap | string;
+    decoded_map?: DecodedSourceMap | null;
 }
 
 export interface SourceMapOptions {
     /** Source map object, 'inline' or source map file content */
-    content?: RawSourceMap | string;
+    content?: SectionedSourceMapInput | string;
     includeSources?: boolean;
     filename?: string;
     root?: string;
+    asObject?: boolean;
     url?: string | 'inline';
 }
 
 export function minify(files: string | string[] | { [file: string]: string }, options?: MinifyOptions): Promise<MinifyOutput>;
+export function minify_sync(files: string | string[] | { [file: string]: string }, options?: MinifyOptions): MinifyOutput;

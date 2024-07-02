@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Lut } from '../../node_modules/three/examples/jsm/math/Lut.js';
-import { linkMeshList, uiScene } from '../../public/main.js'; 
+import { linkMeshList, uiScene } from '../../public/main.js';
 import { colorMapCanvas } from './draw_links';
 import { deleteMesh } from '../mesh_helper.js';
 import { hexToHsl } from "../color_helper.js";
@@ -11,7 +11,7 @@ class ColorMapCanvas {
         this.lut = new Lut();
         this.lut.setColorMap( colorMapName );
         this.lut.setMax(maxLinkStrength);
-        if (maxLinkStrength == minLinkStrength){
+        if (maxLinkStrength === minLinkStrength){
             this.lut.setMin(minLinkStrength - 0.001);
         }
         else {
@@ -24,7 +24,7 @@ class ColorMapCanvas {
     getMinV() {return this.lut.minV;}
 
     drawColorMapCanvas(){
-        if (!linkMeshList || linkMeshList.length == 0){ return; }
+        if (!linkMeshList || linkMeshList.length === 0){ return; }
         const colorMap = document.getElementById("colorMap");
         colorMap.textContent = "";
 
@@ -83,7 +83,7 @@ class ColorMapCanvas {
         ColorMapCanvas.changeTextColor('white');
         }
     }
-    
+
 }
 
 //this one exists in the scene, it is generated in order to print the color map

@@ -41,7 +41,10 @@ class EntryOptionPlugin {
 					name,
 					desc
 				);
-				for (const entry of desc.import) {
+				const descImport =
+					/** @type {Exclude<EntryDescription["import"], undefined>} */
+					(desc.import);
+				for (const entry of descImport) {
 					new EntryPlugin(context, entry, options).apply(compiler);
 				}
 			}
@@ -62,8 +65,10 @@ class EntryOptionPlugin {
 			runtime: desc.runtime,
 			layer: desc.layer,
 			dependOn: desc.dependOn,
+			baseUri: desc.baseUri,
 			publicPath: desc.publicPath,
 			chunkLoading: desc.chunkLoading,
+			asyncChunks: desc.asyncChunks,
 			wasmLoading: desc.wasmLoading,
 			library: desc.library
 		};

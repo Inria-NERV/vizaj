@@ -1,10 +1,8 @@
-import {
-	Vector2
-} from 'three';
+import { Vector2 } from 'three';
 
 class SelectionHelper {
 
-	constructor( selectionBox, renderer, cssClassName ) {
+	constructor( renderer, cssClassName ) {
 
 		this.element = document.createElement( 'div' );
 		this.element.classList.add( cssClassName );
@@ -17,15 +15,20 @@ class SelectionHelper {
 		this.pointBottomRight = new Vector2();
 
 		this.isDown = false;
+		this.enabled = true;
 
-		this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
+		this.onPointerDown = function ( event ) {
+
+			if ( this.enabled === false ) return;
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
-		}.bind( this ) );
+		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
+		this.onPointerMove = function ( event ) {
+
+			if ( this.enabled === false ) return;
 
 			if ( this.isDown ) {
 
@@ -33,18 +36,34 @@ class SelectionHelper {
 
 			}
 
-		}.bind( this ) );
+		}.bind( this );
 
-		this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
+		this.onPointerUp = function ( ) {
+
+			if ( this.enabled === false ) return;
 
 			this.isDown = false;
-			this.onSelectOver( event );
+			this.onSelectOver();
 
-		}.bind( this ) );
+		}.bind( this );
+
+		this.renderer.domElement.addEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.addEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.addEventListener( 'pointerup', this.onPointerUp );
+
+	}
+
+	dispose() {
+
+		this.renderer.domElement.removeEventListener( 'pointerdown', this.onPointerDown );
+		this.renderer.domElement.removeEventListener( 'pointermove', this.onPointerMove );
+		this.renderer.domElement.removeEventListener( 'pointerup', this.onPointerUp );
 
 	}
 
 	onSelectStart( event ) {
+
+		this.element.style.display = 'none';
 
 		this.renderer.domElement.parentElement.appendChild( this.element );
 
@@ -59,6 +78,8 @@ class SelectionHelper {
 	}
 
 	onSelectMove( event ) {
+
+		this.element.style.display = 'block';
 
 		this.pointBottomRight.x = Math.max( this.startPoint.x, event.clientX );
 		this.pointBottomRight.y = Math.max( this.startPoint.y, event.clientY );

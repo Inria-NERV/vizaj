@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three';
-import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils';
-import { scene, transformControls, 
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils';
+import { scene, transformControls,
     mouseButtonIsDown,
     cortexMeshUrl,
-    innerSkullMeshUrl, 
+    innerSkullMeshUrl,
     scalpMeshUrl,
      GLOBAL_LAYER } from "../public/main.js";
 import { guiParams } from './setup_gui';
@@ -28,8 +28,8 @@ const cortexMaterial = new THREE.MeshStandardMaterial({
     flatShading: false
 });
 
-function loadAndDrawCortexModel(){  
-    removeExtraItemMesh(); 
+function loadAndDrawCortexModel(){
+    removeExtraItemMesh();
     loadCortexModel()
         .then((response) => drawExtraItemModel(response));
 }
@@ -57,7 +57,7 @@ function loadCortexModel(){
         (gltf) => {
             const hemi0Mesh = gltf.scene.children[0].children[0];
             const hemi1Mesh = gltf.scene.children[0].children[1];
-            return BufferGeometryUtils.mergeBufferGeometries([hemi0Mesh.geometry, hemi1Mesh.geometry]);
+            return BufferGeometryUtils.mergeGeometries([hemi0Mesh.geometry, hemi1Mesh.geometry]);
     });
 }
 

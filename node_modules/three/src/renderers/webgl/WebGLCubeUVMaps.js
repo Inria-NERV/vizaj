@@ -9,45 +9,62 @@ function WebGLCubeUVMaps( renderer ) {
 
 	function get( texture ) {
 
-		if ( texture && texture.isTexture && texture.isRenderTargetTexture === false ) {
+		if ( texture && texture.isTexture ) {
 
 			const mapping = texture.mapping;
 
 			const isEquirectMap = ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping );
 			const isCubeMap = ( mapping === CubeReflectionMapping || mapping === CubeRefractionMapping );
 
+			// equirect/cube map to cubeUV conversion
+
 			if ( isEquirectMap || isCubeMap ) {
 
-				// equirect/cube map to cubeUV conversion
+				let renderTarget = cubeUVmaps.get( texture );
 
-				if ( cubeUVmaps.has( texture ) ) {
+				const currentPMREMVersion = renderTarget !== undefined ? renderTarget.texture.pmremVersion : 0;
 
-					return cubeUVmaps.get( texture ).texture;
+				if ( texture.isRenderTargetTexture && texture.pmremVersion !== currentPMREMVersion ) {
+
+					if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
+
+					renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture, renderTarget ) : pmremGenerator.fromCubemap( texture, renderTarget );
+					renderTarget.texture.pmremVersion = texture.pmremVersion;
+
+					cubeUVmaps.set( texture, renderTarget );
+
+					return renderTarget.texture;
 
 				} else {
 
-					const image = texture.image;
-
-					if ( ( isEquirectMap && image && image.height > 0 ) || ( isCubeMap && image && isCubeTextureComplete( image ) ) ) {
-
-						const currentRenderTarget = renderer.getRenderTarget();
-
-						if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
-
-						const renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture ) : pmremGenerator.fromCubemap( texture );
-						cubeUVmaps.set( texture, renderTarget );
-
-						renderer.setRenderTarget( currentRenderTarget );
-
-						texture.addEventListener( 'dispose', onTextureDispose );
+					if ( renderTarget !== undefined ) {
 
 						return renderTarget.texture;
 
 					} else {
 
-						// image not yet ready. try the conversion next frame
+						const image = texture.image;
 
-						return null;
+						if ( ( isEquirectMap && image && image.height > 0 ) || ( isCubeMap && image && isCubeTextureComplete( image ) ) ) {
+
+							if ( pmremGenerator === null ) pmremGenerator = new PMREMGenerator( renderer );
+
+							renderTarget = isEquirectMap ? pmremGenerator.fromEquirectangular( texture ) : pmremGenerator.fromCubemap( texture );
+							renderTarget.texture.pmremVersion = texture.pmremVersion;
+
+							cubeUVmaps.set( texture, renderTarget );
+
+							texture.addEventListener( 'dispose', onTextureDispose );
+
+							return renderTarget.texture;
+
+						} else {
+
+							// image not yet ready. try the conversion next frame
+
+							return null;
+
+						}
 
 					}
 
@@ -87,7 +104,7 @@ function WebGLCubeUVMaps( renderer ) {
 
 		if ( cubemapUV !== undefined ) {
 
-			cubemapUV.delete( texture );
+			cubeUVmaps.delete( texture );
 			cubemapUV.dispose();
 
 		}

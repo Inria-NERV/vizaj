@@ -8,11 +8,11 @@ class ARButton {
 
 			if ( sessionInit.domOverlay === undefined ) {
 
-				var overlay = document.createElement( 'div' );
+				const overlay = document.createElement( 'div' );
 				overlay.style.display = 'none';
 				document.body.appendChild( overlay );
 
-				var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+				const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 				svg.setAttribute( 'width', 38 );
 				svg.setAttribute( 'height', 38 );
 				svg.style.position = 'absolute';
@@ -25,7 +25,7 @@ class ARButton {
 				} );
 				overlay.appendChild( svg );
 
-				var path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+				const path = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
 				path.setAttribute( 'd', 'M 12,12 L 28,28 M 28,12 12,28' );
 				path.setAttribute( 'stroke', '#fff' );
 				path.setAttribute( 'stroke-width', 2 );
@@ -104,9 +104,33 @@ class ARButton {
 
 					currentSession.end();
 
+					if ( navigator.xr.offerSession !== undefined ) {
+
+						navigator.xr.offerSession( 'immersive-ar', sessionInit )
+							.then( onSessionStarted )
+							.catch( ( err ) => {
+
+								console.warn( err );
+
+							} );
+
+					}
+
 				}
 
 			};
+
+			if ( navigator.xr.offerSession !== undefined ) {
+
+				navigator.xr.offerSession( 'immersive-ar', sessionInit )
+					.then( onSessionStarted )
+					.catch( ( err ) => {
+
+						console.warn( err );
+
+					} );
+
+			}
 
 		}
 
@@ -130,6 +154,16 @@ class ARButton {
 			disableButton();
 
 			button.textContent = 'AR NOT SUPPORTED';
+
+		}
+
+		function showARNotAllowed( exception ) {
+
+			disableButton();
+
+			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
+
+			button.textContent = 'AR NOT ALLOWED';
 
 		}
 
@@ -161,7 +195,7 @@ class ARButton {
 
 				supported ? showStartAR() : showARNotSupported();
 
-			} ).catch( showARNotSupported );
+			} ).catch( showARNotAllowed );
 
 			return button;
 

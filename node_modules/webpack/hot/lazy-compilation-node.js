@@ -3,13 +3,21 @@
 "use strict";
 
 var urlBase = decodeURIComponent(__resourceQuery.slice(1));
+
+/**
+ * @param {{ data: string, onError: (err: Error) => void, active: boolean, module: module }} options options
+ * @returns {() => void} function to destroy response
+ */
 exports.keepAlive = function (options) {
 	var data = options.data;
 	var onError = options.onError;
 	var active = options.active;
 	var module = options.module;
+	/** @type {import("http").IncomingMessage} */
 	var response;
-	var request = require("http").request(
+	var request = (
+		urlBase.startsWith("https") ? require("https") : require("http")
+	).request(
 		urlBase + data,
 		{
 			agent: false,
@@ -25,6 +33,10 @@ exports.keepAlive = function (options) {
 			}
 		}
 	);
+
+	/**
+	 * @param {Error} err error
+	 */
 	function errorHandler(err) {
 		err.message =
 			"Problem communicating active modules to the server: " + err.message;

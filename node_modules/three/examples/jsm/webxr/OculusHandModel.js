@@ -6,13 +6,15 @@ const POINTING_JOINT = 'index-finger-tip';
 
 class OculusHandModel extends Object3D {
 
-	constructor( controller ) {
+	constructor( controller, loader = null, onLoad = null ) {
 
 		super();
 
 		this.controller = controller;
 		this.motionController = null;
 		this.envMap = null;
+		this.loader = loader;
+		this.onLoad = onLoad;
 
 		this.mesh = null;
 
@@ -24,7 +26,7 @@ class OculusHandModel extends Object3D {
 
 				this.xrInputSource = xrInputSource;
 
-				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness );
+				this.motionController = new XRHandMeshModel( this, controller, this.path, xrInputSource.handedness, this.loader, this.onLoad );
 
 			}
 

@@ -1,66 +1,60 @@
-import { Node } from './Node.js';
+import Node, { addNodeClass } from './Node.js';
+import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class VarNode extends Node {
 
-	constructor( type, value ) {
+	constructor( node, name = null ) {
 
-		super( type );
+		super();
 
-		this.value = value;
+		this.node = node;
+		this.name = name;
 
-	}
-
-	getType( builder ) {
-
-		return builder.getTypeByFormat( this.type );
+		this.isVarNode = true;
 
 	}
 
-	generate( builder, output ) {
+	isGlobal() {
 
-		const varying = builder.getVar( this.uuid, this.type );
-
-		if ( this.value && builder.isShader( 'vertex' ) ) {
-
-			builder.addNodeCode( varying.name + ' = ' + this.value.build( builder, this.getType( builder ) ) + ';' );
-
-		}
-
-		return builder.format( varying.name, this.getType( builder ), output );
+		return true;
 
 	}
 
-	copy( source ) {
+	getHash( builder ) {
 
-		super.copy( source );
-
-		this.type = source.type;
-		this.value = source.value;
-
-		return this;
+		return this.name || super.getHash( builder );
 
 	}
 
-	toJSON( meta ) {
+	getNodeType( builder ) {
 
-		let data = this.getJSONNode( meta );
+		return this.node.getNodeType( builder );
 
-		if ( ! data ) {
+	}
 
-			data = this.createJSONNode( meta );
+	generate( builder ) {
 
-			data.type = this.type;
+		const { node, name } = this;
 
-			if ( this.value ) data.value = this.value.toJSON( meta ).uuid;
+		const nodeVar = builder.getVarFromNode( this, name, builder.getVectorType( this.getNodeType( builder ) ) );
 
-		}
+		const propertyName = builder.getPropertyName( nodeVar );
 
-		return data;
+		const snippet = node.build( builder, nodeVar.type );
+
+		builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+
+		return propertyName;
 
 	}
 
 }
 
-VarNode.prototype.nodeType = 'Var';
+export default VarNode;
 
-export { VarNode };
+export const temp = nodeProxy( VarNode );
+
+addNodeElement( 'temp', temp ); // @TODO: Will be removed in the future
+addNodeElement( 'toVar', ( ...params ) => temp( ...params ).append() );
+
+addNodeClass( 'VarNode', VarNode );

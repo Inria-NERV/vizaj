@@ -1,18 +1,25 @@
 import * as THREE from "three";
-import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls";
-import { TransformControls } from '../node_modules/three/examples/jsm/controls/TransformControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { assignSensorLabels, clearAllSensors, drawSensorsAndUpdateGlobalValues, loadSensorCoordinates, sensorMaterial } from "../js/draw_sensors.js";
 import "regenerator-runtime/runtime.js";
 import { addLightAndBackground } from "../js/add_light_and_background";
 import { loadAndDrawCortexModel, handleTransformControlChangeEvent, updateTransformControlHistory } from "../js/draw_cortex.js";
-import { clearLoadAndDrawSensors, 
+import { clearLoadAndDrawSensors,
   loadAndAssignSensorLabels } from '../js/draw_sensors.js';
-import { loadAndDrawLinks, clearAllLinks, generateLinkData, drawLinksAndUpdateVisibility, ecoFiltering } from "../js/link_builder/draw_links";
+import {
+  loadAndDrawLinks,
+  clearAllLinks,
+  generateLinkData,
+  drawLinksAndUpdateVisibility,
+  ecoFiltering,
+  loadAndDrawLinksFromUrl
+} from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { guiParams, setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
-import { GUI } from "three/examples/jsm/libs/dat.gui.module";
+import { GUI } from 'dat.gui';
 import { hexToHsl } from "../js/color_helper";
 
 const highlightedLinksPreviousMaterials = [];
@@ -75,7 +82,7 @@ function init() {
   renderer.setPixelRatio( window.devicePixelRatio );
   setupGui();
   generateSceneElements();
-  
+
   window.addEventListener("resize", onWindowResize);
   document.addEventListener("mousemove", onDocumentMouseMove);
   transformControls.addEventListener('dragging-changed', (event)=>{
@@ -116,7 +123,7 @@ async function generateSceneElements() {
   const data = await loadSensorCoordinates(sensorCoordinatesUrl);
   await drawSensorsAndUpdateGlobalValues(data);
   await loadAndAssignSensorLabels(sensorLabelsUrl);
-  await loadAndDrawLinks(connectivityMatrixUrl);
+  await loadAndDrawLinksFromUrl(connectivityMatrixUrl);
 }
 
 function onDocumentMouseMove(event) {
@@ -142,7 +149,7 @@ function onRendererMouseUp(event){
 }
 
 function onDocumentMouseClick(event){
-  
+
 }
 
 function hoverDisplayUpdate() {
@@ -192,7 +199,7 @@ function fillIntersected() {
         material: linkMesh.mesh.material});
       let color = hexToHsl(guiParams.backgroundColor).l < 50 ? new THREE.Color(1,1,1) : new THREE.Color(0,0,0);
       linkMesh.mesh.material = new THREE.LineBasicMaterial({
-        color : color, 
+        color : color,
         opacity: 1,
         transparent: false
       });
@@ -209,7 +216,7 @@ function getNewFileUrl(evt){
 function handleConnectivityMatrixFileSelect(evt) {
   const fileUrl = getNewFileUrl(evt);
   const fileName = evt.target.files[0].name;
-  loadAndDrawLinks(fileUrl).then(
+  loadAndDrawLinksFromUrl(fileUrl).then(
       ()=>{ userLogMessage("Connectivity matrix file " + fileName + "succesfully loaded.", "green")},
         (e) => userLogError(e, fileName)
     );
@@ -228,7 +235,7 @@ function handleMontageLabelsFileSelect(evt) {
   sensorLabelsUrl = getNewFileUrl(evt);
   const fileName = evt.target.files[0].name;
   loadAndAssignSensorLabels(sensorLabelsUrl)
-    .then(() => userLogMessage("Labels file " + fileName + " succesfully loaded.", "green"), 
+    .then(() => userLogMessage("Labels file " + fileName + " succesfully loaded.", "green"),
       (e)=>userLogError(e, fileName)
     );
 }
@@ -279,8 +286,8 @@ async function handleJsonFileSelect(evt){
     for (const [key, value] of Object.entries(graph.edges)){
       if (value.strength != 0 && value.strength)
       linkList.push(generateLinkData(
-        sensorIdMap.get(value.source.toString()), 
-        sensorIdMap.get(value.target.toString()), 
+        sensorIdMap.get(value.source.toString()),
+        sensorIdMap.get(value.target.toString()),
         value.strength));
     }
 
