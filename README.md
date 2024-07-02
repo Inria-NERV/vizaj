@@ -16,10 +16,13 @@ The online app can be accessed here https://bci-net.github.io/vizaj/
 Each node provided on the data generates a sphere that represents it. Each node needs to have a location and a strength. The strength is displayed in the color of the links, and can be used to filter the links we wish to display. The user specifies as input the graph density he wants. This density corresponds to the proportion of strongest links displayed.
 
 
-The data can be loaded using two file formats: .csv and .json (see BCI-NET/vizaj/data for some examples).
+The data can be loaded manually or read from a Websocket.
 
+## Load data manually
 
-## .csv files
+Two file formats can be used to load data manually: .csv and .json (see BCI-NET/vizaj/data for some examples).
+
+### .csv files
 
 When loading using .csv files, the user needs to provide a node position file, a connectivity matrix file, and an optional label file.
 The separator used by default is a comma ‘,’. 
@@ -51,7 +54,7 @@ connectivity_matrix.csv:
 .8,.2,0
 ```
 
-## .json files
+### .json files
 
 When working with .json files, a single file is necessary. It should include a *graph* item, which should have 2 element called *nodes* and *edges*.
 The *nodes* item is a list which contains one item per node with elements : 
@@ -101,6 +104,11 @@ In this example below, 2 nodes are drawn with labels associated, and one link is
     }
 }
 ```
+
+## Read from a Websocket
+
+The connectivity matrix can be read from a Websocket (see "Development" section to configure the Websocket). If data is streamed through the Websocket, the data is displayed in real time.
+
 
 # GUI overview
 In this section, we propose to explain the usage of each menu and button of the GUI.
@@ -219,6 +227,16 @@ npm run start
 ```
 
 Vizaj is then accessible at the following address: http://localhost:1234/
+
+## OpenVibe integration
+
+You can display in real time the data acquired by OpenVibe. To do so, you need to run a middleware that converts OpenVibe's TCP stream into a Websocket stream. You can use the following command to start the middleware:
+
+```
+npm run middleware
+```
+
+The middleware reads the data from OpenVibe on port 4001 and sends it to the Websocket server on port 8080. The Websocket server is then accessible at the following address: `ws://localhost:8080/`
 
 ## Build
 

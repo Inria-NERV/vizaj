@@ -29,7 +29,7 @@ let innerSkullMeshUrl = require('../data/innskull.glb');
 let scalpMeshUrl = require('../data/scalp.glb');
 let sensorLabelsUrl = require('../data/sensor_labels.csv');
 let sensorCoordinatesUrl = require('../data/sensor_coordinates.csv');
-let connectivityMatrixUrl = require('../data/conn_matrix_0.csv');
+let connectivityMatrixUrl = require('../data/connectivity_matrix.csv');
 
 const GLOBAL_LAYER = 0,  LINK_LAYER = 1;
 
@@ -75,6 +75,7 @@ let mouseDownDate;
 
 init();
 animate();
+connectToWebSocket();
 
 function init() {
   THREE.Cache.enabled = true;
@@ -300,6 +301,29 @@ async function handleJsonFileSelect(evt){
     userLogError(e, fileName);
 
   }
+}
+
+function connectToWebSocket() {
+  const socket = new WebSocket('ws://localhost:8080');
+
+  socket.addEventListener('open', function (event) {
+    console.log('Connected to WebSocket server');
+  });
+
+  socket.addEventListener('message', async function (event) {
+    const matrix = event.data?.trim()?.split('\n')
+    await loadAndDrawLinks(matrix, true);
+  });
+
+  socket.addEventListener('close', function (event) {
+    console.log('WebSocket connection closed. Reconnecting...');
+    setTimeout(connectToWebSocket, 1000);
+  });
+
+  socket.addEventListener('error', function (error) {
+    console.log('WebSocket error:', error);
+    socket.close();
+  });
 }
 
 export {
