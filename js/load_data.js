@@ -168,19 +168,16 @@ export function csvMontageLoadingCheckForError(data){
 }
 
 export function csvSensorLabelsCheckForError(data){
-  
+
 }
 
-export function csvConnectivityMatrixCheckForError(data){
-  if (data.length != sensorMeshList.length){
-    throw new TypeError("Number of rows of file (" + (data.length + 1) + ") differs from count of sensors (" + (sensorMeshList.length + 1) + ")")
+export function csvConnectivityMatrixCheckForError(matrix) {
+  if (matrix.length !== sensorMeshList.length) {
+      throw new TypeError(`Number of rows (${matrix.length}) differs from count of sensors (${sensorMeshList.length})`);
   }
-  let i = 0;
-  for (let row of data){
-    const values = row.split(',');
-    if (values.length != sensorMeshList.length){
-      throw new TypeError("Number of values of row " + i + "(" + (values.length + 1) + " rows) differs from count of sensors (" + (sensorMeshList.length + 1) + ")")
-    }
-    i++;
-  }
+  matrix.forEach((row, i) => {
+      if (row.length !== sensorMeshList.length) {
+          throw new TypeError(`Row ${i} has ${row.length} values, expected ${sensorMeshList.length}`);
+      }
+  });
 }

@@ -6,25 +6,30 @@
   "scripts": {
     "test": "mocha --reporter list",
     "start": "parcel public/index.html",
+    "middleware": "node js/middleware.js",
     "build": "parcel build public/index.html --no-minify --public-url ./",
     "deploy": "parcel build public/index.html --no-minify --public-url ./ && gh-pages -d dist"
   },
   "author": "Thibault Rolland",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "gh-pages": "^3.2.3",
+    "axios": "^1.7.2",
+    "dat.gui": "^0.7.9",
+    "express": "^4.19.2",
+    "gh-pages": "^6.1.1",
     "node": "^16.6.1",
     "path": "^0.12.7",
     "regenerator-runtime": "^0.13.9",
     "rimraf": "^3.0.2",
     "rollup": "^2.56.3",
-    "serve": "^12.0.0",
-    "three": ">=0.137.0",
-    "webpack": "^5.51.1"
+    "serve": "^14.2.3",
+    "three": "^0.165.0",
+    "webpack": "^5.51.1",
+    "ws": "^8.17.0"
   },
   "devDependencies": {
     "cssnano": "^5.0.13",
+    "parcel-bundler": "^1.12.5",
     "postcss": "^8.4.5",
     "webpack-cli": "^4.8.0"
   }

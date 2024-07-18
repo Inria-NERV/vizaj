@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { sensorMeshList, scene, linkMeshList, LINK_LAYER} from '../../public/main';
 import {updateAllDegreeLineLength } from "../draw_degree_line";
-import { csvConnectivityMatrixCheckForError, loadData } from '../load_data';
+import { csvConnectivityMatrixCheckForError,  loadData } from '../load_data';
 import { guiControllers, guiParams } from '../setup_gui';
 import { maxSensorDistance } from '../draw_sensors';
 import { deleteMesh } from '../mesh_helper';
@@ -10,33 +10,41 @@ import { ColorMapCanvas } from './color_map_sprite.js';
 
 let colorMapCanvas;
 
-async function loadAndDrawLinks(linksDataFileUrl){
-    const rawData = await loadLinks(linksDataFileUrl);
-    csvConnectivityMatrixCheckForError(rawData);
-    const links = connectivityMatrixExtractData(rawData);
-    clearAllLinks();
+async function loadAndDrawLinksFromUrl(url) {
+    const links = await loadLinks(url);
+    await loadAndDrawLinks(links);
+}
+
+async function loadAndDrawLinks(data, keepLinkDensity = false) {
+    const matrix = formatCsvMatrix(data);
+
+    csvConnectivityMatrixCheckForError(matrix);
+    const links = connectivityMatrixExtractData(matrix);
+
+    // If keepLinkDensity is true, we want to keep the previous link density, not compute a new one
+    const linkDensity = keepLinkDensity ? guiParams.linkDensity : null;
+    await clearAllLinks();
     await drawLinksAndUpdateVisibility(links);
-    ecoFiltering();
+    ecoFiltering(linkDensity);
+}
+
+function formatCsvMatrix(data) {
+    return data.reduce((acc, row) => row ? [...acc, row.split(',')] : acc, []);
 }
 
 async function loadLinks(linksDataFileUrl){
     return loadData(linksDataFileUrl, 'connectivity matrix');
 }
 
-
-
-function connectivityMatrixExtractData(data){
+function connectivityMatrixExtractData(matrix) {
     const outList = [];
-    const splittedData = data.filter(x => x !== null && x !== '');
-    for (let i = 0; i < splittedData.length; i++){
-        const row = splittedData[i];
-        const splittedRow = row.split(',');
-        for (let j = 0; j < i; j++){
-            if (splittedRow[j] != 0 && splittedRow[j]){
-                outList.push(generateLinkData(i, j, splittedRow[j]));
+    matrix.forEach((row, i) => {
+        row.forEach((value, j) => {
+            if (i > j && value != 0 && value) {
+                outList.push(generateLinkData(i, j, value));
             }
-        }
-    }
+        });
+    });
     return outList;
 }
 
@@ -134,10 +142,11 @@ function updateVisibleLinks() {
     guiControllers.linkDensity.updateDisplay();
 }
 
-function ecoFiltering(){
+function ecoFiltering(density = null){
     // According to Eco filtering, one optimal way of filtering the links is to set node degree = 3
     // in other words : number of links = number of nodes * 3 / 2
-    guiParams.linkDensity = 3 / 2 * sensorMeshList.length / linkMeshList.length;
+    const optimalDensity = 3 / 2 * sensorMeshList.length / linkMeshList.length;
+    guiParams.linkDensity = density || optimalDensity;
     updateVisibleLinks();
 }
 
@@ -164,6 +173,7 @@ function updateLinkColor(linkTuple){
     clearAllLinks,
     generateLinkData,
     loadAndDrawLinks,
+    loadAndDrawLinksFromUrl,
     colorMapCanvas,
     drawLinksAndUpdateVisibility,
     redrawLinks,
@@ -171,4 +181,3 @@ function updateLinkColor(linkTuple){
     updateVisibleLinks,
     updateAllLinkMaterial,
     ecoFiltering}
-     
