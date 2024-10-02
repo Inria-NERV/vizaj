@@ -9,7 +9,13 @@ This tool aims to be a 3d visualization tool for networks with fixed node positi
 
 The camera can be rotated by drag and drop. Right-click drag and drop translates the camera. Scrolling zooms and unzooms.
 
-The online app can be accessed here https://bci-net.github.io/vizaj/
+The online app can be accessed here: https://bci-net.github.io/vizaj/
+
+# Citation
+
+When citing Vizaj or using it for obtaining results and figures for publications, please also cite the journal article reference: 
+
+> Rolland T, De Vico Fallani F (2023) Vizaj—A free online interactive software for visualizing spatial networks. PLoS ONE 18(3): e0282181. https://doi.org/10.1371/journal.pone.0282181
 
 # Load data
 
