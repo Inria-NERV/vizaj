@@ -21,6 +21,7 @@ import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForErro
 import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from 'dat.gui';
 import { hexToHsl } from "../js/color_helper";
+import { handleConfigInputChange } from "../js/import_config.js";
 
 const highlightedLinksPreviousMaterials = [];
 
@@ -66,6 +67,7 @@ const csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
 const csvNodePositionsInput = document.getElementById("csvNodePositions");
 const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
 const jsonInput = document.getElementById("jsonInput");
+const configInput = document.getElementById("configInput");
 
 //intersectedNodeList is used to check wether the mouse intersects with a sensor
 var intersectedNode;
@@ -98,6 +100,7 @@ function init() {
   csvNodePositionsInput.addEventListener("change", handleMontageCoordinatesFileSelect, false);
   csvNodeLabelsInput.addEventListener("change", handleMontageLabelsFileSelect, false);
   jsonInput.addEventListener("change", handleJsonFileSelect, false);
+  configInput.addEventListener("change", handleConfigInputChange, false);
 }
 
 function animate() {
@@ -345,6 +348,7 @@ export {
     csvNodePositionsInput,
     csvNodeLabelsInput,
     jsonInput,
+    configInput,
     emptyIntersected,
     intersectedNode as intersectedNodeList,
     onWindowResize,
