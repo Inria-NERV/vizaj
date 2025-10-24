@@ -343,7 +343,7 @@ function setupGui() {
     logsFolder.add(guiParams, 'hideLogs').name("Hide");
 
     const configFolder = gui.addFolder('Configuration');
-    configFolder.add({ exportParamsToFile }, 'exportParamsToFile').name('Export Conf');
+    configFolder.add({ exportParamsToFile }, 'exportParamsToFile').name('Export');
     configFolder.add(guiParams, 'loadConfig').name('Import');
 
 }
