@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { updateBackgroundColor } from "./add_light_and_background.js";
-import { updateBrainMeshVisibility, updateExtraItemMaterial } from "./draw_cortex.js";
+import {updateBrainMeshVisibility, updateExtraItemMaterial, updateExtraItemMesh} from "./draw_cortex.js";
 import { redrawDegreeLines, updateAllDegreeLineLength, updateAllDegreeLineVisibility } from "./draw_degree_line.js";
 import { updateAllSensorMaterial, updateAllSensorRadius } from "./draw_sensors.js";
 import { redrawLinks, updateAllLinkMaterial, updateLinkOutline, updateVisibleLinks } from "./link_builder/draw_links";
@@ -75,6 +75,7 @@ const updateSettingsFromConfig = () => {
   updateBackgroundColor();
   updateBrainMeshVisibility();
   updateExtraItemMaterial();
+  updateExtraItemMesh()
   updateVisibleLinks();
   updateAllLinkMaterial();
   updateLinkOutline();
