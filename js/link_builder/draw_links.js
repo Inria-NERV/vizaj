@@ -150,24 +150,49 @@ function ecoFiltering(density = null){
     updateVisibleLinks();
 }
 
-function updateAllLinkMaterial(){
-    colorMapCanvas.setColorMap(guiParams.linkColorMap );
+function updateAllLinkMaterial(minStrength = null, maxStrength = null){
+    colorMapCanvas.setColorMap(guiParams.linkColorMap);
     for (let linkTuple of linkMeshList){
-        updateLinkMaterial(linkTuple);
+        updateLinkMaterial(linkTuple, minStrength, maxStrength);
     }
     guiControllers.linkOpacity.updateDisplay();
 }
 
-function updateLinkMaterial(linkTuple){
+function updateLinkMaterial(linkTuple, minStrength = null, maxStrength = null){
     const mesh = linkTuple.mesh;
     mesh.material.opacity = guiParams.linkOpacity;
-    updateLinkColor(linkTuple);
+    updateLinkColor(linkTuple, minStrength, maxStrength);
 }
 
-function updateLinkColor(linkTuple){
-    const color = colorMapCanvas.getColor(linkTuple.link.strength);
+function updateLinkColor(linkTuple, minStrength = null, maxStrength = null) {
+    const strength = linkTuple.link.strength;
+    let color;
+    if (minStrength !== null && maxStrength !== null) {
+        // Normalize the link strength to the range [0, 1]
+        const normalizedStrength = (strength - minStrength) / (maxStrength - minStrength);
+        color = colorMapCanvas.getColor(normalizedStrength);
+    } else {
+        color = colorMapCanvas.getColor(strength);
+    }
     linkTuple.mesh.material.color = color;
 }
+
+function rescaleColors() {
+    // Only consider visible links for scaling
+    const visibleLinks = linkMeshList.filter(link => link.mesh.visible);
+    const strengths = visibleLinks.map(link => link.link.strength);
+    const minStrength = strengths.length ? Math.min(...strengths) : Infinity;
+    const maxStrength = strengths.length ? Math.max(...strengths) : -Infinity;
+    updateAllLinkMaterial(minStrength, maxStrength);
+
+    // Update the color map texts with new min and max values
+    const colorMapTexts = document.querySelectorAll('.colorMapText');
+    if (colorMapTexts.length >= 2) {
+        colorMapTexts[0].innerHTML = maxStrength.toFixed(2);
+        colorMapTexts[1].innerHTML = minStrength.toFixed(2);
+    }
+}
+
 
  export {
     clearAllLinks,
@@ -177,6 +202,7 @@ function updateLinkColor(linkTuple){
     colorMapCanvas,
     drawLinksAndUpdateVisibility,
     redrawLinks,
+    rescaleColors,
     updateLinkOutline,
     updateVisibleLinks,
     updateAllLinkMaterial,
