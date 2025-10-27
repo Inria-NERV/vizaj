@@ -24,6 +24,7 @@ import { export2DImage, export3Dgltf, isExporting2DImage } from './export_image'
 import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_background';
 import { ColorMapCanvas } from './link_builder/color_map_sprite';
 import { showLogs, hideLogs } from "../js/logs_helper";
+import { rescaleColors } from './link_builder/draw_links';
 import { exportParamsToFile } from './export_config';
 
 const guiParams = {
@@ -226,6 +227,7 @@ function setupGui() {
         .onChange (updateVisibleLinks)
         .step(.0001);
     linksToDisplayFolder.add(guiParams, 'ecoFiltering').name('ECO');
+    linksToDisplayFolder.add({ rescale: rescaleColors }, 'rescale').name('Rescale');
 
     const extraItemFolder = gui.addFolder('Support');
     extraItemFolder.add(guiParams, 'showExtraItem').onChange(updateBrainMeshVisibility).name('Show').listen();
