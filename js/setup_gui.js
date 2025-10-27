@@ -3,7 +3,9 @@ import { gui, controls,
     csvConnMatrixInput,
     csvNodePositionsInput,
     csvNodeLabelsInput,
-    jsonInput } from '../public/main';
+    jsonInput,
+    configInput
+} from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
 import { redrawLinks, updateLinkOutline, updateVisibleLinks, updateAllLinkMaterial, ecoFiltering } from './link_builder/draw_links';
@@ -23,12 +25,14 @@ import { updateBackgroundColor, resetBackgroundColor } from './add_light_and_bac
 import { ColorMapCanvas } from './link_builder/color_map_sprite';
 import { showLogs, hideLogs } from "../js/logs_helper";
 import { rescaleColors } from './link_builder/draw_links';
+import { exportParamsToFile } from './export_config';
 
 const guiParams = {
     loadConnectivityMatrixCsvFile: () => csvConnMatrixInput.click(),
     loadMontageCsvFile: () => {csvNodePositionsInput.click();},
     loadMontageLabelsCsvFile: () => {csvNodeLabelsInput.click();},
     loadJson: () => {jsonInput.click()},
+    loadConfig: () => {configInput.click()},
 
     autoRotateCamera: false,
     autoRotateSpeed: 2.0,
@@ -339,6 +343,11 @@ function setupGui() {
     const logsFolder = gui.addFolder('Logs');
     logsFolder.add(guiParams, 'showLogs').name("Show");
     logsFolder.add(guiParams, 'hideLogs').name("Hide");
+
+    const configFolder = gui.addFolder('Configuration');
+    configFolder.add({ exportParamsToFile }, 'exportParamsToFile').name('Export');
+    configFolder.add(guiParams, 'loadConfig').name('Import');
+
 }
 
 export {
