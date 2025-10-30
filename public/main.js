@@ -22,6 +22,11 @@ import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from 'dat.gui';
 import { hexToHsl } from "../js/color_helper";
 import { handleConfigInputChange } from "../js/import_config.js";
+import { 
+  removeSensorLabel, 
+  repositionLabelsOnCameraChange, 
+  updateHoveredSensorLabel,
+} from "../js/highlight_sensors.js";
 
 const highlightedLinksPreviousMaterials = [];
 const nodeStateMap = new Map();
@@ -63,7 +68,7 @@ const raycaster = new THREE.Raycaster();
 let gui = new GUI();
 
 document.body.appendChild(renderer.domElement);
-const sensorNameDiv = document.getElementById("sensorName");
+const hoveredSensorNameDiv = document.getElementById("hoveredSensorName");
 const csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
 const csvNodePositionsInput = document.getElementById("csvNodePositions");
 const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
@@ -112,7 +117,8 @@ function animate() {
   renderer.render(scene, camera);
   renderer.clearDepth();
   renderer.render(uiScene, uiCamera);
-  updateLabelPosition(nodeStateMap);
+  repositionLabelsOnCameraChange(nodeStateMap, camera, renderer);
+  updateHoveredSensorLabel(intersectedNode, camera, renderer);
 }
 animate();
 
@@ -137,28 +143,7 @@ function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  const padding = 15;
-  sensorNameDiv.style.top = event.clientY + padding + "px";
-  sensorNameDiv.style.left = event.clientX + padding + "px";
   hoverDisplayUpdate();
-
-}
-
-function updateLabelPosition(nodeStateMap) {
-  nodeStateMap.forEach((state, node) => {
-    if (state === 'highlighted') {
-    const vector = new THREE.Vector3();
-    node.getWorldPosition(vector);
-    vector.project(camera);
-
-    const x = (vector.x *  .5 + .5) * renderer.domElement.clientWidth;
-    const y = (vector.y * -.5 + .5) * renderer.domElement.clientHeight;
-
-    sensorNameDiv.style.top = `${y}px`;
-    sensorNameDiv.style.left = `${x}px`;
-    sensorNameDiv.innerHTML = node.name;
-    sensorNameDiv.style.visibility = 'visible';
-}});
 }
 
 function onRendererMouseDown(event) {
@@ -210,7 +195,6 @@ function onDocumentMouseClick(event) {
   }
 }
 
-
 function hoverDisplayUpdate() {
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(sensorMeshList.map(x => x.mesh));
@@ -245,15 +229,13 @@ function clearSelectedNodes() {
       node.material = sensorMaterial;
       nodeStateMap.set(node, 'normal');
     }
-    sensorNameDiv.innerHTML = "";
-    sensorNameDiv.style.visibility = 'invisible';
+    removeSensorLabel(node.uuid);
   });
   nodeStateMap.clear();
   linkMeshList.forEach(linkMesh => {
     linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, transparent: false });
   });
 }
-
 
 function updateLinkColors(node, color) {
   linkMeshList.forEach(linkMesh => {
@@ -277,8 +259,8 @@ function emptyIntersected() {
     }
   }
   intersectedNode = null;
-  sensorNameDiv.innerHTML = "";
-  sensorNameDiv.style.visibility = 'hidden';
+  hoveredSensorNameDiv.innerHTML = "";
+  hoveredSensorNameDiv.style.visibility = 'hidden';
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
     for (const linkMesh of linkMeshList
@@ -291,8 +273,8 @@ function emptyIntersected() {
 function fillIntersected() {
     intersectedNode.material = enlightenedSensorMaterial;
     intersectedNode.visible = true;
-    sensorNameDiv.innerHTML = intersectedNode.name;
-  if (sensorNameDiv.innerHTML) { sensorNameDiv.style.visibility = 'visible'; }
+    hoveredSensorNameDiv.innerHTML = intersectedNode.name;
+  if (hoveredSensorNameDiv.innerHTML) { hoveredSensorNameDiv.style.visibility = 'visible'; }
   for (const linkMesh of linkMeshList) {
     if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode) {
       highlightedLinksPreviousMaterials.push({

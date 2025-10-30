@@ -5,7 +5,7 @@
   visibility: hidden;
 }
 
-#sensorName {
+.sensorName {
     position:fixed;
     z-index: 50;
     color: white;
