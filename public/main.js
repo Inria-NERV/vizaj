@@ -20,7 +20,6 @@ import { guiParams, setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from 'dat.gui';
-import { hexToHsl } from "../js/color_helper";
 import { handleConfigInputChange } from "../js/import_config.js";
 import { 
   removeSensorLabel, 
@@ -118,9 +117,7 @@ function animate() {
   renderer.clearDepth();
   renderer.render(uiScene, uiCamera);
   repositionLabelsOnCameraChange(nodeStateMap, camera, renderer);
-  updateHoveredSensorLabel(intersectedNode, camera, renderer);
 }
-animate();
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -143,7 +140,6 @@ function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  hoverDisplayUpdate();
 }
 
 function onRendererMouseDown(event) {
@@ -154,20 +150,13 @@ function onRendererMouseDown(event) {
 function onRendererMouseUp(event) {
   mouseButtonIsDown = false;
   if (Date.now() - mouseDownDate < 500) {
-    // Effectuer la détection de clic seulement si un nœud est effectivement intersecté
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(sensorMeshList.map(x => x.mesh));
-    if (intersects.length > 0) {
-      onDocumentMouseClick(event);
-    }
+    onDocumentMouseClick(event);
   }
   updateTransformControlHistory();
 }
 
-
 function onDocumentMouseClick(event) {
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(sensorMeshList.map(x => x.mesh));
+  const intersects = getRaycastedNodes();
 
   if (intersects.length > 0) {
     const selectedNode = intersects[0].object;
@@ -196,8 +185,7 @@ function onDocumentMouseClick(event) {
 }
 
 function hoverDisplayUpdate() {
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(sensorMeshList.map(x => x.mesh));
+  const intersects = getRaycastedNodes();
 
   if (intersects.length === 0) {
     if (intersectedNode && nodeStateMap.get(intersectedNode) !== 'highlighted') {
@@ -221,6 +209,8 @@ function hoverDisplayUpdate() {
       }
     }
   }
+
+  updateHoveredSensorLabel(intersectedNode, camera, renderer);
 }
 
 function clearSelectedNodes() {
@@ -240,7 +230,6 @@ function clearSelectedNodes() {
 function updateLinkColors(node, color) {
   linkMeshList.forEach(linkMesh => {
     if (linkMesh.link.node1 === node || linkMesh.link.node2 === node) {
-      linkMesh.originalMaterial = linkMesh.mesh.material; // Sauvegarder la couleur originale
       linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: color, opacity: 1, transparent: false });
     }
   });
@@ -269,30 +258,6 @@ function emptyIntersected() {
     }
   }
 }
-
-function fillIntersected() {
-    intersectedNode.material = enlightenedSensorMaterial;
-    intersectedNode.visible = true;
-    hoveredSensorNameDiv.innerHTML = intersectedNode.name;
-  if (hoveredSensorNameDiv.innerHTML) { hoveredSensorNameDiv.style.visibility = 'visible'; }
-  for (const linkMesh of linkMeshList) {
-    if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode) {
-      highlightedLinksPreviousMaterials.push({
-        node1: linkMesh.link.node1,
-        node2: linkMesh.link.node2,
-        material: linkMesh.mesh.material
-      });
-      let color = hexToHsl(guiParams.backgroundColor).l < 50 ? new THREE.Color(1, 1, 1) : new THREE.Color(0, 0, 0);
-      linkMesh.mesh.material = new THREE.LineBasicMaterial({
-        color: color,
-        opacity: 1,
-        transparent: false
-      });
-    }
-  }
-}
-
-
 
 function getNewFileUrl(evt) {
   if (evt.target.files.length === 0) { return; }
