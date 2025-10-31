@@ -6,6 +6,7 @@ import { gui, controls,
     jsonInput,
     configInput,
     clearSelectedNodes,
+    redrawSelectedSensorLinks,
 } from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
@@ -281,7 +282,12 @@ function setupGui() {
 
 
     const colorMapFolder = linkFolder.addFolder('Color map');
-    colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial).name('Color map');
+    colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale'])
+        .onChange(() => {
+            updateAllLinkMaterial();
+            redrawSelectedSensorLinks();
+        })
+        .name('Color map');
     colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {ColorMapCanvas.show(guiParams.showColorMap)}).name('Show color bar');
 
     const linkAlignmentTargetFolder = linkFolder.addFolder('Link alignment target');

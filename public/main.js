@@ -210,6 +210,12 @@ function clearSelectedNodes() {
   updateAllLinkMaterial();
 }
 
+function redrawSelectedSensorLinks() {
+  selectedSensors.forEach((sensor) => {
+    highlightSensorLinks(sensor, linkMeshList, guiParams.backgroundColor);
+  });
+}
+
 function resetSensorLinkMaterials(sensor) {
   const associatedLinks = linkMeshList.filter((linkMesh) => linkMesh.link.node1 === sensor || linkMesh.link.node2 === sensor);
   associatedLinks.forEach(linkMesh => {
@@ -386,4 +392,5 @@ export {
     uiCamera,
     mouseButtonIsDown,
     clearSelectedNodes,
+    redrawSelectedSensorLinks,
 };
