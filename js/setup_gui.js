@@ -4,7 +4,9 @@ import { gui, controls,
     csvNodePositionsInput,
     csvNodeLabelsInput,
     jsonInput,
-    configInput
+    configInput,
+    clearSelectedNodes,
+    redrawSelectedSensorLinks,
 } from '../public/main';
 import { updateAllSensorRadius,
     updateAllSensorMaterial } from './draw_sensors';
@@ -134,8 +136,9 @@ const guiParams = {
     export3Dgltf: () => export3Dgltf(),
 
     showLogs: showLogs,
-    hideLogs: hideLogs
-    
+    hideLogs: hideLogs,
+    clearSelectedNodes: clearSelectedNodes,
+
   };
 
 const premadeLinkGeometriesList = ['Default', 'Bell', 'Triangle', 'Circle', 'Circle2', 'Rounded square', 'Peak', 'Straight'];
@@ -279,7 +282,12 @@ function setupGui() {
 
 
     const colorMapFolder = linkFolder.addFolder('Color map');
-    colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale']).onChange(updateAllLinkMaterial).name('Color map');
+    colorMapFolder.add(guiParams, 'linkColorMap', ['rainbow', 'cooltowarm', 'blackbody', 'grayscale'])
+        .onChange(() => {
+            updateAllLinkMaterial();
+            redrawSelectedSensorLinks();
+        })
+        .name('Color map');
     colorMapFolder.add(guiParams, 'showColorMap').onChange(() => {ColorMapCanvas.show(guiParams.showColorMap)}).name('Show color bar');
 
     const linkAlignmentTargetFolder = linkFolder.addFolder('Link alignment target');
@@ -348,6 +356,8 @@ function setupGui() {
     configFolder.add({ exportParamsToFile }, 'exportParamsToFile').name('Export');
     configFolder.add(guiParams, 'loadConfig').name('Import');
 
+    const resetFolder = gui.addFolder('Node/links selection');
+    resetFolder.add(guiParams, 'clearSelectedNodes').name('Reset selection');
 }
 
 export {
