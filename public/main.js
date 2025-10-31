@@ -166,6 +166,7 @@ function onDocumentMouseClick(_event) {
       // If the sensor was already selected, we un-highlight it
       clickedNode.material = sensorMaterial;
       selectedSensors.delete(clickedNode.uuid);
+      removeSensorLabel(clickedNode.uuid);
     } else {
       // Else, we highlight it
       clickedNode.material = enlightenedSensorMaterial;
