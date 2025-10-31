@@ -25,10 +25,11 @@ import {
   removeSensorLabel, 
   repositionLabelsOnCameraChange, 
   updateHoveredSensorLabel,
+  highlightSensorLinks,
 } from "../js/highlight_sensors.js";
 
 const highlightedLinksPreviousMaterials = [];
-const nodeStateMap = new Map();
+const selectedSensors = new Map();
 
 let cortexMeshUrl = require('../data/cortex_model.glb');
 let innerSkullMeshUrl = require('../data/innskull.glb');
@@ -116,7 +117,7 @@ function animate() {
   renderer.render(scene, camera);
   renderer.clearDepth();
   renderer.render(uiScene, uiCamera);
-  repositionLabelsOnCameraChange(nodeStateMap, camera, renderer);
+  repositionLabelsOnCameraChange(selectedSensors, camera, renderer);
 }
 
 function onWindowResize() {
@@ -155,31 +156,21 @@ function onRendererMouseUp(event) {
   updateTransformControlHistory();
 }
 
-function onDocumentMouseClick(event) {
+function onDocumentMouseClick(_event) {
   const intersects = getRaycastedNodes();
 
   if (intersects.length > 0) {
-    const selectedNode = intersects[0].object;
+    const clickedNode = intersects[0].object;
 
-    if (nodeStateMap.get(selectedNode) === 'highlighted') {
-      // Si le nœud est déjà surligné, on le remet à normal
-      selectedNode.material = sensorMaterial;
-      nodeStateMap.set(selectedNode, 'normal');
+    if (selectedSensors.has(clickedNode.uuid)) {
+      // If the sensor was already selected, we un-highlight it
+      clickedNode.material = sensorMaterial;
+      selectedSensors.delete(clickedNode.uuid);
     } else {
-      // Sinon, on le surligne
-      selectedNode.material = enlightenedSensorMaterial;
-      nodeStateMap.set(selectedNode, 'highlighted');
-    }
-
-    // Mise à jour des liens
-    for (const linkMesh of linkMeshList) {
-      if (linkMesh.link.node1 === selectedNode || linkMesh.link.node2 === selectedNode) {
-        if (nodeStateMap.get(selectedNode) === 'highlighted') {
-          linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 1, transparent: false });
-        } else {
-          linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: new THREE.Color(0xff0000), opacity: 1, transparent: false });
-        }
-      }
+      // Else, we highlight it
+      clickedNode.material = enlightenedSensorMaterial;
+      selectedSensors.set(clickedNode.uuid, clickedNode);
+      highlightSensorLinks(clickedNode, linkMeshList);
     }
   }
 }
@@ -188,24 +179,25 @@ function hoverDisplayUpdate() {
   const intersects = getRaycastedNodes();
 
   if (intersects.length === 0) {
-    if (intersectedNode && nodeStateMap.get(intersectedNode) !== 'highlighted') {
+    // When we're not hovering over any sensor, we un-highlight the previously hovered sensor.
+    // If the previous hovered sensor was already selected, we don't un-highlight it, to keep it selected.
+    if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
       intersectedNode.material = sensorMaterial;
       updateLinkColors(intersectedNode, 0xff0000);
-      nodeStateMap.delete(intersectedNode);
+      selectedSensors.delete(intersectedNode.uuid);
       intersectedNode = null;
     }
   } else {
     const hoveredNode = intersects[0].object;
-    if (!nodeStateMap.get(hoveredNode) || nodeStateMap.get(hoveredNode) === 'normal') {
-      if (intersectedNode && nodeStateMap.get(intersectedNode) !== 'highlighted') {
+    if (!selectedSensors.has(hoveredNode.uuid)) {
+      if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
         intersectedNode.material = sensorMaterial;
         updateLinkColors(intersectedNode, 0xff0000);
       }
       intersectedNode = hoveredNode;
-      if (nodeStateMap.get(hoveredNode) !== 'highlighted') {
+      if (!selectedSensors.has(hoveredNode.uuid)) {
         hoveredNode.material = enlightenedSensorMaterial;
         updateLinkColors(hoveredNode, 0xffffff);
-        nodeStateMap.set(hoveredNode, 'hovered');
       }
     }
   }
@@ -214,14 +206,11 @@ function hoverDisplayUpdate() {
 }
 
 function clearSelectedNodes() {
-  nodeStateMap.forEach((state, node) => {
-    if (state === 'highlighted') {
-      node.material = sensorMaterial;
-      nodeStateMap.set(node, 'normal');
-    }
-    removeSensorLabel(node.uuid);
+  selectedSensors.forEach((node, uuid) => {
+    node.material = sensorMaterial;
+    removeSensorLabel(uuid);
   });
-  nodeStateMap.clear();
+  selectedSensors.clear();
   linkMeshList.forEach(linkMesh => {
     linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, transparent: false });
   });
@@ -376,9 +365,6 @@ function connectToWebSocket() {
     socket.close();
   });
 }
-
-
-
 
 export {
     scene,

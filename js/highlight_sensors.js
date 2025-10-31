@@ -74,13 +74,12 @@ function updateHoveredSensorLabel(intersectedNode, camera, renderer) {
 /**
  * Reposition sensor labels when the camera changes.
  * If a sensor does not have a label yet, create it.
- * @param {*} nodeStateMap 
+ * @param {*} sensors - map of sensor uuids with their corresponding 3D node
  * @param {*} camera 
  * @param {*} renderer 
  */
-function repositionLabelsOnCameraChange(nodeStateMap, camera, renderer) {
-  nodeStateMap.forEach((state, node) => {
-    if (state === 'highlighted') {
+function repositionLabelsOnCameraChange(sensors, camera, renderer) {
+  sensors.forEach((node, uuid) => {
     const vector = new THREE.Vector3();
     node.getWorldPosition(vector);
     vector.project(camera);
@@ -88,17 +87,30 @@ function repositionLabelsOnCameraChange(nodeStateMap, camera, renderer) {
     const x = (vector.x *  .5 + .5) * renderer.domElement.clientWidth;
     const y = (vector.y * -.5 + .5) * renderer.domElement.clientHeight;
 
-    let labelContainer = document.getElementById("sensorName-" + node.uuid);
+    let labelContainer = document.getElementById("sensorName-" + uuid);
     if (!labelContainer) {
-        labelContainer = createSensorLabel(node.uuid);
+        labelContainer = createSensorLabel(uuid);
     }
     moveSensorLabel(labelContainer, x, y);
     renameSensorLabel(labelContainer, node.name);
-  }});
+  });
+}
+
+/**
+ * Highlight the links associated with a specific sensor node.
+ * @param {*} sensorNode 
+ * @param {*} links 
+ */
+function highlightSensorLinks(sensorNode, links) {
+    const associatedLinks = links.filter((linkMesh) => linkMesh.link.node1 === sensorNode || linkMesh.link.node2 === sensorNode);
+    for (const linkMesh of associatedLinks) {
+        linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 1, transparent: false });
+    }
 }
 
 export { 
   removeSensorLabel, 
   repositionLabelsOnCameraChange, 
   updateHoveredSensorLabel,
+  highlightSensorLinks,
 };
