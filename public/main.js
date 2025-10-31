@@ -13,7 +13,9 @@ import {
   generateLinkData,
   drawLinksAndUpdateVisibility,
   ecoFiltering,
-  loadAndDrawLinksFromUrl
+  loadAndDrawLinksFromUrl,
+  updateLinkMaterial,
+  updateAllLinkMaterial,
 } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { guiParams, setupGui } from '../js/setup_gui';
@@ -171,7 +173,7 @@ function onDocumentMouseClick(_event) {
       // Else, we highlight it
       clickedNode.material = enlightenedSensorMaterial;
       selectedSensors.set(clickedNode.uuid, clickedNode);
-      highlightSensorLinks(clickedNode, linkMeshList);
+      highlightSensorLinks(clickedNode, linkMeshList, guiParams.backgroundColor);
     }
   }
 }
@@ -179,28 +181,21 @@ function onDocumentMouseClick(_event) {
 function hoverDisplayUpdate() {
   const intersects = getRaycastedNodes();
 
-  if (intersects.length === 0) {
-    // When we're not hovering over any sensor, we un-highlight the previously hovered sensor.
-    // If the previous hovered sensor was already selected, we don't un-highlight it, to keep it selected.
-    if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
-      intersectedNode.material = sensorMaterial;
-      updateLinkColors(intersectedNode, 0xff0000);
-      selectedSensors.delete(intersectedNode.uuid);
-      intersectedNode = null;
-    }
+  // Un-highlight the previous hovered sensor (if not selected)
+  if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
+    intersectedNode.material = sensorMaterial;
+    resetSensorLinkMaterials(intersectedNode);
+  }
+
+  const hoveredNode = intersects.length > 0 ? intersects[0].object : null;
+  if (hoveredNode) {
+    // Highlight the newly hovered sensor
+    intersectedNode = hoveredNode;
+    intersectedNode.material = enlightenedSensorMaterial;
+    highlightSensorLinks(intersectedNode, linkMeshList, guiParams.backgroundColor);
   } else {
-    const hoveredNode = intersects[0].object;
-    if (!selectedSensors.has(hoveredNode.uuid)) {
-      if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
-        intersectedNode.material = sensorMaterial;
-        updateLinkColors(intersectedNode, 0xff0000);
-      }
-      intersectedNode = hoveredNode;
-      if (!selectedSensors.has(hoveredNode.uuid)) {
-        hoveredNode.material = enlightenedSensorMaterial;
-        updateLinkColors(hoveredNode, 0xffffff);
-      }
-    }
+    // No sensor is hovered anymore
+    intersectedNode = null;
   }
 
   updateHoveredSensorLabel(intersectedNode, camera, renderer);
@@ -212,16 +207,13 @@ function clearSelectedNodes() {
     removeSensorLabel(uuid);
   });
   selectedSensors.clear();
-  linkMeshList.forEach(linkMesh => {
-    linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xff0000, opacity: 1, transparent: false });
-  });
+  updateAllLinkMaterial();
 }
 
-function updateLinkColors(node, color) {
-  linkMeshList.forEach(linkMesh => {
-    if (linkMesh.link.node1 === node || linkMesh.link.node2 === node) {
-      linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: color, opacity: 1, transparent: false });
-    }
+function resetSensorLinkMaterials(sensor) {
+  const associatedLinks = linkMeshList.filter((linkMesh) => linkMesh.link.node1 === sensor || linkMesh.link.node2 === sensor);
+  associatedLinks.forEach(linkMesh => {
+    updateLinkMaterial(linkMesh);
   });
 }
 

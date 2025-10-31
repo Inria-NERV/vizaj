@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { hexToHsl } from "../js/color_helper";
 
 /**
  * Create a DOM element to display the sensor label
@@ -100,11 +101,17 @@ function repositionLabelsOnCameraChange(sensors, camera, renderer) {
  * Highlight the links associated with a specific sensor node.
  * @param {*} sensorNode 
  * @param {*} links 
+ * @param {*} backgroundColor 3D scene background color in hex format
  */
-function highlightSensorLinks(sensorNode, links) {
+function highlightSensorLinks(sensorNode, links, backgroundColor) {
     const associatedLinks = links.filter((linkMesh) => linkMesh.link.node1 === sensorNode || linkMesh.link.node2 === sensorNode);
     for (const linkMesh of associatedLinks) {
-        linkMesh.mesh.material = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 1, transparent: false });
+        let color = hexToHsl(backgroundColor).l < 50 ? new THREE.Color(1,1,1) : new THREE.Color(0,0,0);
+        linkMesh.mesh.material = new THREE.LineBasicMaterial({
+            color,
+            opacity: 1,
+            transparent: false
+        });
     }
 }
 
