@@ -13,17 +13,25 @@ import {
   generateLinkData,
   drawLinksAndUpdateVisibility,
   ecoFiltering,
-  loadAndDrawLinksFromUrl
+  loadAndDrawLinksFromUrl,
+  updateLinkMaterial,
+  updateAllLinkMaterial,
 } from "../js/link_builder/draw_links";
 import { setupCamera } from '../js/setup_camera';
 import { guiParams, setupGui } from '../js/setup_gui';
 import { loadJsonData, jsonLoadingNodeCheckForError, jsonLoadingEdgeCheckForError } from "../js/load_data";
 import { userLogError, userLogMessage } from "../js/logs_helper";
 import { GUI } from 'dat.gui';
-import { hexToHsl } from "../js/color_helper";
 import { handleConfigInputChange } from "../js/import_config.js";
+import { 
+  removeSensorLabel, 
+  repositionLabelsOnCameraChange, 
+  updateHoveredSensorLabel,
+  highlightSensorLinks,
+} from "../js/highlight_sensors.js";
 
 const highlightedLinksPreviousMaterials = [];
+const selectedSensors = new Map();
 
 let cortexMeshUrl = require('../data/cortex_model.glb');
 let innerSkullMeshUrl = require('../data/innskull.glb');
@@ -62,7 +70,7 @@ const raycaster = new THREE.Raycaster();
 let gui = new GUI();
 
 document.body.appendChild(renderer.domElement);
-const sensorNameDiv = document.getElementById("sensorName");
+const hoveredSensorNameDiv = document.getElementById("hoveredSensorName");
 const csvConnMatrixInput = document.getElementById("csvConnMatrixInput");
 const csvNodePositionsInput = document.getElementById("csvNodePositions");
 const csvNodeLabelsInput = document.getElementById("csvNodeLabels");
@@ -111,6 +119,7 @@ function animate() {
   renderer.render(scene, camera);
   renderer.clearDepth();
   renderer.render(uiScene, uiCamera);
+  repositionLabelsOnCameraChange(selectedSensors, camera, renderer);
 }
 
 function onWindowResize() {
@@ -134,84 +143,111 @@ function onDocumentMouseMove(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  const padding = 15;
-  sensorNameDiv.style.top = event.clientY + padding + "px";
-  sensorNameDiv.style.left = event.clientX + padding + "px";
 }
 
-function onRendererMouseDown(event){
-  mouseButtonIsDown=true;
+function onRendererMouseDown(event) {
+  mouseButtonIsDown = true;
   mouseDownDate = Date.now();
 }
 
-function onRendererMouseUp(event){
+function onRendererMouseUp(event) {
   mouseButtonIsDown = false;
-  if (Date.now() - mouseDownDate < 500){
+  if (Date.now() - mouseDownDate < 500) {
     onDocumentMouseClick(event);
   }
   updateTransformControlHistory();
 }
 
-function onDocumentMouseClick(event){
+function onDocumentMouseClick(_event) {
+  const intersects = getRaycastedNodes();
 
+  if (intersects.length > 0) {
+    const clickedNode = intersects[0].object;
+
+    if (selectedSensors.has(clickedNode.uuid)) {
+      // If the sensor was already selected, we un-highlight it
+      clickedNode.material = sensorMaterial;
+      selectedSensors.delete(clickedNode.uuid);
+      removeSensorLabel(clickedNode.uuid);
+    } else {
+      // Else, we highlight it
+      clickedNode.material = enlightenedSensorMaterial;
+      selectedSensors.set(clickedNode.uuid, clickedNode);
+      highlightSensorLinks(clickedNode, linkMeshList, guiParams.backgroundColor);
+    }
+  }
 }
 
 function hoverDisplayUpdate() {
   const intersects = getRaycastedNodes();
-  emptyIntersected();
-  if (intersects.length) {
-    intersectedNode = intersects[0].object;
-    fillIntersected();
+
+  // Un-highlight the previous hovered sensor (if not selected)
+  if (intersectedNode && !selectedSensors.has(intersectedNode.uuid)) {
+    intersectedNode.material = sensorMaterial;
+    resetSensorLinkMaterials(intersectedNode);
   }
+
+  const hoveredNode = intersects.length > 0 ? intersects[0].object : null;
+  if (hoveredNode) {
+    // Highlight the newly hovered sensor
+    intersectedNode = hoveredNode;
+    intersectedNode.material = enlightenedSensorMaterial;
+    highlightSensorLinks(intersectedNode, linkMeshList, guiParams.backgroundColor);
+  } else {
+    // No sensor is hovered anymore
+    intersectedNode = null;
+  }
+
+  updateHoveredSensorLabel(intersectedNode, camera, renderer);
 }
 
-function getRaycastedNodes(){
+function clearSelectedNodes() {
+  selectedSensors.forEach((node, uuid) => {
+    node.material = sensorMaterial;
+    removeSensorLabel(uuid);
+  });
+  selectedSensors.clear();
+  updateAllLinkMaterial();
+}
+
+function redrawSelectedSensorLinks() {
+  selectedSensors.forEach((sensor) => {
+    highlightSensorLinks(sensor, linkMeshList, guiParams.backgroundColor);
+  });
+}
+
+function resetSensorLinkMaterials(sensor) {
+  const associatedLinks = linkMeshList.filter((linkMesh) => linkMesh.link.node1 === sensor || linkMesh.link.node2 === sensor);
+  associatedLinks.forEach(linkMesh => {
+    updateLinkMaterial(linkMesh);
+  });
+}
+
+function getRaycastedNodes() {
   raycaster.setFromCamera(mouse, camera);
-  return raycaster.intersectObjects(sensorMeshList.map(x=>x.mesh));
+  return raycaster.intersectObjects(sensorMeshList.map(x => x.mesh));
 }
 
 function emptyIntersected() {
   if (intersectedNode) {
     intersectedNode.material = sensorMaterial;
-    if (guiParams.sensorOpacity == 0){
+    if (guiParams.sensorOpacity == 0) {
       intersectedNode.visible = true;
     }
   }
   intersectedNode = null;
-  sensorNameDiv.innerHTML = "";
-  sensorNameDiv.style.visibility = 'hidden';
+  hoveredSensorNameDiv.innerHTML = "";
+  hoveredSensorNameDiv.style.visibility = 'hidden';
   while (highlightedLinksPreviousMaterials.length > 0) {
     const elem = highlightedLinksPreviousMaterials.shift();
     for (const linkMesh of linkMeshList
-      .filter((linkMesh) => linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2)){
+      .filter((linkMesh) => linkMesh.link.node1 === elem.node1 && linkMesh.link.node2 === elem.node2)) {
       linkMesh.mesh.material = elem.material;
     }
   }
 }
 
-function fillIntersected() {
-  intersectedNode.material = enlightenedSensorMaterial;
-  intersectedNode.visible = true;
-  sensorNameDiv.innerHTML = intersectedNode.name;
-  if (sensorNameDiv.innerHTML){sensorNameDiv.style.visibility = 'visible';}
-  for (const linkMesh of linkMeshList){
-    if (linkMesh.link.node1 === intersectedNode || linkMesh.link.node2 === intersectedNode)
-    {
-      highlightedLinksPreviousMaterials.push({
-        node1: linkMesh.link.node1,
-        node2: linkMesh.link.node2,
-        material: linkMesh.mesh.material});
-      let color = hexToHsl(guiParams.backgroundColor).l < 50 ? new THREE.Color(1,1,1) : new THREE.Color(0,0,0);
-      linkMesh.mesh.material = new THREE.LineBasicMaterial({
-        color : color,
-        opacity: 1,
-        transparent: false
-      });
-    }
-  }
-}
-
-function getNewFileUrl(evt){
+function getNewFileUrl(evt) {
   if (evt.target.files.length === 0) { return; }
   const file = evt.target.files[0];
   return window.URL.createObjectURL(file);
@@ -221,9 +257,9 @@ function handleConnectivityMatrixFileSelect(evt) {
   const fileUrl = getNewFileUrl(evt);
   const fileName = evt.target.files[0].name;
   loadAndDrawLinksFromUrl(fileUrl).then(
-      ()=>{ userLogMessage("Connectivity matrix file " + fileName + "succesfully loaded.", "green")},
-        (e) => userLogError(e, fileName)
-    );
+    () => { userLogMessage("Connectivity matrix file " + fileName + "succesfully loaded.", "green") },
+    (e) => userLogError(e, fileName)
+  );
 }
 
 function handleMontageCoordinatesFileSelect(evt) {
@@ -231,7 +267,7 @@ function handleMontageCoordinatesFileSelect(evt) {
   const fileName = evt.target.files[0].name;
   clearLoadAndDrawSensors(sensorCoordinatesUrl)
     .then(() => userLogMessage("Coordinates file " + fileName + " succesfully loaded.", "green"),
-      (e)=>userLogError(e, fileName)
+      (e) => userLogError(e, fileName)
     );
 }
 
@@ -240,32 +276,32 @@ function handleMontageLabelsFileSelect(evt) {
   const fileName = evt.target.files[0].name;
   loadAndAssignSensorLabels(sensorLabelsUrl)
     .then(() => userLogMessage("Labels file " + fileName + " succesfully loaded.", "green"),
-      (e)=>userLogError(e, fileName)
+      (e) => userLogError(e, fileName)
     );
 }
 
-async function handleJsonFileSelect(evt){
+async function handleJsonFileSelect(evt) {
   const jsonUrl = getNewFileUrl(evt);
   const fileName = evt.target.files[0].name;
-  try{
+  try {
     const jsonData = await loadJsonData(jsonUrl);
-    if (!jsonData.graph){
+    if (!jsonData.graph) {
       throw new TypeError("Graph attribute is missing.");
     }
-    if (!jsonData.graph.nodes){
+    if (!jsonData.graph.nodes) {
       throw new TypeError("No nodes folder.");
     }
-    if (!jsonData.graph.edges){
+    if (!jsonData.graph.edges) {
       throw new TypeError("No edges folder.");
     }
 
     const graph = jsonData.graph;
-    const coordinatesList  = [];
+    const coordinatesList = [];
     const labelList = [];
     const linkList = [];
     const sensorIdMap = new Map();
     let i = 0;
-    for (const [key, value] of Object.entries(graph.nodes)){
+    for (const [key, value] of Object.entries(graph.nodes)) {
       jsonLoadingNodeCheckForError(key, value, i, sensorIdMap);
       i++;
       coordinatesList.push([parseFloat(value.position.x), parseFloat(value.position.y), parseFloat(value.position.z)]);
@@ -275,8 +311,8 @@ async function handleJsonFileSelect(evt){
       sensorIdMap.set(value.id.toString(), labelList.length - 1);
     }
 
-    i=0;
-    for (const [key, value] of Object.entries(graph.edges)){
+    i = 0;
+    for (const [key, value] of Object.entries(graph.edges)) {
       jsonLoadingEdgeCheckForError(key, value, i, coordinatesList.length, sensorIdMap);
       i++;
     }
@@ -287,12 +323,12 @@ async function handleJsonFileSelect(evt){
     await drawSensorsAndUpdateGlobalValues(coordinatesList);
     assignSensorLabels(labelList);
 
-    for (const [key, value] of Object.entries(graph.edges)){
+    for (const [key, value] of Object.entries(graph.edges)) {
       if (value.strength != 0 && value.strength)
-      linkList.push(generateLinkData(
-        sensorIdMap.get(value.source.toString()),
-        sensorIdMap.get(value.target.toString()),
-        value.strength));
+        linkList.push(generateLinkData(
+          sensorIdMap.get(value.source.toString()),
+          sensorIdMap.get(value.target.toString()),
+          value.strength));
     }
 
     await drawLinksAndUpdateVisibility(linkList);
@@ -300,7 +336,7 @@ async function handleJsonFileSelect(evt){
 
     userLogMessage('Json file ' + fileName + ' succesfully loaded.', 'green');
   }
-  catch(e){
+  catch (e) {
     userLogError(e, fileName);
 
   }
@@ -354,5 +390,7 @@ export {
     onWindowResize,
     uiScene,
     uiCamera,
-    mouseButtonIsDown
+    mouseButtonIsDown,
+    clearSelectedNodes,
+    redrawSelectedSensorLinks,
 };

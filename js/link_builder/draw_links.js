@@ -206,4 +206,6 @@ function rescaleColors() {
     updateLinkOutline,
     updateVisibleLinks,
     updateAllLinkMaterial,
-    ecoFiltering}
+    updateLinkMaterial,
+    ecoFiltering
+ };
