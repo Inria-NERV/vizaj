@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <title>Vizaj</title>
-  <link rel="stylesheet" href="main.c8ba154c.css">
+  <link rel="stylesheet" href="main.efbccca3.css" type="text/css">
   <link rel="icon" href="favicon.c2dfaf54.ico">
   <meta name="viewport" content="width=device-width, initial-scale=0">
 </head>
@@ -13,12 +13,15 @@
   <input type="file" id="csvNodePositions" class="fileInput" accept=".csv">
   <input type="file" id="csvNodeLabels" class="fileInput" accept=".csv">
   <input type="file" id="jsonInput" class="fileInput" accept="application/JSON">
+  <input type="file" id="configInput" class="fileInput" accept="application/JSON">
   <div id="colorMap">
     <div id="colorMapTopValue"></div>
     <canvas id="colorBar"></canvas></div>
     <div id="colorMapBottomValue"></div>
   
-  <div id="sensorName"></div>
-  <script src="main.7694ded8.js"></script>
+  <div id="sensorNameContainer">
+    <div id="hoveredSensorName" class="sensorName"></div>
+  </div>
+  <script src="main.156b249f.js"></script>
 </body>
 </html>
