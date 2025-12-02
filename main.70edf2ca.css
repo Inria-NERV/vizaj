@@ -1,0 +1,87 @@
+
+
+.fileInput {
+  position:fixed;
+  visibility: hidden;
+}
+
+.sensorName {
+    position:fixed;
+    z-index: 50;
+    color: white;
+    background-color: rgba(0,0,0,.5);
+    border-radius: 10px;
+    padding-top: 2px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 2px;
+    font-family:'Trebuchet MS'; 
+    font-size:23px;
+    visibility: hidden;
+  }
+
+.colorMapText{
+  color: white;
+  font-family: 'Trebuchet MS';
+  font-weight: lighter;
+  font-size: 1.5vmax;
+  text-align: center;
+}
+
+#colorBar {
+  height: 100%;
+  width: 100%;
+  margin-top: .5vmax;
+  margin-bottom: .5vmax;
+  margin-left: .35vmax;
+}
+
+#colorMap {
+    top: 60%;
+    bottom: 20%;
+    left: 3%;
+    right: 95%;
+    z-index:100;
+    position: absolute;
+    visibility: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  
+#logs {
+  position: absolute;
+  z-index: 150;
+  width: 40%;
+  height: 50%;
+  overflow: hidden;
+}
+
+#logs > .log {
+  background-color: black;
+  color: white;
+  font-family: Monospace;
+  animation-name: logAnim;
+  animation-duration: 15s;
+  visibility:hidden;
+}
+
+@keyframes logAnim {
+  0% {
+    background-color: white;
+    visibility: visible;
+  }
+  5% {
+    background-color: black;
+  }
+}
+
+.notransition {
+  animation-name: none !important;
+  animation-duration: none !important;
+}
+  
+body {
+  margin: 0;
+}
+
+/*# sourceMappingURL=/main.70edf2ca.css.map */
